@@ -106,6 +106,6 @@ DATASTORE_ACCESS_TOKEN = os.environ["DATASTORE_ACCESS_TOKEN"]
 DATASTORE_URL = os.environ["DATASTORE_URL"]
 
 try:
-    from local_settings import *
+    from oeem_client.local_settings import *
 except ImportError:
     pass
