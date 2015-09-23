@@ -2,5 +2,9 @@
 
 .ipynb_checkpoints/
 
+.DS_Store
 
+
+# Client Specific Stuff
 demo_settings.py
+client_logos/

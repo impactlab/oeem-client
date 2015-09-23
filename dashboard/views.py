@@ -58,10 +58,10 @@ class ProjectBlockIndexView(TemplateView):
         client_slug = kwargs['client_slug']
         context['client_slug'] = client_slug
         if client_slug in DEMO_CLIENTS:
-            context['logo'] = DEMO_CLIENTS[client_slug]['logo']
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
             context['client_name'] = DEMO_CLIENTS[client_slug]['name']
         else:
-            context['logo'] = DEMO_CLIENTS['default']['logo']
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
             context['client_name'] = DEMO_CLIENTS['default']['name']
 
 
