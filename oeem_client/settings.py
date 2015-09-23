@@ -100,9 +100,12 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ( os.path.join(BASE_DIR,'staticfiles'),)
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 # OAUTH connection to datastore
 DATASTORE_ACCESS_TOKEN = os.environ["DATASTORE_ACCESS_TOKEN"]
 
 DATASTORE_URL = os.environ["DATASTORE_URL"]
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
