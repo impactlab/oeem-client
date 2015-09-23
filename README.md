@@ -26,7 +26,6 @@ We recommend using virtualenv to manage python packages
 #### Create the database (and optionally the eemeter weather cache database)
 
     createdb oeem_client
-    createdb eemeter_weather_cache # optional
 
 #### Define the following environment variables
 
@@ -34,7 +33,6 @@ We recommend using virtualenv to manage python packages
     export DATABASE_URL=postgres://:@localhost:5432/oeem_client
     export DEBUG=true
     export SECRET_KEY=############################
-    export EEMETER_WEATHER_CACHE_DATABASE_URL=postgres://:@localhost:5432/eemeter_weather_cache
     export DATASTORE_ACCESS_TOKEN=#####################
     export DATASTORE_URL=https://############
 
