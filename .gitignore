@@ -4,6 +4,7 @@
 
 .DS_Store
 
+local_settings.py
 
 # Client Specific Stuff
 demo_settings.py
