@@ -49,7 +49,7 @@ def create_project_block(data):
     return project_block
 
 class ProjectBlockIndexView(TemplateView):
-    template_name = "dashboard/index_view.html"
+    template_name = "dashboard/project_block_index.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockIndexView, self).get_context_data(**kwargs)
@@ -76,7 +76,7 @@ class ProjectBlockIndexView(TemplateView):
         return project_blocks
 
 class ProjectBlockDetailView(TemplateView):
-    template_name = "dashboard/detail_view.html"
+    template_name = "dashboard/project_block_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockDetailView, self).get_context_data(**kwargs)
@@ -332,3 +332,24 @@ class ProjectBlockDetailView(TemplateView):
             'latlongs': latlongs,
         }
         return map_data
+
+
+class ProjectDetailView(TemplateView):
+    template_name = "dashboard/project_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDetailView, self).get_context_data(**kwargs)
+        
+        project_id = kwargs['project_id']
+
+        client_slug = kwargs['client_slug']
+        context['client_slug'] = client_slug
+        if client_slug in DEMO_CLIENTS:
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
+            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
+        else:
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
+            context['client_name'] = DEMO_CLIENTS['default']['name']
+
+
+        return context
