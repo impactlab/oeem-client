@@ -3,6 +3,7 @@ from django.http import Http404
 
 from oeem_client.settings import DATASTORE_ACCESS_TOKEN
 from oeem_client.settings import DATASTORE_URL
+from oeem_client.demo_settings import DEMO_CLIENTS
 
 import requests
 import numpy as np
@@ -53,6 +54,17 @@ class ProjectBlockIndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockIndexView, self).get_context_data(**kwargs)
         context['project_blocks'] = self.get_project_blocks()
+        
+        client_slug = kwargs['client_slug']
+        context['client_slug'] = client_slug
+        if client_slug in DEMO_CLIENTS:
+            context['logo'] = DEMO_CLIENTS[client_slug]['logo']
+            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
+        else:
+            context['logo'] = DEMO_CLIENTS['default']['logo']
+            context['client_name'] = DEMO_CLIENTS['default']['name']
+
+
         return context
 
     def get_project_blocks(self):
