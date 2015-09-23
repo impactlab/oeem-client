@@ -1,0 +1,8 @@
+DEMO_CLIENTS = {
+	'default': {
+		'name': 'Utility X',
+		'logo': 'eemeter.png',
+	},
+	
+	# add additional clients here
+}
