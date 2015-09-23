@@ -90,6 +90,15 @@ class ProjectBlockDetailView(TemplateView):
         context["map_data"] = self.get_map_data(projects)
         context["all_savings_data"] = self.get_savings_data(projects)
 
+        client_slug = kwargs['client_slug']
+        context['client_slug'] = client_slug
+        if client_slug in DEMO_CLIENTS:
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
+            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
+        else:
+            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
+            context['client_name'] = DEMO_CLIENTS['default']['name']        
+
         return context
 
     def get_project_block(self, pk):
