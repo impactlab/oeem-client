@@ -340,7 +340,9 @@ class ProjectDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         
-        project_id = kwargs['project_id']
+        project = self.get_project(kwargs['pk'])
+
+        context["all_savings_data"] = self.get_savings_data(project)
 
         client_slug = kwargs['client_slug']
         context['client_slug'] = client_slug
@@ -351,5 +353,180 @@ class ProjectDetailView(TemplateView):
             context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
             context['client_name'] = DEMO_CLIENTS['default']['name']
 
-
         return context
+
+    def get_project(self, pk):
+        response = datastore_get("/datastore/project/{}/".format(pk))
+        if response.status_code == 200:
+            project_data = response.json()
+            meter_runs = self.get_meter_runs(project_data["recent_meter_runs"])
+            project = Project(
+                    project_id=project_data["project_id"],
+                    meter_runs=meter_runs,
+                    baseline_period_start=project_data["baseline_period_start"],
+                    baseline_period_end=project_data["baseline_period_end"],
+                    reporting_period_start=project_data["reporting_period_start"],
+                    reporting_period_end=project_data["reporting_period_end"],
+                    )
+            return project
+        else:
+            raise Http404("Project does not exist")
+
+    def get_consumptions(self, pk):
+        response = datastore_get("datastore/consumption/?project_id={}".format(pk))
+        if response.status_code == 200:
+            print "yay"
+            consumptions = response.json()
+            return consumptions
+        else:
+            raise Http404("Consumptions do not exist")
+
+    def get_savings_data(self, project):
+        fuel_type_icons = {
+                "E": "fa-lightbulb-o",
+                "NG": "fa-lightbulb-o",
+                }
+        fuel_type_names = {
+                "E": "Electricity",
+                "NG": "Natural Gas",
+                }
+        fuel_type_slugs = {
+                "E": "electricity",
+                "NG": "natural-gas",
+                }
+        fuel_type_units = {
+                "E": "kWh",
+                "NG": "therms",
+                }
+
+        meter_runs_by_fuel_type = defaultdict(list)
+        for meter_run in project.meter_runs:
+            meter_run_data = (meter_run, project.reporting_period_start)
+            meter_runs_by_fuel_type[meter_run.fuel_type].append(meter_run_data)
+
+        data = []
+        for fuel_type in ["E", "NG"]:
+            name = fuel_type_names[fuel_type]
+            slug = fuel_type_slugs[fuel_type]
+            icon = fuel_type_icons[fuel_type]
+            unit = fuel_type_units[fuel_type]
+
+            meter_runs = meter_runs_by_fuel_type[fuel_type]
+
+            total_gross_savings = self.get_total_gross_savings(meter_runs)
+            total_annual_savings = self.get_total_annual_savings(meter_runs)
+
+            usage_data = self.get_monthly_gross_usage(meter_runs)
+
+
+            energy_type_data = {
+                "energy_type": name,
+                "energy_type_slug": slug,
+                "icon": icon,
+                "unit": unit,
+                "usage_data": usage_data,
+                "total_gross_savings": total_gross_savings,
+                "total_annual_savings": total_annual_savings,
+            }
+            data.append(energy_type_data)
+        return data
+
+    def get_meter_runs(self, meter_run_ids):
+        meter_runs = []
+        for meter_run_id in meter_run_ids:
+            response = datastore_get("/datastore/meter_run_monthly/{}/".format(meter_run_id))
+            if response.status_code == 200:
+                meter_run_data = response.json()
+                meter_run = MeterRun(
+                        fuel_type=meter_run_data["fuel_type"],
+                        annual_usage_baseline=meter_run_data["annual_usage_baseline"],
+                        annual_usage_reporting=meter_run_data["annual_usage_reporting"],
+                        annual_savings=meter_run_data["annual_savings"],
+                        gross_savings=meter_run_data["gross_savings"],
+                        baseline_monthly_averages=meter_run_data["monthlyaverageusagebaseline_set"],
+                        reporting_monthly_averages=meter_run_data["monthlyaverageusagereporting_set"],
+                        )
+                meter_runs.append(meter_run)
+            else:
+                #raise Http404("MeterRun does not exist")
+                pass
+        return meter_runs
+
+    def get_total_gross_savings(self, meter_runs):
+        savings = []
+        for meter_run, _ in meter_runs:
+            savings.append(meter_run.gross_savings)
+        return np.nansum(savings)
+
+    def get_total_annual_savings(self, meter_runs):
+        savings = []
+        for meter_run, _ in meter_runs:
+            savings.append(meter_run.annual_savings)
+        return np.nansum(savings)
+
+    def get_monthly_gross_usage(self, meter_runs):
+
+        baseline_grouped_by_month = defaultdict(list)
+        reporting_grouped_by_month = defaultdict(list)
+        for meter_run, reporting_period_start in meter_runs:
+
+            # assumes same ordering of baseline and reporting data
+            for baseline_data, reporting_data in zip(meter_run.baseline_monthly_averages, meter_run.reporting_monthly_averages):
+
+                # always add baseline periods
+                baseline_grouped_by_month[baseline_data["date"]].append(baseline_data["value"])
+
+                # add reporting periods if in reporting period, otherwise add baseline.
+                # strings, but this comparison works because they're iso
+                if reporting_data["date"] > reporting_period_start:
+                    reporting_grouped_by_month[reporting_data["date"]].append(reporting_data["value"])
+                else:
+                    reporting_grouped_by_month[baseline_data["date"]].append(baseline_data["value"])
+
+        month_labels = sorted(baseline_grouped_by_month.keys())
+
+        x_labels = []
+        series_baseline = []
+        series_reporting = []
+        actual_start_ix = 0
+        for i, month_label in enumerate(month_labels):
+
+            _, n_days_per_month = monthrange(int(month_label[:4]), int(month_label[5:7]))
+
+            # sum baseline usage and convert to month gross
+            if baseline_grouped_by_month[month_label] == []:
+                baseline_usage = None
+            else:
+                baseline_usage = np.nansum(baseline_grouped_by_month[month_label]) * n_days_per_month
+
+            # sum reporting usage and convert to month gross
+            if reporting_grouped_by_month[month_label] == []:
+                reporting_usage = None
+            else:
+                reporting_usage = np.nansum(reporting_grouped_by_month[month_label]) * n_days_per_month
+
+            # only include if really necessary
+            if abs(baseline_usage - reporting_usage) > 1e-6:
+                x_labels.append(month_label[:7])
+                series_baseline.append(baseline_usage)
+                series_reporting.append(reporting_usage)
+
+        return self.get_usage_data(x_labels, series_baseline, series_reporting)
+
+    def get_usage_data(self, x_labels, series_baseline, series_reporting):
+        usage_data = {
+            "xlabels": x_labels,
+            "series_baseline": {
+                "errors": [],
+                "values": series_baseline,
+                },
+            "series_actual": {
+                "errors": [],
+                "values": series_reporting,
+                },
+            "actual_start_idx": 0,
+        }
+        return json.dumps(usage_data)
+
+
+
