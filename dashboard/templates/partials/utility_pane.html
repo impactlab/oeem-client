@@ -52,6 +52,7 @@
 <div class="container-fluid">
 	<div class="row-fluid">
 
+    {% if savings_data.gross_savings_hist_data %}
     <div class="col-sm-6">
       <div id="{{ savings_data.energy_type_slug }}-gross-savings-histogram">
       	Histogram
@@ -75,7 +76,9 @@
       });
 
     </script>
+    {% endif %}
 
+    {% if savings_data.annual_savings_hist_data %}
     <div class="col-sm-6">
       <div id="{{ savings_data.energy_type_slug }}-annual-savings-histogram">
       	Histogram
@@ -99,6 +102,7 @@
       });
 
     </script>
+    {% endif %}
 
   </div>
 
