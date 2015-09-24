@@ -342,6 +342,8 @@ class ProjectDetailView(TemplateView):
         
         project = self.get_project(kwargs['pk'])
 
+        context['project_id'] = project[0][:8]
+
         context["all_savings_data"] = self.get_savings_data(project)
 
         context["map_data"] = {
