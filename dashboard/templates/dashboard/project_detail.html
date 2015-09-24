@@ -36,7 +36,7 @@
               {% for savings_data in all_savings_data %}
               <a href="javascript://" class="energy-pane-select"
                 target-pane="#pane-{{ savings_data.energy_type_slug }}, #pane-summary-{{ savings_data.energy_type_slug }}">
-                <i class="fa {{ savings_data.icon }} fa-lg"></i> ENERGY TYPE
+                <i class="fa {{ savings_data.icon }} fa-lg"></i> {{ savings_data.energy_type }}
               </a>
               {% endfor %}
             </div>
@@ -67,7 +67,7 @@ $(document).ready(function () {
 
   // ****************** MAP ***************
   // create map
-  var map = L.map('map', {scrollWheelZoom:false}).setView([{{ map_data.center_lat }},{{ map_data.center_long }}], {{ map_data.zoom }});
+  var map = L.map('map', {scrollWheelZoom:false}).setView( {{map_data.latlong}}, {{ map_data.zoom }});
   L.tileLayer(
       'https://{s}.tiles.mapbox.com/v3/cathyd125.k6ock5a1/{z}/{x}/{y}.png',
       {
@@ -78,16 +78,13 @@ $(document).ready(function () {
     .addTo(map);
 
   // adding dots to map
-  var locations = {{ map_data.latlongs | safe}};
-  for (var i = 0; i < locations.length; i++) {
-    jitterx = (Math.random() - .5)/50;
-    jittery = (Math.random() - .5)/50;
-    marker = new L.circleMarker(
-          [locations[i][0] + jitterx,locations[i][1] + jittery],
+  var location = {{ map_data.latlong | safe}};
+  marker = new L.circleMarker(
+          location,
           {color: "#00b16a"})
-      .setRadius(1)
+      .setRadius(10)
       .addTo(map);
-  }
+  
 
   // ********* PAGE NAVIGATION ************
   // show first energy type on page load

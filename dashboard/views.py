@@ -344,6 +344,11 @@ class ProjectDetailView(TemplateView):
 
         context["all_savings_data"] = self.get_savings_data(project)
 
+        context["map_data"] = {
+            'latlong': [40.0096836, -82.9700032],
+            'zoom': 10,
+        }
+
         client_slug = kwargs['client_slug']
         context['client_slug'] = client_slug
         if client_slug in DEMO_CLIENTS:
