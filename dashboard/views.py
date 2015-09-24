@@ -382,7 +382,6 @@ class ProjectDetailView(TemplateView):
     def get_consumptions(self, pk):
         response = datastore_get("datastore/consumption/?project_id={}".format(pk))
         if response.status_code == 200:
-            print "yay"
             consumptions = response.json()
             return consumptions
         else:
