@@ -105,6 +105,13 @@ DATASTORE_ACCESS_TOKEN = os.environ["DATASTORE_ACCESS_TOKEN"]
 
 DATASTORE_URL = os.environ["DATASTORE_URL"]
 
+# can be overridden in local_settings
+CLIENT_SETTINGS = {
+    'name': 'Demo',
+    'slug': 'demo',
+    'logo': 'eemeter.png',
+}
+
 try:
     from oeem_client.local_settings import *
 except ImportError:

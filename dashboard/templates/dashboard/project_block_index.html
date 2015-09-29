@@ -20,7 +20,7 @@
       <h2>Project Blocks</h2>
       <ul>
         {% for project_block in project_blocks %}
-        <li><a href="{% url 'dashboard:project_block_detail' client_slug project_block.id %}">{{ project_block.name }}</a></li>
+        <li><a href="{% url 'dashboard:project_block_detail' project_block.id %}">{{ project_block.name }}</a></li>
         {% endfor %}
       </ul>
     </div>
