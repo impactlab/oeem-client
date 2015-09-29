@@ -3,7 +3,7 @@ from django.http import Http404
 
 from oeem_client.settings import DATASTORE_ACCESS_TOKEN
 from oeem_client.settings import DATASTORE_URL
-from oeem_client.demo_settings import DEMO_CLIENTS
+from oeem_client.settings import CLIENT_SETTINGS
 
 import requests
 import numpy as np
@@ -54,16 +54,9 @@ class ProjectBlockIndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockIndexView, self).get_context_data(**kwargs)
         context['project_blocks'] = self.get_project_blocks()
-        
-        client_slug = kwargs['client_slug']
-        context['client_slug'] = client_slug
-        if client_slug in DEMO_CLIENTS:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
-            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
-        else:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
-            context['client_name'] = DEMO_CLIENTS['default']['name']
 
+        context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
+        context['client_name'] = CLIENT_SETTINGS['name']
 
         return context
 
@@ -90,14 +83,8 @@ class ProjectBlockDetailView(TemplateView):
         context["map_data"] = self.get_map_data(projects)
         context["all_savings_data"] = self.get_savings_data(projects)
 
-        client_slug = kwargs['client_slug']
-        context['client_slug'] = client_slug
-        if client_slug in DEMO_CLIENTS:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
-            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
-        else:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
-            context['client_name'] = DEMO_CLIENTS['default']['name']        
+        context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
+        context['client_name'] = CLIENT_SETTINGS['name']
 
         return context
 
@@ -339,7 +326,7 @@ class ProjectDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        
+
         project = self.get_project(kwargs['pk'])
 
         context['project_id'] = project[0][:8]
@@ -351,14 +338,8 @@ class ProjectDetailView(TemplateView):
             'zoom': 10,
         }
 
-        client_slug = kwargs['client_slug']
-        context['client_slug'] = client_slug
-        if client_slug in DEMO_CLIENTS:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS[client_slug]['logo']
-            context['client_name'] = DEMO_CLIENTS[client_slug]['name']
-        else:
-            context['logo'] = 'client_logos/'+DEMO_CLIENTS['default']['logo']
-            context['client_name'] = DEMO_CLIENTS['default']['name']
+        context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
+        context['client_name'] = CLIENT_SETTINGS['name']
 
         return context
 
