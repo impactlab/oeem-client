@@ -1,1 +1,6 @@
 STATIC_ROOT = "/home/ubuntu/static/"
+
+CLIENT_SETTINGS = {
+    'name': 'Demo',
+    'logo': 'oee-logo.png',
+}

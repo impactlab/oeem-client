@@ -7,5 +7,5 @@
 local_settings.py
 
 # Client Specific Stuff
-demo_settings.py
 client_logos/
+!client_logos/oee-logo.png
