@@ -516,4 +516,14 @@ class ProjectDetailView(TemplateView):
         return json.dumps(usage_data)
 
 
+class ProjectListingView(TemplateView):
+    template_name = "dashboard/project_listing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectListingView, self).get_context_data(**kwargs)
+        
+        context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
+        context['client_name'] = CLIENT_SETTINGS['name']
+
+        return context
 

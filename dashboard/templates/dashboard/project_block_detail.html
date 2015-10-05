@@ -73,7 +73,7 @@
 
   {% for savings_data in all_savings_data %}
     <div class="energy-pane" id="pane-{{ savings_data.energy_type_slug }}">
-      {% include "partials/utility_pane.html" %}
+      {% include "partials/utility_pane_viz.html" %}
     </div>
   {% endfor %}
 
