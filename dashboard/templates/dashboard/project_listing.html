@@ -32,7 +32,7 @@
           {% for table_data in all_tables_data %}
           <a href="javascript://" class="energy-pane-select"
             target-pane="#pane-{{ table_data.energy_type_slug }}, #pane-summary-{{ table_data.energy_type_slug }}">
-            <i class="fa {{ table_data.icon }} fa-lg"></i> {{ savings_data.energy_type }}
+            <i class="fa {{ table_data.icon }} fa-lg"></i> {{ table_data.energy_type }}
           </a>
           {% endfor %}
         </div>

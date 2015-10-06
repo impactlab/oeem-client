@@ -2,9 +2,27 @@
 	<div class="row-fluid">
     <div class="col-sm-12">
 
-      <h2>Table</h2>
+      <h2>{{ table_data.energy_type }} Projects</h2>
 
-      <div id="{{ savings_data.energy_type_slug }}-table">
+      <div id="{{ table_data.energy_type_slug }}-table">
+
+        <table class="table">
+          <tr>
+            {% for h in table_data.table_header %}
+              <th>{{ h }}</th>
+            {% endfor %}
+          </tr>
+          {% for row in table_data.table_body %}
+            <tr>
+
+              {% for cell in row %}
+                <td>{{ cell }}</td>
+              {% endfor %}
+
+            </tr>
+          {% endfor %}
+
+        </table>
       </div>
 
     </div>
