@@ -542,16 +542,30 @@ class ProjectListingView(TemplateView):
                     'cell_type':'link',
                     'cell_data': {'pk': str(p['project_pk']), 'id': p['project_id'] }
                 }
+
                 cvrmse_baseline = {
-                    'cell_type':'int_threshold_lt', 
-                    'cell_data':p[fuel_type]['cvrmse_baseline']
+                    'cell_type':'int_threshold', 
+                    'cell_data':{'val': p[fuel_type]['cvrmse_baseline']}
                 }
+                cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
+                
                 cvrmse_reporting = {
-                    'cell_type':'int_threshold_lt',
-                    'cell_data':p[fuel_type]['cvrmse_reporting']
+                    'cell_type':'int_threshold',
+                    'cell_data':{'val': p[fuel_type]['cvrmse_reporting']}
+                }
+                cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
+
+                pass_all_checks = True
+                for check in [cvrmse_baseline, cvrmse_reporting]:
+                    if check['cell_data']['is_invalid']:
+                        pass_all_checks = False
+
+                data_quality = {
+                    'cell_type': 'boolean',
+                    'cell_data': pass_all_checks
                 }
 
-                row = [project_link, cvrmse_baseline, cvrmse_reporting]
+                row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
                 table_data.append(row)
 
             energy_type_data = {
@@ -559,7 +573,7 @@ class ProjectListingView(TemplateView):
                 "energy_type_slug": fuel_type_slugs[fuel_type],
                 "icon": fuel_type_icons[fuel_type],
                 "unit": fuel_type_units[fuel_type],
-                'table_header': ['Project ID', 'CVRMSE Baseline', 'CVRMSE Reporting'],
+                'table_header': ['Project ID','Data Quality' , 'CVRMSE Baseline', 'CVRMSE Reporting'],
                 'table_body': table_data,
             }
             tables.append(energy_type_data)

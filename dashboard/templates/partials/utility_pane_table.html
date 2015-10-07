@@ -20,8 +20,22 @@
                   <td>
                     <a href="/dashboard/project/{{ c.cell_data.pk }}" title="View project detail">{{ c.cell_data.id }}</a>
                   </td>
-                {% elif c.cell_type == 'int_threshold_lt' %}
-                  <td>{{ c.cell_data }}</td>
+                {% elif c.cell_type == 'boolean' %}
+                  {% if c.cell_data %}
+                    <td>
+                      <i class="fa fa-check fa-fw"></i>
+                    </td>
+                  {% else %}
+                    <td>
+                      <i class="fa fa-exclamation-circle fa-fw"></i>
+                    </td>
+                  {% endif %}
+                {% elif c.cell_type == 'int_threshold' %}
+                  {% if c.cell_data.is_invalid %}
+                    <td class="text-danger">{{ c.cell_data.val }}</td>
+                  {% else %}
+                    <td class="text-success">{{ c.cell_data.val }}</td>
+                  {% endif %}
                 {% endif %}
 
               {% endfor %}
