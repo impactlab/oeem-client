@@ -13,6 +13,7 @@ from collections import namedtuple
 from collections import defaultdict
 from calendar import monthrange
 import json
+import re
 
 ProjectBlock = namedtuple("ProjectBlock", ["id", "name", "n_projects", "project_ids"])
 
@@ -35,9 +36,47 @@ MeterRun = namedtuple("MeterRun", [
     "gross_savings",
 ])
 
+fuel_type_icons = {
+        "E": "fa-lightbulb-o",
+        "NG": "fa-fire",
+        }
+fuel_type_names = {
+        "E": "Electricity",
+        "NG": "Natural Gas",
+        }
+fuel_type_slugs = {
+        "E": "electricity",
+        "NG": "natural-gas",
+        }
+fuel_type_units = {
+        "E": "kWh",
+        "NG": "therms",
+        }
+
 def datastore_get(url, verify=False):
     auth_headers = {"Authorization":"Bearer {}".format(DATASTORE_ACCESS_TOKEN)}
     return requests.get(DATASTORE_URL + url, headers=auth_headers, verify=False)
+
+def get_meter_runs(meter_run_ids):
+    meter_runs = []
+    for meter_run_id in meter_run_ids:
+        response = datastore_get("/datastore/meter_run_monthly/{}/".format(meter_run_id))
+        if response.status_code == 200:
+            meter_run_data = response.json()
+            meter_run = MeterRun(
+                    fuel_type=meter_run_data["fuel_type"],
+                    annual_usage_baseline=meter_run_data["annual_usage_baseline"],
+                    annual_usage_reporting=meter_run_data["annual_usage_reporting"],
+                    annual_savings=meter_run_data["annual_savings"],
+                    gross_savings=meter_run_data["gross_savings"],
+                    baseline_monthly_averages=meter_run_data["monthlyaverageusagebaseline_set"],
+                    reporting_monthly_averages=meter_run_data["monthlyaverageusagereporting_set"],
+                    )
+            meter_runs.append(meter_run)
+        else:
+            #raise Http404("MeterRun does not exist")
+            pass
+    return meter_runs
 
 def create_project_block(data):
     project_block = ProjectBlock(
@@ -102,7 +141,7 @@ class ProjectBlockDetailView(TemplateView):
         if response.status_code == 200:
             projects = []
             for project_data in response.json():
-                meter_runs = self.get_meter_runs(project_data["recent_meter_runs"])
+                meter_runs = get_meter_runs(project_data["recent_meter_runs"])
                 project = Project(
                         project_id=project_data["project_id"],
                         meter_runs=meter_runs,
@@ -117,44 +156,7 @@ class ProjectBlockDetailView(TemplateView):
             #raise Http404("No projects found")
             return []
 
-    def get_meter_runs(self, meter_run_ids):
-        meter_runs = []
-        for meter_run_id in meter_run_ids:
-            response = datastore_get("/datastore/meter_run_monthly/{}/".format(meter_run_id))
-            if response.status_code == 200:
-                meter_run_data = response.json()
-                meter_run = MeterRun(
-                        fuel_type=meter_run_data["fuel_type"],
-                        annual_usage_baseline=meter_run_data["annual_usage_baseline"],
-                        annual_usage_reporting=meter_run_data["annual_usage_reporting"],
-                        annual_savings=meter_run_data["annual_savings"],
-                        gross_savings=meter_run_data["gross_savings"],
-                        baseline_monthly_averages=meter_run_data["monthlyaverageusagebaseline_set"],
-                        reporting_monthly_averages=meter_run_data["monthlyaverageusagereporting_set"],
-                        )
-                meter_runs.append(meter_run)
-            else:
-                #raise Http404("MeterRun does not exist")
-                pass
-        return meter_runs
-
     def get_savings_data(self, projects):
-        fuel_type_icons = {
-                "E": "fa-lightbulb-o",
-                "NG": "fa-lightbulb-o",
-                }
-        fuel_type_names = {
-                "E": "Electricity",
-                "NG": "Natural Gas",
-                }
-        fuel_type_slugs = {
-                "E": "electricity",
-                "NG": "natural-gas",
-                }
-        fuel_type_units = {
-                "E": "kWh",
-                "NG": "therms",
-                }
 
         meter_runs_by_fuel_type = defaultdict(list)
         for project in projects:
@@ -347,7 +349,7 @@ class ProjectDetailView(TemplateView):
         response = datastore_get("/datastore/project/{}/".format(pk))
         if response.status_code == 200:
             project_data = response.json()
-            meter_runs = self.get_meter_runs(project_data["recent_meter_runs"])
+            meter_runs = get_meter_runs(project_data["recent_meter_runs"])
             project = Project(
                     project_id=project_data["project_id"],
                     meter_runs=meter_runs,
@@ -369,22 +371,6 @@ class ProjectDetailView(TemplateView):
             raise Http404("Consumptions do not exist")
 
     def get_savings_data(self, project):
-        fuel_type_icons = {
-                "E": "fa-lightbulb-o",
-                "NG": "fa-lightbulb-o",
-                }
-        fuel_type_names = {
-                "E": "Electricity",
-                "NG": "Natural Gas",
-                }
-        fuel_type_slugs = {
-                "E": "electricity",
-                "NG": "natural-gas",
-                }
-        fuel_type_units = {
-                "E": "kWh",
-                "NG": "therms",
-                }
 
         meter_runs_by_fuel_type = defaultdict(list)
         for meter_run in project.meter_runs:
@@ -417,27 +403,6 @@ class ProjectDetailView(TemplateView):
             }
             data.append(energy_type_data)
         return data
-
-    def get_meter_runs(self, meter_run_ids):
-        meter_runs = []
-        for meter_run_id in meter_run_ids:
-            response = datastore_get("/datastore/meter_run_monthly/{}/".format(meter_run_id))
-            if response.status_code == 200:
-                meter_run_data = response.json()
-                meter_run = MeterRun(
-                        fuel_type=meter_run_data["fuel_type"],
-                        annual_usage_baseline=meter_run_data["annual_usage_baseline"],
-                        annual_usage_reporting=meter_run_data["annual_usage_reporting"],
-                        annual_savings=meter_run_data["annual_savings"],
-                        gross_savings=meter_run_data["gross_savings"],
-                        baseline_monthly_averages=meter_run_data["monthlyaverageusagebaseline_set"],
-                        reporting_monthly_averages=meter_run_data["monthlyaverageusagereporting_set"],
-                        )
-                meter_runs.append(meter_run)
-            else:
-                #raise Http404("MeterRun does not exist")
-                pass
-        return meter_runs
 
     def get_total_gross_savings(self, meter_runs):
         savings = []
@@ -515,5 +480,73 @@ class ProjectDetailView(TemplateView):
         }
         return json.dumps(usage_data)
 
+
+class ProjectListingView(TemplateView):
+    template_name = "dashboard/project_listing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectListingView, self).get_context_data(**kwargs)
+
+        projects_data = self.get_projects_data()
+        all_tables_data = self.make_table_data(projects_data)
+
+        context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
+        context['client_name'] = CLIENT_SETTINGS['name']
+        context['all_tables_data'] = all_tables_data
+
+        return context
+
+    def get_projects_data(self):
+        # TEMPORARY: using a project block of 5 projects while in development. this should be all projects
+        response = datastore_get("/datastore/project/?project_block=5")
+        if response.status_code == 200:
+            projects = []
+            for project_data in response.json():
+
+                p = {
+                    'project_id': project_data["project_id"],
+                    'reporting_period_start': project_data["reporting_period_start"],
+                }
+
+                for meter_run_id in project_data["recent_meter_runs"]:
+                    response = datastore_get("/datastore/meter_run_summary/{}/".format(meter_run_id))
+                    if response.status_code == 200:
+                        meter_run_data = response.json()
+
+                        energy_type = re.sub(r'.+_', '', meter_run_data['meter_type'])
+                        p[energy_type] = {
+                            'cvrmse_reporting': meter_run_data['cvrmse_reporting'],
+                            'cvrmse_baseline': meter_run_data['cvrmse_baseline'],
+                        }
+                    else:
+                        pass
+
+                projects.append(p)
+
+            return projects
+        else:
+            return []
+
+
+    def make_table_data(self, projects):
+
+        tables = []
+        for fuel_type in ["E", "NG"]:
+
+            table_data = []
+            for p in projects:
+                row = [p['project_id'], p[fuel_type]['cvrmse_baseline'], p[fuel_type]['cvrmse_reporting']]
+                table_data.append(row)
+
+            energy_type_data = {
+                "energy_type": fuel_type_names[fuel_type],
+                "energy_type_slug": fuel_type_slugs[fuel_type],
+                "icon": fuel_type_icons[fuel_type],
+                "unit": fuel_type_units[fuel_type],
+                'table_header': ['Project ID', 'CVRMSE Baseline', 'CVRMSE Reporting'],
+                'table_body': table_data,
+            }
+            tables.append(energy_type_data)
+        return tables
 
 
