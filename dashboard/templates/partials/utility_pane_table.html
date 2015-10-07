@@ -15,8 +15,15 @@
           {% for row in table_data.table_body %}
             <tr>
 
-              {% for cell in row %}
-                <td>{{ cell }}</td>
+              {% for c in row %}
+                {% if c.cell_type == 'link' %}
+                  <td>
+                    <a href="/dashboard/project/{{ c.cell_data.pk }}" title="View project detail">{{ c.cell_data.id }}</a>
+                  </td>
+                {% elif c.cell_type == 'int_threshold_lt' %}
+                  <td>{{ c.cell_data }}</td>
+                {% endif %}
+
               {% endfor %}
 
             </tr>

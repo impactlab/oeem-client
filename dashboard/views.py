@@ -505,6 +505,7 @@ class ProjectListingView(TemplateView):
 
                 p = {
                     'project_id': project_data["project_id"],
+                    'project_pk': project_data["id"],
                     'reporting_period_start': project_data["reporting_period_start"],
                 }
 
@@ -535,7 +536,22 @@ class ProjectListingView(TemplateView):
 
             table_data = []
             for p in projects:
-                row = [p['project_id'], p[fuel_type]['cvrmse_baseline'], p[fuel_type]['cvrmse_reporting']]
+
+                # for each cell, construct a dict w/ type & data
+                project_link = {
+                    'cell_type':'link',
+                    'cell_data': {'pk': str(p['project_pk']), 'id': p['project_id'] }
+                }
+                cvrmse_baseline = {
+                    'cell_type':'int_threshold_lt', 
+                    'cell_data':p[fuel_type]['cvrmse_baseline']
+                }
+                cvrmse_reporting = {
+                    'cell_type':'int_threshold_lt',
+                    'cell_data':p[fuel_type]['cvrmse_reporting']
+                }
+
+                row = [project_link, cvrmse_baseline, cvrmse_reporting]
                 table_data.append(row)
 
             energy_type_data = {
