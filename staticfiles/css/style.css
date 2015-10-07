@@ -27,14 +27,15 @@
     background-color: #333;
 }
 #project-block-content{
-    height: 103px;
+    height: 94px;
 }
 #project-block-content h2{
     margin-top: 0px;
 }
 
 #energy-pane-menu{
-    height: 37px;
+    padding-top: 10px;
+    height: 46px;
 }
 #energy-pane-menu a{
     color: #0A4376;
