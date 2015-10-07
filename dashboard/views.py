@@ -122,6 +122,18 @@ class ProjectBlockDetailView(TemplateView):
         context["map_data"] = self.get_map_data(projects)
         context["all_savings_data"] = self.get_savings_data(projects)
 
+        # get summary data across all savings types
+        gross = 0
+        annual = 0
+        for s in context["all_savings_data"]:
+            if s['energy_type'] == 'Electricity':
+                gross += s['total_gross_savings']
+                annual += s['total_annual_savings']
+            elif s['energy_type'] == 'Natural Gas':
+                gross += 29.3001*s['total_gross_savings']
+                annual += 29.3001*s['total_annual_savings']
+        context["savings_all_types"] = {'gross': gross, 'annual': annual, 'unit': 'kWh'}
+
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
 

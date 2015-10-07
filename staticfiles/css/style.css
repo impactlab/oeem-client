@@ -76,15 +76,26 @@
 }
 
 .units{
-    font-size: .6em;
+    font-size: .5em;
 }
-
+.no-pad-bottom{
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+.pad-top{
+    padding-top: 12px;
+}
 
 .align-right{
     text-align: right;
 }
 .align-center{
     text-align: center;
+}
+
+.project-count{
+    font-size: .6em;
+    vertical-align: bottom;
 }
 
 
