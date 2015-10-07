@@ -575,7 +575,7 @@ class ProjectListingView(TemplateView):
                 "unit": fuel_type_units[fuel_type],
                 'table_header': [
                                     ['Project ID', None],
-                                    ['Data Quality', 'center'], 
+                                    ['Data Quality Overview', 'center'], 
                                     ['CVRMSE Baseline', 'right'], 
                                     ['CVRMSE Reporting', 'right']
                                 ],

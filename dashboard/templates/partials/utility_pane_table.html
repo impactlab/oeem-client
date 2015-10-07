@@ -24,12 +24,12 @@
                   </td>
                 {% elif c.cell_type == 'boolean' %}
                   {% if c.cell_data %}
-                    <td class="align-center">
-                      <i class="fa fa-check fa-fw"></i>
+                    <td class="align-center text-success">
+                      <i class="fa fa-check fa-fw fa-lg"></i>
                     </td>
                   {% else %}
-                    <td class="align-center">
-                      <i class="fa fa-exclamation-circle fa-fw"></i>
+                    <td class="align-center text-danger">
+                      <i class="fa fa-exclamation-circle fa-fw fa-lg"></i>
                     </td>
                   {% endif %}
                 {% elif c.cell_type == 'int_threshold' %}

@@ -2,10 +2,6 @@
   padding: 0px;
 }
 
-body{
-    background-image: url("/static/img/subtlenet2.png");
-}
-
 #map {
     height: 200px;
 }
