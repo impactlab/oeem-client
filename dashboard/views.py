@@ -87,6 +87,20 @@ def create_project_block(data):
             )
     return project_block
 
+def aggregate_savings(all_savings_data):
+    # get summary data across all savings types
+    gross = 0
+    annual = 0
+    for s in all_savings_data:
+        if s['energy_type'] == 'Electricity':
+            gross += s['total_gross_savings']
+            annual += s['total_annual_savings']
+        elif s['energy_type'] == 'Natural Gas':
+            gross += 29.3001*s['total_gross_savings']
+            annual += 29.3001*s['total_annual_savings']
+    
+    return {'gross': gross, 'annual': annual, 'unit': 'kWh'}
+
 class ProjectBlockIndexView(TemplateView):
     template_name = "dashboard/project_block_index.html"
 
@@ -121,6 +135,7 @@ class ProjectBlockDetailView(TemplateView):
 
         context["map_data"] = self.get_map_data(projects)
         context["all_savings_data"] = self.get_savings_data(projects)
+        context["agg_savings"] = aggregate_savings(context["all_savings_data"])
 
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
@@ -334,6 +349,7 @@ class ProjectDetailView(TemplateView):
         context['project_id'] = project[0][:8]
 
         context["all_savings_data"] = self.get_savings_data(project)
+        context["agg_savings"] = aggregate_savings(context["all_savings_data"])
 
         context["map_data"] = {
             'latlong': [40.0096836, -82.9700032],
@@ -505,6 +521,7 @@ class ProjectListingView(TemplateView):
 
                 p = {
                     'project_id': project_data["project_id"],
+                    'project_pk': project_data["id"],
                     'reporting_period_start': project_data["reporting_period_start"],
                 }
 
@@ -535,7 +552,36 @@ class ProjectListingView(TemplateView):
 
             table_data = []
             for p in projects:
-                row = [p['project_id'], p[fuel_type]['cvrmse_baseline'], p[fuel_type]['cvrmse_reporting']]
+
+                # for each cell, construct a dict w/ type & data
+                project_link = {
+                    'cell_type':'link',
+                    'cell_data': {'pk': str(p['project_pk']), 'id': p['project_id'] }
+                }
+
+                cvrmse_baseline = {
+                    'cell_type':'int_threshold', 
+                    'cell_data':{'val': p[fuel_type]['cvrmse_baseline']}
+                }
+                cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
+                
+                cvrmse_reporting = {
+                    'cell_type':'int_threshold',
+                    'cell_data':{'val': p[fuel_type]['cvrmse_reporting']}
+                }
+                cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
+
+                pass_all_checks = True
+                for check in [cvrmse_baseline, cvrmse_reporting]:
+                    if check['cell_data']['is_invalid']:
+                        pass_all_checks = False
+
+                data_quality = {
+                    'cell_type': 'boolean',
+                    'cell_data': pass_all_checks
+                }
+
+                row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
                 table_data.append(row)
 
             energy_type_data = {
@@ -543,7 +589,12 @@ class ProjectListingView(TemplateView):
                 "energy_type_slug": fuel_type_slugs[fuel_type],
                 "icon": fuel_type_icons[fuel_type],
                 "unit": fuel_type_units[fuel_type],
-                'table_header': ['Project ID', 'CVRMSE Baseline', 'CVRMSE Reporting'],
+                'table_header': [
+                                    ['Project ID', None],
+                                    ['Data Quality Overview', 'center'], 
+                                    ['CVRMSE Baseline', 'right'], 
+                                    ['CVRMSE Reporting', 'right']
+                                ],
                 'table_body': table_data,
             }
             tables.append(energy_type_data)

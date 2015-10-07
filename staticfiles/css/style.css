@@ -2,10 +2,6 @@
   padding: 0px;
 }
 
-body{
-    background-image: url("/static/img/subtlenet2.png");
-}
-
 #map {
     height: 200px;
 }
@@ -31,14 +27,15 @@ body{
     background-color: #333;
 }
 #project-block-content{
-    height: 103px;
+    height: 94px;
 }
 #project-block-content h2{
     margin-top: 0px;
 }
 
 #energy-pane-menu{
-    height: 37px;
+    padding-top: 10px;
+    height: 46px;
 }
 #energy-pane-menu a{
     color: #0A4376;
@@ -79,9 +76,27 @@ body{
 }
 
 .units{
-    font-size: .6em;
+    font-size: .5em;
+}
+.no-pad-bottom{
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+.pad-top{
+    padding-top: 12px;
 }
 
+.align-right{
+    text-align: right;
+}
+.align-center{
+    text-align: center;
+}
+
+.project-count{
+    font-size: .6em;
+    vertical-align: bottom;
+}
 
 
 

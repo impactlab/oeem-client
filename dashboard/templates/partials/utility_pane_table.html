@@ -2,21 +2,44 @@
 	<div class="row-fluid">
     <div class="col-sm-12">
 
-      <h2>{{ table_data.energy_type }} Projects</h2>
+      <h4>{{ table_data.energy_type }} Project Listing</h4>
 
       <div id="{{ table_data.energy_type_slug }}-table">
 
         <table class="table">
           <tr>
-            {% for h in table_data.table_header %}
-              <th>{{ h }}</th>
+            {% for h, align in table_data.table_header %}
+              <th {%if align%}class="align-{{align}}"{%endif%}>
+                {{ h }}
+              </th>
             {% endfor %}
           </tr>
           {% for row in table_data.table_body %}
             <tr>
 
-              {% for cell in row %}
-                <td>{{ cell }}</td>
+              {% for c in row %}
+                {% if c.cell_type == 'link' %}
+                  <td>
+                    <a href="/dashboard/project/{{ c.cell_data.pk }}" title="View project detail">{{ c.cell_data.id }}</a>
+                  </td>
+                {% elif c.cell_type == 'boolean' %}
+                  {% if c.cell_data %}
+                    <td class="align-center text-success">
+                      <i class="fa fa-check fa-fw fa-lg"></i>
+                    </td>
+                  {% else %}
+                    <td class="align-center text-danger">
+                      <i class="fa fa-exclamation-circle fa-fw fa-lg"></i>
+                    </td>
+                  {% endif %}
+                {% elif c.cell_type == 'int_threshold' %}
+                  {% if c.cell_data.is_invalid %}
+                    <td class="text-danger align-right">{{ c.cell_data.val | floatformat:2 }}</td>
+                  {% else %}
+                    <td class="text-success align-right">{{ c.cell_data.val | floatformat:2 }}</td>
+                  {% endif %}
+                {% endif %}
+
               {% endfor %}
 
             </tr>
