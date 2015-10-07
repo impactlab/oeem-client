@@ -573,7 +573,12 @@ class ProjectListingView(TemplateView):
                 "energy_type_slug": fuel_type_slugs[fuel_type],
                 "icon": fuel_type_icons[fuel_type],
                 "unit": fuel_type_units[fuel_type],
-                'table_header': ['Project ID','Data Quality' , 'CVRMSE Baseline', 'CVRMSE Reporting'],
+                'table_header': [
+                                    ['Project ID', None],
+                                    ['Data Quality', 'center'], 
+                                    ['CVRMSE Baseline', 'right'], 
+                                    ['CVRMSE Reporting', 'right']
+                                ],
                 'table_body': table_data,
             }
             tables.append(energy_type_data)
