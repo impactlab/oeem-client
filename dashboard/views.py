@@ -19,6 +19,7 @@ ProjectBlock = namedtuple("ProjectBlock", ["id", "name", "n_projects", "project_
 
 Project = namedtuple("Project", [
     "project_id",
+    "project_pk",
     "meter_runs",
     "baseline_period_start",
     "baseline_period_end",
@@ -27,6 +28,8 @@ Project = namedtuple("Project", [
 ])
 
 MeterRun = namedtuple("MeterRun", [
+    "project_id",
+    "project_pk",
     "fuel_type",
     "baseline_monthly_averages",
     "reporting_monthly_averages",
@@ -34,6 +37,8 @@ MeterRun = namedtuple("MeterRun", [
     "annual_usage_reporting",
     "annual_savings",
     "gross_savings",
+    "cvrmse_baseline",
+    "cvrmse_reporting",
 ])
 
 fuel_type_icons = {
@@ -57,13 +62,15 @@ def datastore_get(url, verify=False):
     auth_headers = {"Authorization":"Bearer {}".format(DATASTORE_ACCESS_TOKEN)}
     return requests.get(DATASTORE_URL + url, headers=auth_headers, verify=False)
 
-def get_meter_runs(meter_run_ids):
+def get_project_meter_runs(meter_run_ids, project_id, project_pk):
     meter_runs = []
     for meter_run_id in meter_run_ids:
         response = datastore_get("/datastore/meter_run_monthly/{}/".format(meter_run_id))
         if response.status_code == 200:
             meter_run_data = response.json()
             meter_run = MeterRun(
+                    project_id=project_id,
+                    project_pk=project_pk,
                     fuel_type=meter_run_data["fuel_type"],
                     annual_usage_baseline=meter_run_data["annual_usage_baseline"],
                     annual_usage_reporting=meter_run_data["annual_usage_reporting"],
@@ -71,12 +78,40 @@ def get_meter_runs(meter_run_ids):
                     gross_savings=meter_run_data["gross_savings"],
                     baseline_monthly_averages=meter_run_data["monthlyaverageusagebaseline_set"],
                     reporting_monthly_averages=meter_run_data["monthlyaverageusagereporting_set"],
+                    cvrmse_baseline=meter_run_data['cvrmse_baseline'],
+                    cvrmse_reporting=meter_run_data['cvrmse_reporting'],
                     )
             meter_runs.append(meter_run)
         else:
-            #raise Http404("MeterRun does not exist")
             pass
     return meter_runs
+
+def get_projects(project_block_id=None):
+    if project_block_id is None:
+        # TEMPORARY: using a project block of 5 projects while in development. this should be all projects
+        response = datastore_get("/datastore/project/?project_block=5")
+    else:
+        response = datastore_get("/datastore/project/?project_block={}".format(project_block_id))
+    if response.status_code == 200:
+        projects = []
+        for project_data in response.json():
+            project_id = project_data["project_id"]
+            project_pk = project_data["id"]
+            meter_runs = get_project_meter_runs(project_data["recent_meter_runs"], project_id, project_pk)
+            project = Project(
+                    project_id=project_id,
+                    project_pk=project_pk,
+                    meter_runs=meter_runs,
+                    baseline_period_start=project_data["baseline_period_start"],
+                    baseline_period_end=project_data["baseline_period_end"],
+                    reporting_period_start=project_data["reporting_period_start"],
+                    reporting_period_end=project_data["reporting_period_end"],
+                    )
+            projects.append(project)
+        return projects
+    else:
+        #raise Http404("No projects found")
+        return []
 
 def create_project_block(data):
     project_block = ProjectBlock(
@@ -98,7 +133,7 @@ def aggregate_savings(all_savings_data):
         elif s['energy_type'] == 'Natural Gas':
             gross += 29.3001*s['total_gross_savings']
             annual += 29.3001*s['total_annual_savings']
-    
+
     return {'gross': gross, 'annual': annual, 'unit': 'kWh'}
 
 class ProjectBlockIndexView(TemplateView):
@@ -121,14 +156,97 @@ class ProjectBlockIndexView(TemplateView):
             project_blocks.append(project_block)
         return project_blocks
 
-class ProjectBlockDetailView(TemplateView):
+class ProjectTableMixin(object):
+
+    def get_project_table_data(self, meter_runs):
+
+        table_body = []
+        for meter_run, _ in meter_runs:
+
+            # for each cell, construct a dict w/ type & data
+            project_link = {
+                'cell_type':'link',
+                'cell_data': {'pk': str(meter_run.project_pk), 'id': meter_run.project_id }
+            }
+
+            cvrmse_baseline = {
+                'cell_type':'int_threshold',
+                'cell_data':{'val': meter_run.cvrmse_baseline}
+            }
+            cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
+
+            cvrmse_reporting = {
+                'cell_type':'int_threshold',
+                'cell_data':{'val': meter_run.cvrmse_reporting}
+            }
+            cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
+
+            pass_all_checks = True
+            for check in [cvrmse_baseline, cvrmse_reporting]:
+                if check['cell_data']['is_invalid']:
+                    pass_all_checks = False
+
+            data_quality = {
+                'cell_type': 'boolean',
+                'cell_data': pass_all_checks
+            }
+
+            row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
+            table_body.append(row)
+
+        table_data = {
+            'table_header': [
+                ['Project ID', None],
+                ['Data Quality Overview', 'center'],
+                ['CVRMSE Baseline', 'right'],
+                ['CVRMSE Reporting', 'right']
+            ],
+            'table_body': table_body,
+        }
+
+        return table_data
+
+class MultipleProjectMixin(object):
+
+    def get_savings_data(self, projects):
+
+        meter_runs_by_fuel_type = defaultdict(list)
+        for project in projects:
+            for meter_run in project.meter_runs:
+                meter_run_data = (meter_run, project.reporting_period_start)
+                meter_runs_by_fuel_type[meter_run.fuel_type].append(meter_run_data)
+
+        data = []
+        for fuel_type in ["E", "NG"]:
+            meter_runs = meter_runs_by_fuel_type[fuel_type]
+
+            fuel_type_data = self.get_fuel_type_data(meter_runs, fuel_type)
+            data.append(fuel_type_data)
+        return data
+
+    def get_fuel_type_data(self, meter_runs, fuel_type):
+        name = fuel_type_names[fuel_type]
+        slug = fuel_type_slugs[fuel_type]
+        icon = fuel_type_icons[fuel_type]
+        unit = fuel_type_units[fuel_type]
+
+        fuel_type_data = {
+            "energy_type": name,
+            "energy_type_slug": slug,
+            "icon": icon,
+            "unit": unit,
+        }
+        return fuel_type_data
+
+class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_block_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockDetailView, self).get_context_data(**kwargs)
 
         project_block = self.get_project_block(kwargs["pk"])
-        projects = self.get_projects(project_block.id)
+
+        projects = get_projects(project_block.id)
 
         context["project_block"] = project_block
         context["projects"] = projects
@@ -151,65 +269,24 @@ class ProjectBlockDetailView(TemplateView):
         else:
             raise Http404("Project block does not exist")
 
-    def get_projects(self, project_block_id):
-        response = datastore_get("/datastore/project/?project_block={}".format(project_block_id))
-        if response.status_code == 200:
-            projects = []
-            for project_data in response.json():
-                meter_runs = get_meter_runs(project_data["recent_meter_runs"])
-                project = Project(
-                        project_id=project_data["project_id"],
-                        meter_runs=meter_runs,
-                        baseline_period_start=project_data["baseline_period_start"],
-                        baseline_period_end=project_data["baseline_period_end"],
-                        reporting_period_start=project_data["reporting_period_start"],
-                        reporting_period_end=project_data["reporting_period_end"],
-                        )
-                projects.append(project)
-            return projects
-        else:
-            #raise Http404("No projects found")
-            return []
+    def get_fuel_type_data(self, meter_runs, fuel_type):
+        fuel_type_data = super(ProjectBlockDetailView, self).get_fuel_type_data(meter_runs, fuel_type)
 
-    def get_savings_data(self, projects):
+        usage_data = self.get_monthly_gross_usage(meter_runs)
+        total_gross_savings = self.get_total_gross_savings(meter_runs)
+        total_annual_savings = self.get_total_annual_savings(meter_runs)
+        gross_savings_hist_data = self.get_gross_savings_hist_data(meter_runs)
+        annual_savings_hist_data = self.get_annual_savings_hist_data(meter_runs)
+        project_table_data = self.get_project_table_data(meter_runs)
 
-        meter_runs_by_fuel_type = defaultdict(list)
-        for project in projects:
-            for meter_run in project.meter_runs:
-                meter_run_data = (meter_run, project.reporting_period_start)
-                meter_runs_by_fuel_type[meter_run.fuel_type].append(meter_run_data)
+        fuel_type_data["usage_data"] = usage_data
+        fuel_type_data["total_gross_savings"] = total_gross_savings
+        fuel_type_data["total_annual_savings"] = total_annual_savings
+        fuel_type_data["gross_savings_hist_data"] = gross_savings_hist_data
+        fuel_type_data["annual_savings_hist_data"] = annual_savings_hist_data
+        fuel_type_data["project_table_data"] = project_table_data
 
-        data = []
-        for fuel_type in ["E", "NG"]:
-            name = fuel_type_names[fuel_type]
-            slug = fuel_type_slugs[fuel_type]
-            icon = fuel_type_icons[fuel_type]
-            unit = fuel_type_units[fuel_type]
-
-            meter_runs = meter_runs_by_fuel_type[fuel_type]
-
-            total_gross_savings = self.get_total_gross_savings(meter_runs)
-            total_annual_savings = self.get_total_annual_savings(meter_runs)
-
-            usage_data = self.get_monthly_gross_usage(meter_runs)
-
-            gross_savings_hist_data = self.get_gross_savings_hist_data(meter_runs)
-            annual_savings_hist_data = self.get_annual_savings_hist_data(meter_runs)
-
-
-            energy_type_data = {
-                "energy_type": name,
-                "energy_type_slug": slug,
-                "icon": icon,
-                "unit": unit,
-                "usage_data": usage_data,
-                "total_gross_savings": total_gross_savings,
-                "total_annual_savings": total_annual_savings,
-                "gross_savings_hist_data": gross_savings_hist_data,
-                "annual_savings_hist_data": annual_savings_hist_data,
-            }
-            data.append(energy_type_data)
-        return data
+        return fuel_type_data
 
     def get_monthly_gross_usage(self, meter_runs):
 
@@ -365,9 +442,12 @@ class ProjectDetailView(TemplateView):
         response = datastore_get("/datastore/project/{}/".format(pk))
         if response.status_code == 200:
             project_data = response.json()
-            meter_runs = get_meter_runs(project_data["recent_meter_runs"])
+            project_id = project_data["project_id"]
+            project_pk = project_data["id"]
+            meter_runs = get_project_meter_runs(project_data["recent_meter_runs"], project_id, project_pk)
             project = Project(
-                    project_id=project_data["project_id"],
+                    project_id=project_id,
+                    project_pk=project_pk,
                     meter_runs=meter_runs,
                     baseline_period_start=project_data["baseline_period_start"],
                     baseline_period_end=project_data["baseline_period_end"],
@@ -497,107 +577,26 @@ class ProjectDetailView(TemplateView):
         return json.dumps(usage_data)
 
 
-class ProjectListingView(TemplateView):
+
+class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_listing.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListingView, self).get_context_data(**kwargs)
 
-        projects_data = self.get_projects_data()
-        all_tables_data = self.make_table_data(projects_data)
+        projects = get_projects()
 
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
-        context['all_tables_data'] = all_tables_data
+
+        context["all_savings_data"] = self.get_savings_data(projects)
 
         return context
 
-    def get_projects_data(self):
-        # TEMPORARY: using a project block of 5 projects while in development. this should be all projects
-        response = datastore_get("/datastore/project/?project_block=5")
-        if response.status_code == 200:
-            projects = []
-            for project_data in response.json():
+    def get_fuel_type_data(self, meter_runs, fuel_type):
+        fuel_type_data = super(ProjectListingView, self).get_fuel_type_data(meter_runs, fuel_type)
 
-                p = {
-                    'project_id': project_data["project_id"],
-                    'project_pk': project_data["id"],
-                    'reporting_period_start': project_data["reporting_period_start"],
-                }
+        project_table_data = self.get_project_table_data(meter_runs)
+        fuel_type_data["project_table_data"] = project_table_data
 
-                for meter_run_id in project_data["recent_meter_runs"]:
-                    response = datastore_get("/datastore/meter_run_summary/{}/".format(meter_run_id))
-                    if response.status_code == 200:
-                        meter_run_data = response.json()
-
-                        energy_type = re.sub(r'.+_', '', meter_run_data['meter_type'])
-                        p[energy_type] = {
-                            'cvrmse_reporting': meter_run_data['cvrmse_reporting'],
-                            'cvrmse_baseline': meter_run_data['cvrmse_baseline'],
-                        }
-                    else:
-                        pass
-
-                projects.append(p)
-
-            return projects
-        else:
-            return []
-
-
-    def make_table_data(self, projects):
-
-        tables = []
-        for fuel_type in ["E", "NG"]:
-
-            table_data = []
-            for p in projects:
-
-                # for each cell, construct a dict w/ type & data
-                project_link = {
-                    'cell_type':'link',
-                    'cell_data': {'pk': str(p['project_pk']), 'id': p['project_id'] }
-                }
-
-                cvrmse_baseline = {
-                    'cell_type':'int_threshold', 
-                    'cell_data':{'val': p[fuel_type]['cvrmse_baseline']}
-                }
-                cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
-                
-                cvrmse_reporting = {
-                    'cell_type':'int_threshold',
-                    'cell_data':{'val': p[fuel_type]['cvrmse_reporting']}
-                }
-                cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
-
-                pass_all_checks = True
-                for check in [cvrmse_baseline, cvrmse_reporting]:
-                    if check['cell_data']['is_invalid']:
-                        pass_all_checks = False
-
-                data_quality = {
-                    'cell_type': 'boolean',
-                    'cell_data': pass_all_checks
-                }
-
-                row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
-                table_data.append(row)
-
-            energy_type_data = {
-                "energy_type": fuel_type_names[fuel_type],
-                "energy_type_slug": fuel_type_slugs[fuel_type],
-                "icon": fuel_type_icons[fuel_type],
-                "unit": fuel_type_units[fuel_type],
-                'table_header': [
-                                    ['Project ID', None],
-                                    ['Data Quality Overview', 'center'], 
-                                    ['CVRMSE Baseline', 'right'], 
-                                    ['CVRMSE Reporting', 'right']
-                                ],
-                'table_body': table_data,
-            }
-            tables.append(energy_type_data)
-        return tables
-
-
+        return fuel_type_data

@@ -2,19 +2,19 @@
 	<div class="row-fluid">
     <div class="col-sm-12">
 
-      <h4>{{ table_data.energy_type }} Project Listing</h4>
+      <h4>Projects</h4>
 
-      <div id="{{ table_data.energy_type_slug }}-table">
+      <div id="{{ savings_data.energy_type_slug }}-table">
 
         <table class="table">
           <tr>
-            {% for h, align in table_data.table_header %}
+            {% for h, align in savings_data.project_table_data.table_header %}
               <th {%if align%}class="align-{{align}}"{%endif%}>
                 {{ h }}
               </th>
             {% endfor %}
           </tr>
-          {% for row in table_data.table_body %}
+          {% for row in savings_data.project_table_data.table_body %}
             <tr>
 
               {% for c in row %}
@@ -54,6 +54,7 @@
   <script type="text/javascript">
 
   $(document).ready(function () {
+  });
 
   </script>
 </div>

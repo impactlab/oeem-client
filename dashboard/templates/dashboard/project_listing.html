@@ -4,7 +4,7 @@
 
 {% load humanize %}
 
-{% block title %}Project Detail{% endblock %}
+{% block title %}Project Listing{% endblock %}
 
 {% block content %}
 
@@ -28,10 +28,10 @@
     <div class="row-fluid" id="energy-pane-menu">
       <div class="col-xs-12">
         <div>
-          {% for table_data in all_tables_data %}
+          {% for savings_data in all_savings_data %}
           <a href="javascript://" class="energy-pane-select"
-            target-pane="#pane-{{ table_data.energy_type_slug }}, #pane-summary-{{ table_data.energy_type_slug }}">
-            <i class="fa {{ table_data.icon }} fa-lg"></i> {{ table_data.energy_type }}
+            target-pane="#pane-{{ savings_data.energy_type_slug }}, #pane-summary-{{ savings_data.energy_type_slug }}">
+            <i class="fa {{ savings_data.icon }} fa-lg"></i> {{ savings_data.energy_type }}
           </a>
           {% endfor %}
         </div>
@@ -40,8 +40,8 @@
 
   </div>
 
-  {% for table_data in all_tables_data %}
-    <div class="energy-pane" id="pane-{{ table_data.energy_type_slug }}">
+  {% for savings_data in all_savings_data %}
+    <div class="energy-pane" id="pane-{{ savings_data.energy_type_slug }}">
       {% include "partials/utility_pane_table.html" %}
     </div>
   {% endfor %}
