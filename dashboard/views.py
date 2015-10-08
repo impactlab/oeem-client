@@ -195,16 +195,46 @@ class ProjectTableMixin(object):
             }
 
             cvrmse_baseline = {
-                'cell_type':'int_threshold',
+                'cell_type':'float_threshold',
                 'cell_data':{'val': meter_run.cvrmse_baseline}
             }
             cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
 
             cvrmse_reporting = {
-                'cell_type':'int_threshold',
+                'cell_type':'float_threshold',
                 'cell_data':{'val': meter_run.cvrmse_reporting}
             }
             cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
+
+            gross_savings = {
+                'cell_type':'float',
+                'cell_data':{'val': meter_run.gross_savings}
+            }
+
+            annual_savings = {
+                'cell_type':'float',
+                'cell_data':{'val': meter_run.annual_savings}
+            }
+
+            annual_usage_baseline = {
+                'cell_type':'float',
+                'cell_data':{'val': meter_run.annual_usage_baseline}
+            }
+
+            annual_usage_reporting = {
+                'cell_type':'float',
+                'cell_data':{'val': meter_run.annual_usage_reporting}
+            }
+
+            if meter_run.annual_usage_baseline != 0:
+                percent_savings_val = meter_run.annual_savings / meter_run.annual_usage_baseline
+            else:
+                percent_savings_val = 0
+
+            percent_savings = {
+                'cell_type':'percent',
+                'cell_data':{'val': "{:.1%}".format(percent_savings_val) }
+            }
 
             pass_all_checks = True
             for check in [cvrmse_baseline, cvrmse_reporting]:
@@ -216,15 +246,37 @@ class ProjectTableMixin(object):
                 'cell_data': pass_all_checks
             }
 
-            row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
+            row = [
+                project_link,
+                data_quality,
+
+                annual_usage_baseline,
+                cvrmse_baseline,
+
+                annual_usage_reporting,
+                cvrmse_reporting,
+
+                gross_savings,
+                annual_savings,
+                percent_savings
+            ]
+
             table_body.append(row)
 
         table_data = {
             'table_header': [
                 ['Project ID', None],
                 ['Data Quality Overview', 'center'],
-                ['CVRMSE Baseline', 'right'],
-                ['CVRMSE Reporting', 'right']
+
+                ['Annual Usage Baseline', 'center'],
+                ['CVRMSE Baseline', 'center'],
+
+                ['Annual Usage Reporting', 'center'],
+                ['CVRMSE Reporting', 'center'],
+
+                ['Gross Savings', 'center'],
+                ['Annual Savings', 'center'],
+                ['Percent Savings', 'center'],
             ],
             'table_body': table_body,
         }
