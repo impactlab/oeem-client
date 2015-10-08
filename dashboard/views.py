@@ -196,70 +196,15 @@ class ProjectTableMixin(object):
 
         table_data = {
             'table_header': [
-                                ['Project ID', None],
-                                ['Data Quality Overview', 'center'],
-                                ['CVRMSE Baseline', 'right'],
-                                ['CVRMSE Reporting', 'right']
-                            ],
+                ['Project ID', None],
+                ['Data Quality Overview', 'center'],
+                ['CVRMSE Baseline', 'right'],
+                ['CVRMSE Reporting', 'right']
+            ],
             'table_body': table_body,
         }
 
         return table_data
-
-    def make_table_data(self, projects):
-
-        tables = []
-        for fuel_type in ["E", "NG"]:
-
-            table_data = []
-            for p in projects:
-
-                # for each cell, construct a dict w/ type & data
-                project_link = {
-                    'cell_type':'link',
-                    'cell_data': {'pk': str(p['project_pk']), 'id': p['project_id'] }
-                }
-
-                cvrmse_baseline = {
-                    'cell_type':'int_threshold',
-                    'cell_data':{'val': p[fuel_type]['cvrmse_baseline']}
-                }
-                cvrmse_baseline['cell_data']['is_invalid'] = cvrmse_baseline['cell_data']['val'] > 20
-                
-                cvrmse_reporting = {
-                    'cell_type':'int_threshold',
-                    'cell_data':{'val': p[fuel_type]['cvrmse_reporting']}
-                }
-                cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
-
-                pass_all_checks = True
-                for check in [cvrmse_baseline, cvrmse_reporting]:
-                    if check['cell_data']['is_invalid']:
-                        pass_all_checks = False
-
-                data_quality = {
-                    'cell_type': 'boolean',
-                    'cell_data': pass_all_checks
-                }
-
-                row = [project_link, data_quality, cvrmse_baseline, cvrmse_reporting]
-                table_data.append(row)
-
-            energy_type_data = {
-                "energy_type": fuel_type_names[fuel_type],
-                "energy_type_slug": fuel_type_slugs[fuel_type],
-                "icon": fuel_type_icons[fuel_type],
-                "unit": fuel_type_units[fuel_type],
-                'table_header': [
-                                    ['Project ID', None],
-                                    ['Data Quality Overview', 'center'], 
-                                    ['CVRMSE Baseline', 'right'], 
-                                    ['CVRMSE Reporting', 'right']
-                                ],
-                'table_body': table_data,
-            }
-            tables.append(energy_type_data)
-        return tables
 
 class MultipleProjectMixin(object):
 
