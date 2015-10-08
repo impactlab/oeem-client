@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
 from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from oeem_client.settings import DATASTORE_ACCESS_TOKEN
 from oeem_client.settings import DATASTORE_URL
@@ -139,6 +141,11 @@ def aggregate_savings(all_savings_data):
 class ProjectBlockIndexView(TemplateView):
     template_name = "dashboard/project_block_index.html"
 
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectBlockIndexView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockIndexView, self).get_context_data(**kwargs)
         context['project_blocks'] = self.get_project_blocks()
@@ -240,6 +247,10 @@ class MultipleProjectMixin(object):
 
 class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_block_detail.html"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectBlockDetailView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ProjectBlockDetailView, self).get_context_data(**kwargs)
@@ -418,6 +429,10 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 class ProjectDetailView(TemplateView):
     template_name = "dashboard/project_detail.html"
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectDetailView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
 
@@ -577,9 +592,12 @@ class ProjectDetailView(TemplateView):
         return json.dumps(usage_data)
 
 
-
 class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_listing.html"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectListingView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListingView, self).get_context_data(**kwargs)
