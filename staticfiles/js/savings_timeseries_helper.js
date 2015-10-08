@@ -1,5 +1,5 @@
 var SavingsTimeseriesHelper = {};
-SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_begin_date, actual_start_idx, baseline_series, actual_series) {
+SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_begin_date, actual_start_idx, baseline_series, actual_series, n_projects_series) {
 
   // this assumes that the breakdowns are by month
 
@@ -8,6 +8,8 @@ SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_beg
   var baseline_vals = $(baseline_series.values).slice(actual_start_idx)
   var actual_vals = $(actual_series.values).slice(actual_start_idx)
   var savings_vals = []
+
+  var n_projects = $(n_projects_series.values).slice(actual_start_idx)
 
   var start_yr = parseInt(baseline_begin_date.slice(0,4))
   var start_mon = parseInt(baseline_begin_date.slice(5))
@@ -21,8 +23,9 @@ SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_beg
     dates.push(month)
 
     savings_vals.push( [ month, savings_val ] )
-    baseline_vals[i] = [month, baseline_vals[i]]
-    actual_vals[i] = [month, actual_vals[i]]
+    baseline_vals[i] = [ month, baseline_vals[i]]
+    actual_vals[i] = [ month, actual_vals[i]]
+    n_projects[i] = [ month, n_projects[i]]
 
     if (savings_val > max_savings){
       max_savings = savings_val
@@ -129,13 +132,34 @@ SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_beg
           data: savings_vals,
           color: '#2274AD'
         },
+        {
+          name: 'Total Projects',
+          type: 'spline',
+          lineWidth: 0, // hide line in chart but keep data for tooltip
+          marker: {     // hide marker in chart
+            states: {
+              hover: {
+                enabled: false,
+              }
+            }
+          },
+          data: n_projects,
+        },
       ],
       tooltip: {
         formatter: function() {
           year = Highcharts.dateFormat("%b %Y", this.x)
-          var s = year+"<br>";
+          var s = year+" - ";
           var actual_fig = null;
           var baseline_fig;
+
+          $.each(this.points, function(i, point) {
+            if (point.series.name == 'Total Projects'){
+              actual_fig = this.y
+              s += 'Total Projects: '+pretty_num(this.y)+'<br>'
+            }
+          });
+
           $.each(this.points, function(i, point) {
             if (point.series.name == 'Adjusted Baseline'){
               baseline_fig = this.y
@@ -148,7 +172,6 @@ SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_beg
             if (point.series.name == 'Gross Savings'){
               savings_fig = this.y
             }
-
           });
 
           if (actual_fig){
