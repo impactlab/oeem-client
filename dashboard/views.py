@@ -100,8 +100,7 @@ def get_project_meter_runs(meter_run_ids, project_id, project_pk, get_timeseries
 
 def get_projects(project_block_id=None, get_timeseries=False):
     if project_block_id is None:
-        # TEMPORARY: using a project block of 5 projects while in development. this should be all projects
-        response = datastore_get("/datastore/project/?project_block=5")
+        response = datastore_get("/datastore/project/")
     else:
         response = datastore_get("/datastore/project/?project_block={}".format(project_block_id))
     if response.status_code == 200:
@@ -234,7 +233,7 @@ class ProjectTableMixin(object):
 
 class MultipleProjectMixin(object):
 
-    def get_savings_data(self, projects, project_block_summaries=None):
+    def get_savings_data(self, projects, project_block_summaries=[]):
 
         meter_runs_by_fuel_type = defaultdict(list)
         for project in projects:
@@ -665,7 +664,7 @@ class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     def get_context_data(self, **kwargs):
         context = super(ProjectListingView, self).get_context_data(**kwargs)
 
-        projects = get_projects()
+        projects = get_projects(get_timeseries=False)
 
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
