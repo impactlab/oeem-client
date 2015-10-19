@@ -156,6 +156,20 @@ def aggregate_savings(all_savings_data):
 
     return {'gross': gross, 'annual': annual, 'unit': 'kWh'}
 
+def pretty_bins(min_val, max_val):
+
+    pretty_bin_sizes = [10000,5000,2000,1000,500,200,100,50,20,10,5,2,1]
+    bin_vals = []
+    for size in pretty_bin_sizes:
+        # find a bin size that isn't too fat
+        if (max_val-min_val) > 5*size:
+            bin_vals.append(int(min_val-min_val%size))
+            while bin_vals[-1] < max_val:
+                bin_vals.append(bin_vals[-1]+size)
+            break
+
+    return bin_vals
+
 class ProjectBlockIndexView(TemplateView):
     template_name = "dashboard/project_block_index.html"
 
@@ -513,7 +527,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
 
-        hist, bin_edges = np.histogram(savings, 10)
+        hist, bin_edges = np.histogram(savings, pretty_bins(min(savings), max(savings)))
 
         xlabels = [ "{:.0f}-{:.0f}".format(f,b) for f, b in zip(bin_edges, bin_edges[1:])]
         data = [int(v) for v in hist]
@@ -525,7 +539,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
 
-        hist, bin_edges = np.histogram(savings, 10)
+        hist, bin_edges = np.histogram(savings, pretty_bins(min(savings), max(savings)))
 
         xlabels = [ "{:.0f}-{:.0f}".format(f,b) for f, b in zip(bin_edges, bin_edges[1:])]
         data = [int(v) for v in hist]
