@@ -22,10 +22,27 @@
     padding: 0 0 0 0;
 }
 
-#project-block-header{
+.header-light{
+    height: 60px;
+    background-color: #efefef;
+}
+.header-dark{
     height: 60px;
     background-color: #333;
 }
+.title{
+    margin: 0 0 0 0;
+    padding: 10px 0 0 90px;
+}
+.header-light .title{
+    color: #333;
+}
+.header-dark .title{
+    color: #efefef;
+}
+
+
+
 #project-block-content{
     height: 94px;
 }
@@ -58,14 +75,8 @@
     border-bottom: 6px solid #388ACD;
 }
 
-.title{
-    color: #F2F1EF;
-    margin: 0 0 0 0;
-    padding: 10px 0 0 90px;
-}
-
 .project-block-summary{
-    background-color: #eee;
+    background-color: #f9f9f9;
     margin-bottom: 20px;
     padding-right: 0px;
     padding-left: 0px;

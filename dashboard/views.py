@@ -152,19 +152,24 @@ def aggregate_savings(all_savings_data):
         if s['energy_type'] == 'Electricity':
             gross_s += s['total_gross_savings']
             annual_s += s['total_annual_savings']
-            baseline_u += s['total_annual_usage']['baseline']
-            reporting_u += s['total_annual_usage']['reporting']
+            if 'total_annual_usage' in s:
+                baseline_u += s['total_annual_usage']['baseline']
+                reporting_u += s['total_annual_usage']['reporting']
         elif s['energy_type'] == 'Natural Gas':
             gross_s += 29.3001*s['total_gross_savings']
             annual_s += 29.3001*s['total_annual_savings']
-            baseline_u += 29.3001*s['total_annual_usage']['baseline']
-            reporting_u += 29.3001*s['total_annual_usage']['reporting']
+            if 'total_annual_usage' in s:
+                baseline_u += 29.3001*s['total_annual_usage']['baseline']
+                reporting_u += 29.3001*s['total_annual_usage']['reporting']
 
-    annual_usage = {
-        'baseline': baseline_u, 
-        'reporting': reporting_u, 
-        'percent_savings': (baseline_u-reporting_u)/baseline_u
-    }
+    if baseline_u and reporting_u:
+        annual_usage = {
+            'baseline': baseline_u, 
+            'reporting': reporting_u, 
+            'percent_savings': (baseline_u-reporting_u)/baseline_u
+        }
+    else:
+        annual_usage = None
 
     return {'gross': gross_s, 'annual': annual_s, 'annual_usage': annual_usage, 'unit': 'kWh'}
 
