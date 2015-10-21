@@ -1,23 +1,44 @@
+// this is a custom bar viz for showing actual vs baseline usage
+// for quick stats on all energy types
 var BarHelper = {};
 BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
 
   dataseries = [
                   {
-                    'name' : 'baseline',
-                    'data': [usage_baseline]
+                    'name' : 'Baseline',
+                    'data': [usage_baseline],
+                    'color': '#ccc',
+                    'dataLabels': {
+                      'enabled': true,
+                      'color': '#F2F1EF',
+                      'format': '{series.name}: {y:,.0f}',
+                      'inside': true,
+                      'align': 'right'
+                    }
                   },
                   {
-                    'name' : 'reporting',
-                    'data': [usage_reporting]
+                    'name' : 'Actual',
+                    'data': [usage_reporting],
+                    'color': '#333', 
+                    'dataLabels': {
+                      'enabled': true,
+                      'color': '#F2F1EF',
+                      'format': '{series.name}: {y:,.0f}',
+                      'inside': true,
+                      'align': 'right'
+                    }
                   }
                 ]
 
   return new Highcharts.Chart({
       chart: {
           renderTo: element_id,
-          height: 36,
+          height: 42,
           type: 'bar',
           backgroundColor: null,
+          style: {
+            fontFamily: '"Open Sans", sans-serif'
+          },
           spacingBottom: 0,
           spacingTop: 6,
           spacingLeft: 0,
@@ -48,6 +69,9 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
         title: {
           text: null,
         }
+      },
+      tooltip: {
+        enabled: false
       },
       plotOptions:{
         bar: {
