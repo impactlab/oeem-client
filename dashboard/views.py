@@ -144,30 +144,30 @@ def create_project_block(data, timeseries=False):
 
 def aggregate_savings(all_savings_data):
     # get summary data across all savings types
-    gross = 0
-    annual = 0
+    gross_s = 0
+    annual_s = 0
+    baseline_u = 0
+    reporting_u = 0
     for s in all_savings_data:
         if s['energy_type'] == 'Electricity':
-            gross += s['total_gross_savings']
-            annual += s['total_annual_savings']
+            gross_s += s['total_gross_savings']
+            annual_s += s['total_annual_savings']
+            baseline_u += s['total_annual_usage']['baseline']
+            reporting_u += s['total_annual_usage']['reporting']
         elif s['energy_type'] == 'Natural Gas':
-            gross += 29.3001*s['total_gross_savings']
-            annual += 29.3001*s['total_annual_savings']
+            gross_s += 29.3001*s['total_gross_savings']
+            annual_s += 29.3001*s['total_annual_savings']
+            baseline_u += 29.3001*s['total_annual_usage']['baseline']
+            reporting_u += 29.3001*s['total_annual_usage']['reporting']
 
-    return {'gross': gross, 'annual': annual, 'unit': 'kWh'}
+    annual_usage = {
+        'baseline': baseline_u, 
+        'reporting': reporting_u, 
+        'percent_savings': (baseline_u-reporting_u)/baseline_u
+    }
 
-def aggregate_usage(all_savings_data):
-    baseline = 0
-    reporting = 0
-    for s in all_savings_data:
-        if s['energy_type'] == 'Electricity':
-            baseline += s['total_annual_usage']['baseline']
-            reporting += s['total_annual_usage']['reporting']
-        elif s['energy_type'] == 'Natural Gas':
-            baseline += 29.3001*s['total_annual_usage']['baseline']
-            reporting += 29.3001*s['total_annual_usage']['reporting']
+    return {'gross': gross_s, 'annual': annual_s, 'annual_usage': annual_usage, 'unit': 'kWh'}
 
-    return {'baseline': baseline, 'reporting': reporting, 'unit': 'kWh'}
 
 def pretty_bins(min_val, max_val):
 
@@ -617,7 +617,6 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
 
         context["all_savings_data"] = self.get_savings_data(project)
         context["agg_savings"] = aggregate_savings(context["all_savings_data"])
-        context["agg_usage"] = aggregate_usage(context['all_savings_data'])
 
         context["map_data"] = {
             'latlong': [40.0096836, -82.9700032],

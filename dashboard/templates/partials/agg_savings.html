@@ -7,7 +7,7 @@
 <div class="row-fluid">
   <div id="agg-savings">
 
-    {% if agg_usage %}
+    {% if agg_savings.annual_usage %}
 
     <div class="col-xs-5">
       <h6 class="no-pad-bottom">
@@ -20,9 +20,7 @@
 
         $(document).ready(function () {
 
-          var usage_data = {{ agg_usage | safe }}
-
-          BarHelper.create('usage-bar', {{ agg_usage.baseline }}, {{agg_usage.reporting}})
+          BarHelper.create('usage-bar', {{ agg_savings.annual_usage.baseline }}, {{agg_savings.annual_usage.reporting}})
         });
 
       </script>
