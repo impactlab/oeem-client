@@ -32,7 +32,11 @@ BaselineTimeseriesHelper.create = function(element_id, title, yaxisLabel, baseli
           renderTo: element_id,
           height: 300,
           backgroundColor:'transparent',
-          zoomType: 'x'
+          zoomType: 'x',
+          style: {
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
+          },
       },
       credits: { 
         enabled: false 

@@ -37,7 +37,8 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
           type: 'bar',
           backgroundColor: null,
           style: {
-            fontFamily: '"Open Sans", sans-serif'
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
           },
           spacingBottom: 0,
           spacingTop: 6,

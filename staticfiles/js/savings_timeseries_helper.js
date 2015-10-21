@@ -54,6 +54,10 @@ SavingsTimeseriesHelper.create = function(element_id, title, units, baseline_beg
           backgroundColor:'transparent',
           zoomType: 'x',
           type: 'areaspline',
+          style: {
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
+          },
       },
       credits: { 
         enabled: false 

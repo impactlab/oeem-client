@@ -6,7 +6,11 @@ ScatterHelper.create = function(element_id, title, yaxisLabel, xaxisLabel, datas
     chart: {
         renderTo: element_id,
         type: 'scatter',
-        zoomType: 'xy'
+        zoomType: 'xy',
+        style: {
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
+          },
     },
     title: {
         text: title

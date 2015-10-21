@@ -7,7 +7,11 @@ TimeseriesHelper.create = function(element_id, title, yaxisLabel, xaxisLabel, xC
       chart: {
           renderTo: element_id,
           type: type,
-          height: 350
+          height: 350,
+          style: {
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
+          },
       },
       credits: {
         enabled: false

@@ -9,6 +9,10 @@ HistHelper.create = function(element_id, title, y_label, x_label, xCategories, d
           type: type,
           height: 350,
           backgroundColor:'transparent',
+          style: {
+            fontFamily: '"Open Sans", sans-serif',
+            fontWeight: 300
+          },
       },
       credits: { 
         enabled: false 
