@@ -166,7 +166,7 @@ def aggregate_savings(all_savings_data):
         annual_usage = {
             'baseline': baseline_u, 
             'reporting': reporting_u, 
-            'percent_savings': (baseline_u-reporting_u)/baseline_u
+            'percent_savings': int((baseline_u-reporting_u)/baseline_u*100+.5)
         }
     else:
         annual_usage = None

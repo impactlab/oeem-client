@@ -33,6 +33,11 @@
       </h6>
       <h2 id="total-annual-savings">
         {{ agg_savings.annual | floatformat:"0" | intcomma }}
+        {% if agg_savings.annual_usage.percent_savings >= 0 %}
+          <span class="badge-pct badge-success">{{agg_savings.annual_usage.percent_savings}}%</span>
+        {% else %}
+          <span class="badge-pct badge-danger">{{agg_savings.annual_usage.percent_savings}}%</span>
+        {% endif %}
       </h2>
     </div>
 

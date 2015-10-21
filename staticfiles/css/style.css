@@ -201,3 +201,29 @@
     font-size: 80%;
     color: #bbb;
 }
+
+
+
+.badge-pct {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 70%;
+    line-height: 1;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #E7E7E7;
+    color: #777;
+    border-radius: 15px;
+}
+.badge-success {
+    background-color: #43AC6A;
+    color: #eee;
+}
+.badge-danger {
+    background-color: #F04124;
+    color: #eee;
+}
+
+
+
