@@ -15,25 +15,46 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
   return new Highcharts.Chart({
       chart: {
           renderTo: element_id,
-          height: 300,
-          type: 'bar'
+          height: 36,
+          type: 'bar',
+          backgroundColor: null,
+          spacingBottom: 0,
+          spacingTop: 6,
+          spacingLeft: 0,
+          spacingRight: 0,
+      },
+      title: {
+        text: null
       },
       credits: { 
         enabled: false 
       },
-      tooltip: {
-            shared: true
-        },
       series: dataseries,
       legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'top',
-            x: -40,
-            y: 100,
-            floating: true,
-            borderWidth: 1,
-            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+          enabled: false,
+        },
+      xAxis: {
+        lineWidth: 0,
+        tickWidth: 0,
+        labels: {
+          enabled: false
         }
+      },
+      yAxis: {
+        gridLineWidth: 0,
+        labels: {
+          enabled: false
+        },
+        title: {
+          text: null,
+        }
+      },
+      plotOptions:{
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0,
+          pointPadding: .05
+        }
+      }
     });
 }
