@@ -186,3 +186,7 @@
 .small-font{
     font-size: 20px;
 }
+.muted {
+    font-size: 80%;
+    color: #bbb;
+}
