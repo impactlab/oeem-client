@@ -616,7 +616,6 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         context['project_id'] = project[0][:8]
 
         context["all_savings_data"] = self.get_savings_data(project)
-        #context["all_usage_data"] = self.get_usage_data(project)
         context["agg_savings"] = aggregate_savings(context["all_savings_data"])
         context["agg_usage"] = aggregate_usage(context['all_savings_data'])
 

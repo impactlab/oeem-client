@@ -1,27 +1,25 @@
 var BarHelper = {};
-BarHelper.create = function(element_id, title, yaxisLabel, xaxisLabel, xCategories, dataseries, dataType) {
+BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
 
-  type = dataType
+  dataseries = [
+                  {
+                    'name' : 'baseline',
+                    'data': [usage_baseline]
+                  },
+                  {
+                    'name' : 'reporting',
+                    'data': [usage_reporting]
+                  }
+                ]
 
   return new Highcharts.Chart({
       chart: {
           renderTo: element_id,
-          type: type,
-          height: xCategories.length * 18 + 200
+          height: 300,
+          type: 'bar'
       },
       credits: { 
         enabled: false 
-      },
-      title: {
-            text: title
-      },
-      xAxis: {
-          categories: xCategories
-      },
-      yAxis: {
-          title: {
-                text: yaxisLabel
-            }
       },
       tooltip: {
             shared: true
