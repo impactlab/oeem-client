@@ -50,6 +50,10 @@
     margin-top: 0px;
 }
 
+#gross-usage{
+    position: absolute;
+}
+
 #energy-pane-menu{
     padding-top: 10px;
     height: 46px;
@@ -92,6 +96,10 @@
 .no-pad-bottom{
     padding-bottom: 0px;
     margin-bottom: 0px;
+}
+.no-pad-top{
+    padding-top: 0px;
+    margin-top: 0px;
 }
 .pad-top{
     padding-top: 12px;
@@ -158,39 +166,8 @@
     font-weight: bold;
 }
 
-.color-box{
-    background-color: white;
-    border: 3px solid;
-    border-color: #0273A2;
-    padding: 0px 0px 20px 0px;
-}
-.color-box h2{
-    margin:0px 0px 10px 15px;
-    color: #333333;//#F2F1EF;
-}
 
-.color-box h3{
-    margin: 20px 0px 10px 15px;
-    color: #333333; //#F2F1EF;
-}
 
-.color-box h4{
-    display: block;
-    color: #F2F1EF;
-    background-color: #0273A2;
-    margin: 0px 0px 10px 0px;
-    padding: 8px 15px 8px 15px;
-}
-.color-box small{
-    color: rgb(34, 34, 34);
-}
-.color-box p{
-    margin: 20px 0px 10px 15px;
-    color: #333333; //#F2F1EF;
-}
-.color-box .wide{
-  margin-left: -20;
-}
 .divider{
     height:30px;
 }

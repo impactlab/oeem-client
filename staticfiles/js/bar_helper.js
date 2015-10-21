@@ -63,6 +63,7 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
         }
       },
       yAxis: {
+        endOnTick: false,
         gridLineWidth: 0,
         labels: {
           enabled: false
