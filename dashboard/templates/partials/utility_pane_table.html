@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <div class="container-fluid energy-table">
 	<div class="row-fluid">
     <div class="col-sm-12">
@@ -37,14 +39,16 @@
                   {% endif %}
                 {% elif c.cell_type == 'float_threshold' %}
                   {% if c.cell_data.is_invalid %}
-                    <td class="text-danger align-center">{{ c.cell_data.val | floatformat:2 }}</td>
+                    <td class="text-danger align-right">{{ c.cell_data.val | floatformat:2 }}</td>
                   {% else %}
-                    <td class="text-success align-center">{{ c.cell_data.val | floatformat:2 }}</td>
+                    <td class="text-success align-right">{{ c.cell_data.val | floatformat:2 }}</td>
                   {% endif %}
                 {% elif c.cell_type == 'float' %}
-                    <td class="align-center">{{ c.cell_data.val | floatformat:2 }}</td>
+                    <td class="align-right">{{ c.cell_data.val | floatformat:2 }}</td>
+                {% elif c.cell_type == 'int' %}
+                    <td class="align-right">{{ c.cell_data.val | floatformat:0 | intcomma }}</td>
                 {% elif c.cell_type == 'percent' %}
-                    <td class="align-center">{{ c.cell_data.val }}</td>
+                    <td class="align-right">{{ c.cell_data.val }}</td>
                 {% endif %}
 
               {% endfor %}

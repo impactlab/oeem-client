@@ -239,22 +239,22 @@ class ProjectTableMixin(object):
             cvrmse_reporting['cell_data']['is_invalid'] = cvrmse_reporting['cell_data']['val'] > 20
 
             gross_savings = {
-                'cell_type':'float',
+                'cell_type':'int',
                 'cell_data':{'val': meter_run.gross_savings}
             }
 
             annual_savings = {
-                'cell_type':'float',
+                'cell_type':'int',
                 'cell_data':{'val': meter_run.annual_savings}
             }
 
             annual_usage_baseline = {
-                'cell_type':'float',
+                'cell_type':'int',
                 'cell_data':{'val': meter_run.annual_usage_baseline}
             }
 
             annual_usage_reporting = {
-                'cell_type':'float',
+                'cell_type':'int',
                 'cell_data':{'val': meter_run.annual_usage_reporting}
             }
 
@@ -300,15 +300,15 @@ class ProjectTableMixin(object):
                 ['Project ID', None, None],
                 ['Data Quality Overview', 'center', None],
 
-                ['Annual Usage Baseline', 'center', 'kWh/yr'],
-                ['CVRMSE Baseline', 'center', None],
+                ['Annual Usage Baseline', 'right', 'kWh/yr'],
+                ['CVRMSE Baseline', 'right', None],
 
-                ['Annual Usage Reporting', 'center', 'kWh/yr'],
-                ['CVRMSE Reporting', 'center', None],
+                ['Annual Usage Reporting', 'right', 'kWh/yr'],
+                ['CVRMSE Reporting', 'right', None],
 
-                ['Gross Savings', 'center', 'kWh'],
-                ['Annual Savings', 'center', 'kWh'],
-                ['Percent Savings', 'center', None],
+                ['Gross Savings', 'right', 'kWh'],
+                ['Annual Savings', 'right', 'kWh'],
+                ['Percent Savings', 'right', None],
             ],
             'table_body': table_body,
         }
