@@ -55,28 +55,33 @@
 }
 
 #energy-pane-menu{
-    padding-top: 10px;
-    height: 46px;
+    height: 60px;
+    text-align: center;
 }
 #energy-pane-menu a{
-    color: #0A4376;
-    margin-right: 20px;
+    color: #388ACD;
+    margin-right: 12px;
     text-decoration: none;
     text-transform: uppercase;
-    font-size: 1.3em;
+    font-size: .9em;
+    border: 1px #388ACD solid;
+    border-radius: 8px;
+    padding: 6px;
 }
 .energy-pane-select{
     padding-bottom: 3px;
 }
-#energy-pane-menu a:hover, #energy-pane-menu a:active, #energy-pane-menu a:visited, #energy-pane-menu a:focus{
-    color: #388ACD;
+#energy-pane-menu a:hover, #energy-pane-menu a:focus{
+    color: #0A4376;
+    border: 1px #0A4376 solid;
     text-decoration: none;
     outline: 0;
 }
 
-#energy-pane-menu .selected{
-    color: #388ACD;
-    border-bottom: 6px solid #388ACD;
+#energy-pane-menu a.selected, #energy-pane-menu a.selected:hover, #energy-pane-menu a.selected:focus{
+    color: #F2F1EF;
+    background-color: #388ACD;
+    border: 1px #388ACD solid;
 }
 
 .project-block-summary{
