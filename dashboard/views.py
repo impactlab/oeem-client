@@ -180,7 +180,7 @@ def pretty_bins(min_val, max_val):
     bin_vals = []
     for size in pretty_bin_sizes:
         # find a bin size that isn't too fat
-        if (max_val-min_val) > 5*size:
+        if (max_val-min_val) > 8*size:
             bin_vals.append(int(min_val-min_val%size))
             while bin_vals[-1] < max_val:
                 bin_vals.append(bin_vals[-1]+size)

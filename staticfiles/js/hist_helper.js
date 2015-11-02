@@ -57,7 +57,7 @@ HistHelper.create = function(element_id, title, y_label, x_label, xCategories, d
             borderWidth: 0
         },
         series: {
-            color: '#2274AD'
+            color: '#c6dceb'
         }
       }
 
