@@ -1,5 +1,5 @@
 .container{
-  padding: 0px;
+    padding: 0px;
 }
 
 #map {
@@ -177,6 +177,7 @@
 .muted {
     font-size: 80%;
     color: #bbb;
+    font-weight: normal;
 }
 
 

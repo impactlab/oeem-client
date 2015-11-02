@@ -297,18 +297,18 @@ class ProjectTableMixin(object):
 
         table_data = {
             'table_header': [
-                ['Project ID', None],
-                ['Data Quality Overview', 'center'],
+                ['Project ID', None, None],
+                ['Data Quality Overview', 'center', None],
 
-                ['Annual Usage Baseline', 'center'],
-                ['CVRMSE Baseline', 'center'],
+                ['Annual Usage Baseline', 'center', 'kWh/yr'],
+                ['CVRMSE Baseline', 'center', None],
 
-                ['Annual Usage Reporting', 'center'],
-                ['CVRMSE Reporting', 'center'],
+                ['Annual Usage Reporting', 'center', 'kWh/yr'],
+                ['CVRMSE Reporting', 'center', None],
 
-                ['Gross Savings', 'center'],
-                ['Annual Savings', 'center'],
-                ['Percent Savings', 'center'],
+                ['Gross Savings', 'center', 'kWh'],
+                ['Annual Savings', 'center', 'kWh'],
+                ['Percent Savings', 'center', None],
             ],
             'table_body': table_body,
         }

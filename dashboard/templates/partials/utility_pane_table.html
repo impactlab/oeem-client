@@ -8,9 +8,12 @@
 
         <table class="table">
           <tr>
-            {% for h, align in savings_data.project_table_data.table_header %}
+            {% for h, align, unit in savings_data.project_table_data.table_header %}
               <th {%if align%}class="align-{{align}}"{%endif%}>
                 {{ h }}
+                {% if unit %}
+                  <span class="muted">{{ unit }}</span>
+                {% endif %}
               </th>
             {% endfor %}
           </tr>
