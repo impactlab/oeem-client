@@ -1,6 +1,14 @@
 <div class="container-fluid energy-summary">
 	<div class="row-fluid">
-    <div class="col-sm-12">
+    <div class="col-sm-4">
+      <h4>Quick Stats - {{savings_data.energy_type}}</h4>
+      <p class="h6">Annual Savings</p>
+      <p class="h2">{{savings_data.total_annual_savings}}</p>
+      <p class="h6">Gross Savings</p>
+      <p class="h2">{{savings_data.total_gross_savings}}</p>
+
+    </div>
+    <div class="col-sm-8">
 
       <div id="{{ savings_data.energy_type_slug }}-gross-savings">
       </div>
