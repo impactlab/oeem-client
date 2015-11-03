@@ -1,42 +1,8 @@
-{% load humanize %}
 <div class="container-fluid energy-summary">
 	<div class="row-fluid">
     {% if savings_data.total_annual_usage %}
     <div class="col-sm-5">
-      <h4>Quick Stats - {{savings_data.energy_type}}</h4>
-
-      <div class="col-xs-6">
-        <h6 class="no-pad-bottom">
-          Annual Usage
-          <span class="muted">{{savings_data.unit}}/yr</span>
-        </h6>
-        <div id="usage-bar-{{savings_data.energy_type_slug}}">
-        </div>
-        <script type="text/javascript">
-
-          $(document).ready(function () {
-
-            BarHelper.create('usage-bar-{{savings_data.energy_type_slug}}', {{ savings_data.total_annual_usage.baseline }}, {{savings_data.total_annual_usage.reporting}})
-          });
-
-        </script>
-      </div>
-
-      <div class="col-xs-6">
-        <h6 class="no-pad-bottom">
-          Annual Savings
-          <span class="muted">{{savings_data.unit}}/yr</span>
-        </h6>
-        <h2 id="total-annual-savings">
-          {{ savings_data.total_annual_savings | floatformat:"0" | intcomma }}
-          {% if savings_data.total_annual_usage.percent_savings >= 0 %}
-            <span class="badge-pct badge-success">{{savings_data.total_annual_usage.percent_savings}}%</span>
-          {% else %}
-            <span class="badge-pct badge-danger">{{savings_data.total_annual_usage.percent_savings}}%</span>
-          {% endif %}
-        </h2>
-      </div>
-
+      {% include 'partials/quick_stats.html' %}
     </div>
     <div class="col-sm-7">
     {% else %}
