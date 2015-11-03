@@ -148,19 +148,44 @@ def aggregate_savings(all_savings_data):
     annual_s = 0
     baseline_u = 0
     reporting_u = 0
+
+    usage_data = {
+        'series_baseline': {
+            'errors': [],
+            'values': [],
+        },
+        'series_actual': {
+            'errors': [],
+            'values': [],
+        },
+    }
+
     for s in all_savings_data:
         if s['energy_type'] == 'Electricity':
-            gross_s += s['total_gross_savings']
-            annual_s += s['total_annual_savings']
-            if 'total_annual_usage' in s:
-                baseline_u += s['total_annual_usage']['baseline']
-                reporting_u += s['total_annual_usage']['reporting']
+            multiplier = 1
         elif s['energy_type'] == 'Natural Gas':
-            gross_s += 29.3001*s['total_gross_savings']
-            annual_s += 29.3001*s['total_annual_savings']
-            if 'total_annual_usage' in s:
-                baseline_u += 29.3001*s['total_annual_usage']['baseline']
-                reporting_u += 29.3001*s['total_annual_usage']['reporting']
+            multiplier = 29.3001
+
+        gross_s += multiplier*s['total_gross_savings']
+        annual_s += multiplier*s['total_annual_savings']
+        if 'total_annual_usage' in s:
+            baseline_u += multiplier*s['total_annual_usage']['baseline']
+            reporting_u += multiplier*s['total_annual_usage']['reporting']
+
+        if 'xlabels' not in usage_data:
+            usage_data['xlabels'] = s['usage_data']['xlabels']
+            usage_data['actual_start_idx'] = s['usage_data']['actual_start_idx']
+
+            usage_data['series_baseline']['values'] = multiplier*np.array(s['usage_data']['series_baseline']['values'])
+            usage_data['series_actual']['values'] = multiplier*np.array(s['usage_data']['series_actual']['values'])
+        else:
+            usage_data['series_baseline']['values'] += multiplier*np.array(s['usage_data']['series_baseline']['values'])
+            usage_data['series_actual']['values'] += multiplier*np.array(s['usage_data']['series_actual']['values'])
+
+        usage_data['series_baseline']['values'] = list(usage_data['series_baseline']['values'])
+        usage_data['series_actual']['values'] = list(usage_data['series_actual']['values'])
+
+
 
     if baseline_u and reporting_u:
         annual_usage = {
@@ -176,7 +201,7 @@ def aggregate_savings(all_savings_data):
         'energy_type_slug': 'all',
         'icon': 'fa-star-o',
         'unit': 'kWh',
-        'usage_data': None,
+        'usage_data': usage_data,
         'total_gross_savings': gross_s,
         'total_annual_savings': annual_s,
         'total_annual_usage': annual_usage,
@@ -433,7 +458,8 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 
         context["map_data"] = self.get_map_data(projects)
         context["all_savings_data"] = self.get_savings_data(projects, project_block.recent_summaries)
-        context["agg_savings"] = aggregate_savings(context["all_savings_data"])
+        agg_savings = aggregate_savings(context["all_savings_data"])
+        context['all_savings_data'].insert(0, agg_savings)
 
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
@@ -498,7 +524,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         series_baseline = []
         series_actual = []
         series_n_projects = []
-        actual_start_ix = 0
+        actual_start_idx = 0
         for i, month_label in enumerate(month_labels):
 
             _, n_days_per_month = monthrange(int(month_label[:4]), int(month_label[5:7]))
@@ -540,7 +566,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
                 },
             "actual_start_idx": 0,
         }
-        return json.dumps(usage_data)
+        return usage_data
 
     def get_project_block_usage(self, project_block_summary):
         x_labels = []
@@ -636,6 +662,9 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         context["all_savings_data"] = self.get_savings_data(project)
         agg_savings = aggregate_savings(context["all_savings_data"])
         context['all_savings_data'].insert(0, agg_savings)
+
+        for i, savings_data in enumerate(context["all_savings_data"]):
+            context["all_savings_data"][i]['usage_data'] = json.dumps(savings_data['usage_data']) if savings_data['usage_data'] else None
 
         context["map_data"] = {
             'latlong': [40.0096836, -82.9700032],
@@ -740,7 +769,7 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         x_labels = []
         series_baseline = []
         series_reporting = []
-        actual_start_ix = 0
+        actual_start_idx = 0
         for i, month_label in enumerate(month_labels):
 
             _, n_days_per_month = monthrange(int(month_label[:4]), int(month_label[5:7]))
@@ -781,7 +810,7 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
                 },
             "actual_start_idx": 0,
         }
-        return json.dumps(usage_data)
+        return usage_data
 
 
 class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
