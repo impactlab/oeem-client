@@ -66,6 +66,12 @@ fuel_type_units = {
     "NG": "therms",
 }
 
+def multiadd(a, b, m):
+    if a:
+        return [a[i]+m*b[i] for i in range(len(b))]
+    else:
+        return [m*b[i] for i in range(len(b))]
+
 def datastore_get(url, verify=False):
     auth_headers = {"Authorization":"Bearer {}".format(DATASTORE_ACCESS_TOKEN)}
     return requests.get(DATASTORE_URL + url, headers=auth_headers, verify=False)
@@ -158,6 +164,8 @@ def aggregate_savings(all_savings_data):
             'errors': [],
             'values': [],
         },
+        'xlabels': all_savings_data[0]['usage_data']['xlabels'],
+        'actual_start_idx': all_savings_data[0]['usage_data']['actual_start_idx'],
     }
 
     for s in all_savings_data:
@@ -172,20 +180,8 @@ def aggregate_savings(all_savings_data):
             baseline_u += multiplier*s['total_annual_usage']['baseline']
             reporting_u += multiplier*s['total_annual_usage']['reporting']
 
-        if 'xlabels' not in usage_data:
-            usage_data['xlabels'] = s['usage_data']['xlabels']
-            usage_data['actual_start_idx'] = s['usage_data']['actual_start_idx']
-
-            usage_data['series_baseline']['values'] = multiplier*np.array(s['usage_data']['series_baseline']['values'])
-            usage_data['series_actual']['values'] = multiplier*np.array(s['usage_data']['series_actual']['values'])
-        else:
-            usage_data['series_baseline']['values'] += multiplier*np.array(s['usage_data']['series_baseline']['values'])
-            usage_data['series_actual']['values'] += multiplier*np.array(s['usage_data']['series_actual']['values'])
-
-        usage_data['series_baseline']['values'] = list(usage_data['series_baseline']['values'])
-        usage_data['series_actual']['values'] = list(usage_data['series_actual']['values'])
-
-
+        usage_data['series_baseline']['values'] = multiadd(usage_data['series_baseline']['values'], s['usage_data']['series_baseline']['values'], multiplier)
+        usage_data['series_actual']['values'] = multiadd(usage_data['series_actual']['values'], s['usage_data']['series_actual']['values'], multiplier)
 
     if baseline_u and reporting_u:
         annual_usage = {
@@ -460,6 +456,10 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         context["all_savings_data"] = self.get_savings_data(projects, project_block.recent_summaries)
         agg_savings = aggregate_savings(context["all_savings_data"])
         context['all_savings_data'].insert(0, agg_savings)
+
+        for i, savings_data in enumerate(context["all_savings_data"]):
+            context["all_savings_data"][i]['usage_data'] = json.dumps(savings_data['usage_data']) if savings_data['usage_data'] else None
+
 
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
