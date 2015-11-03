@@ -1,14 +1,47 @@
+{% load humanize %}
 <div class="container-fluid energy-summary">
 	<div class="row-fluid">
-    <div class="col-sm-4">
+    {% if savings_data.total_annual_usage %}
+    <div class="col-sm-5">
       <h4>Quick Stats - {{savings_data.energy_type}}</h4>
-      <p class="h6">Annual Savings</p>
-      <p class="h2">{{savings_data.total_annual_savings}}</p>
-      <p class="h6">Gross Savings</p>
-      <p class="h2">{{savings_data.total_gross_savings}}</p>
+
+      <div class="col-xs-6">
+        <h6 class="no-pad-bottom">
+          Annual Usage
+          <span class="muted">{{savings_data.unit}}/yr</span>
+        </h6>
+        <div id="usage-bar-{{savings_data.energy_type_slug}}">
+        </div>
+        <script type="text/javascript">
+
+          $(document).ready(function () {
+
+            BarHelper.create('usage-bar-{{savings_data.energy_type_slug}}', {{ savings_data.total_annual_usage.baseline }}, {{savings_data.total_annual_usage.reporting}})
+          });
+
+        </script>
+      </div>
+
+      <div class="col-xs-6">
+        <h6 class="no-pad-bottom">
+          Annual Savings
+          <span class="muted">{{savings_data.unit}}/yr</span>
+        </h6>
+        <h2 id="total-annual-savings">
+          {{ savings_data.total_annual_savings | floatformat:"0" | intcomma }}
+          {% if savings_data.total_annual_usage.percent_savings >= 0 %}
+            <span class="badge-pct badge-success">{{savings_data.total_annual_usage.percent_savings}}%</span>
+          {% else %}
+            <span class="badge-pct badge-danger">{{savings_data.total_annual_usage.percent_savings}}%</span>
+          {% endif %}
+        </h2>
+      </div>
 
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-7">
+    {% else %}
+    <div class="col-sm-12">
+    {% endif %}
 
       <div id="{{ savings_data.energy_type_slug }}-gross-savings">
       </div>
@@ -18,20 +51,21 @@
 
   <script type="text/javascript">
 
-  $(document).ready(function () {
+  {% if savings_data.usage_data %}
+    $(document).ready(function () {
+      var usage_data = {{ savings_data.usage_data | safe }}
 
-    var usage_data = {{ savings_data.usage_data | safe }}
-
-    SavingsTimeseriesHelper.create(
-      '{{ savings_data.energy_type_slug }}-gross-savings',
-      '{{ savings_data.energy_type }} Monthly Gross Savings',
-      '{{ savings_data.unit }}',
-      usage_data['xlabels'][usage_data['actual_start_idx']],
-      usage_data['actual_start_idx'],
-      usage_data['series_baseline'],
-      usage_data['series_actual'],
-      usage_data['series_n_projects']);
-    });
+      SavingsTimeseriesHelper.create(
+        '{{ savings_data.energy_type_slug }}-gross-savings',
+        '{{ savings_data.energy_type }} Monthly Gross Savings',
+        '{{ savings_data.unit }}',
+        usage_data['xlabels'][usage_data['actual_start_idx']],
+        usage_data['actual_start_idx'],
+        usage_data['series_baseline'],
+        usage_data['series_actual'],
+        usage_data['series_n_projects']);
+      });
+  {% endif %}
 
   </script>
 </div>
