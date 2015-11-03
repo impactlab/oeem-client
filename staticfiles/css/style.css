@@ -180,9 +180,9 @@
     font-size: 20px;
 }
 .muted {
-    font-size: 80%;
+    font-size: 70%;
     color: #bbb;
-    font-weight: normal;
+    font-weight: 300;
 }
 
 

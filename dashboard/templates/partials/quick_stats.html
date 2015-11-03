@@ -4,10 +4,10 @@
 </div>
 
 <div class="col-xs-6">
-  <h6 class="no-pad-bottom">
-    Annual Usage
+  <h5 class="no-pad-bottom">
+    <strong>Annual Usage</strong>
     <span class="muted">{{savings_data.unit}}/yr</span>
-  </h6>
+  </h5>
   <div id="usage-bar-{{savings_data.energy_type_slug}}">
   </div>
   <script type="text/javascript">
@@ -21,10 +21,10 @@
 </div>
 
 <div class="col-xs-6">
-  <h6 class="no-pad-bottom">
-    Annual Savings
+  <h5 class="no-pad-bottom">
+    <strong>Annual Savings</strong>
     <span class="muted">{{savings_data.unit}}/yr</span>
-  </h6>
+  </h5>
   <h2 id="total-annual-savings">
     {{ savings_data.total_annual_savings | floatformat:"0" | intcomma }}
     {% if savings_data.total_annual_usage.percent_savings >= 0 %}

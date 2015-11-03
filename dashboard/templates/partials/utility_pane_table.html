@@ -1,9 +1,10 @@
 {% load humanize %}
 
+{% if savings_data.project_table_data %}
 <div class="container-fluid energy-table">
 	<div class="row-fluid">
     <div class="col-sm-12">
-
+      
       <h4>Projects</h4>
 
       <div id="{{ savings_data.energy_type_slug }}-table">
@@ -69,3 +70,4 @@
 
   </script>
 </div>
+{% endif %}

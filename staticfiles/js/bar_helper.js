@@ -33,7 +33,7 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
   return new Highcharts.Chart({
       chart: {
           renderTo: element_id,
-          height: 42,
+          height: 60,
           type: 'bar',
           backgroundColor: null,
           style: {
@@ -41,7 +41,7 @@ BarHelper.create = function(element_id, usage_baseline, usage_reporting) {
             fontWeight: 300
           },
           spacingBottom: 0,
-          spacingTop: 6,
+          spacingTop: 12,
           spacingLeft: 0,
           spacingRight: 0,
       },
