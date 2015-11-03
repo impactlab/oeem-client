@@ -171,8 +171,21 @@ def aggregate_savings(all_savings_data):
     else:
         annual_usage = None
 
-    return {'gross': gross_s, 'annual': annual_s, 'annual_usage': annual_usage, 'unit': 'kWh'}
+    agg_savings = {
+        'energy_type': 'All Energy Types',
+        'energy_type_slug': 'all',
+        'icon': 'fa-star-o',
+        'unit': 'kWh',
+        'usage_data': None,
+        'total_gross_savings': gross_s,
+        'total_annual_savings': annual_s,
+        'total_annual_usage': annual_usage,
+        'gross_savings_hist_data': None,
+        'annual_savings_hist_data': None,
+        'project_table_data': None,
+    }
 
+    return agg_savings
 
 def pretty_bins(min_val, max_val):
 
@@ -621,7 +634,8 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         context['project_id'] = project[0][:8]
 
         context["all_savings_data"] = self.get_savings_data(project)
-        context["agg_savings"] = aggregate_savings(context["all_savings_data"])
+        agg_savings = aggregate_savings(context["all_savings_data"])
+        context['all_savings_data'].insert(0, agg_savings)
 
         context["map_data"] = {
             'latlong': [40.0096836, -82.9700032],
@@ -684,15 +698,22 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         return np.nansum(savings)
 
     def get_total_annual_usage(self, meter_runs):
-        usage = {
-            'baseline': [],
-            'reporting': [], 
-        }
+        baseline_u = []
+        reporting_u = []
         for meter_run, _ in meter_runs:
-            usage['baseline'].append(meter_run.annual_usage_baseline)
-            usage['reporting'].append(meter_run.annual_usage_reporting)
-        usage['baseline'] = np.nansum(usage['baseline'])
-        usage['reporting'] = np.nansum(usage['reporting'])
+            baseline_u.append(meter_run.annual_usage_baseline)
+            reporting_u.append(meter_run.annual_usage_reporting)
+
+        baseline_u = np.nansum(baseline_u)
+        reporting_u = np.nansum(reporting_u)
+
+        pct_savings =  int((baseline_u-reporting_u)/baseline_u*100+.5)
+
+        usage = {
+            'baseline': baseline_u,
+            'reporting': reporting_u,
+            'percent_savings': pct_savings
+        }
         return usage
 
     def get_monthly_gross_usage(self, meter_runs):
