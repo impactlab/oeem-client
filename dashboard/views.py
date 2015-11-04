@@ -349,9 +349,13 @@ class ProjectTableMixin(object):
 
         return table_data
 
-class MultipleProjectMixin(object):
+class ProjectMixin(object):
 
     def get_savings_data(self, projects, project_block_summaries=[]):
+
+        # if projects is a single project, instead of a list of projects
+        if type(projects) is not list:
+            projects = [projects]
 
         meter_runs_by_fuel_type = defaultdict(list)
         for project in projects:
@@ -372,35 +376,14 @@ class MultipleProjectMixin(object):
         return data
 
     def get_fuel_type_data(self, fuel_type, meter_runs, project_block_summary):
-        name = fuel_type_names[fuel_type]
-        slug = fuel_type_slugs[fuel_type]
-        icon = fuel_type_icons[fuel_type]
-        unit = fuel_type_units[fuel_type]
-
+        
         fuel_type_data = {
-            "energy_type": name,
-            "energy_type_slug": slug,
-            "icon": icon,
-            "unit": unit,
+            "energy_type": fuel_type_names[fuel_type],
+            "energy_type_slug": fuel_type_slugs[fuel_type],
+            "icon": fuel_type_icons[fuel_type],
+            "unit": fuel_type_units[fuel_type],
         }
         return fuel_type_data
-
-class SingleProjectMixin(object):
-
-    def get_savings_data(self, project):
-
-        meter_runs_by_fuel_type = defaultdict(list)
-        for meter_run in project.meter_runs:
-            meter_run_data = (meter_run, project.reporting_period_start)
-            meter_runs_by_fuel_type[meter_run.fuel_type].append(meter_run_data)
-
-        data = []
-        for fuel_type in ["E", "NG"]:
-            meter_runs = meter_runs_by_fuel_type[fuel_type]
-
-            fuel_type_data = self.get_fuel_type_data(fuel_type, meter_runs)
-            data.append(fuel_type_data)
-        return data
 
     def get_usage_data(self, project):
 
@@ -417,21 +400,8 @@ class SingleProjectMixin(object):
             data.append(fuel_type_data)
         return data
 
-    def get_fuel_type_data(self, fuel_type, meter_runs):
-        name = fuel_type_names[fuel_type]
-        slug = fuel_type_slugs[fuel_type]
-        icon = fuel_type_icons[fuel_type]
-        unit = fuel_type_units[fuel_type]
 
-        fuel_type_data = {
-            "energy_type": name,
-            "energy_type_slug": slug,
-            "icon": icon,
-            "unit": unit,
-        }
-        return fuel_type_data
-
-class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
+class ProjectBlockDetailView(TemplateView, ProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_block_detail.html"
 
     @method_decorator(login_required)
@@ -645,7 +615,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         return map_data
 
 
-class ProjectDetailView(TemplateView, SingleProjectMixin):
+class ProjectDetailView(TemplateView, ProjectMixin):
     template_name = "dashboard/project_detail.html"
 
     @method_decorator(login_required)
@@ -696,8 +666,8 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         else:
             raise Http404("Project does not exist")
 
-    def get_fuel_type_data(self, fuel_type, meter_runs):
-        fuel_type_data = super(ProjectDetailView, self).get_fuel_type_data(fuel_type, meter_runs)
+    def get_fuel_type_data(self, fuel_type, meter_runs, project_block_summary):
+        fuel_type_data = super(ProjectDetailView, self).get_fuel_type_data(fuel_type, meter_runs, project_block_summary)
 
         fuel_type_data["usage_data"] = self.get_monthly_gross_usage(meter_runs)
         fuel_type_data["total_gross_savings"] = self.get_total_gross_savings(meter_runs)
@@ -813,7 +783,7 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
         return usage_data
 
 
-class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
+class ProjectListingView(TemplateView, ProjectMixin, ProjectTableMixin):
     template_name = "dashboard/project_listing.html"
 
     @method_decorator(login_required)
