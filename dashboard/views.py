@@ -247,6 +247,15 @@ class ProjectBlockIndexView(TemplateView):
             project_blocks.append(project_block)
         return project_blocks
 
+
+class MeterRunTableMixin(object):
+
+    def get_meter_run_table_data(self, meter_runs):
+        table_body = []
+        # for meter_run, _ in meter_runs:
+
+
+
 class ProjectTableMixin(object):
 
     def get_project_table_data(self, meter_runs):
@@ -651,9 +660,11 @@ class ProjectDetailView(TemplateView, ProjectMixin):
 
         context['project_id'] = project[0][:8]
 
-        context["all_savings_data"] = self.get_savings_data(project)
-        agg_savings = aggregate_savings(context["all_savings_data"])
-        context['all_savings_data'].insert(0, agg_savings)
+        fuel_type_savings_data = self.get_savings_data(project)
+        agg_savings = aggregate_savings(fuel_type_savings_data)
+        context['all_savings_data'] = [agg_savings] + fuel_type_savings_data
+        
+        context['meter_run_history'] = self.meter_run_history(project)
 
         for i, savings_data in enumerate(context["all_savings_data"]):
             context["all_savings_data"][i]['usage_data'] = json.dumps(savings_data['usage_data']) if savings_data['usage_data'] else None
@@ -785,6 +796,30 @@ class ProjectDetailView(TemplateView, ProjectMixin):
             "actual_start_idx": 0,
         }
         return usage_data
+
+    def meter_run_history(self, project):
+
+        header = [['Date', None]]
+        dates = [read['date'] for read in project.meter_runs[0].baseline_monthly_averages]
+        hist1 = [read['value'] for read in project.meter_runs[0].baseline_monthly_averages]
+        hist2 = [read['value'] for read in project.meter_runs[1].baseline_monthly_averages]
+
+        for meter_run in project.meter_runs:
+            if meter_run.fuel_type == 'E':
+                header.append(['Electricity', 'kWh'])
+            elif meter_run.fuel_type == 'NG':
+                header.append(['Natural Gas', 'therm'])
+
+        current_run = [ [dates[0], hist1[0], hist2[0]] ]
+        past_runs = [ [dates[i], hist1[i], hist2[i]] for i in range(1,len(dates))]
+
+        history = {
+            'header': header,
+            'current_run': current_run,
+            'past_runs': past_runs
+        }
+        
+        return history
 
 
 class ProjectListingView(TemplateView, ProjectMixin, ProjectTableMixin):
