@@ -376,7 +376,7 @@ class ProjectMixin(object):
         return data
 
     def get_fuel_type_data(self, fuel_type, meter_runs, project_block_summary):
-        
+
         fuel_type_data = {
             "energy_type": fuel_type_names[fuel_type],
             "energy_type_slug": fuel_type_slugs[fuel_type],
@@ -399,6 +399,25 @@ class ProjectMixin(object):
             fuel_type_data = self.get_fuel_type_data(fuel_type, meter_runs)
             data.append(fuel_type_data)
         return data
+
+    def get_total_annual_usage(self, meter_runs):
+        baseline_u = []
+        reporting_u = []
+        for meter_run, _ in meter_runs:
+            baseline_u.append(meter_run.annual_usage_baseline)
+            reporting_u.append(meter_run.annual_usage_reporting)
+
+        baseline_u = np.nansum(baseline_u)
+        reporting_u = np.nansum(reporting_u)
+
+        pct_savings =  int((baseline_u-reporting_u)/baseline_u*100+.5)
+
+        usage = {
+            'baseline': baseline_u,
+            'reporting': reporting_u,
+            'percent_savings': pct_savings
+        }
+        return usage
 
 
 class ProjectBlockDetailView(TemplateView, ProjectMixin, ProjectTableMixin):
@@ -457,6 +476,9 @@ class ProjectBlockDetailView(TemplateView, ProjectMixin, ProjectTableMixin):
         gross_savings_hist_data = self.get_gross_savings_hist_data(meter_runs)
         annual_savings_hist_data = self.get_annual_savings_hist_data(meter_runs)
         project_table_data = self.get_project_table_data(meter_runs)
+
+        # data for one fuel type for a block of projects
+        fuel_type_data["total_annual_usage"] = self.get_total_annual_usage(meter_runs)
 
         fuel_type_data["usage_data"] = usage_data
         fuel_type_data["total_gross_savings"] = total_gross_savings
@@ -669,6 +691,7 @@ class ProjectDetailView(TemplateView, ProjectMixin):
     def get_fuel_type_data(self, fuel_type, meter_runs, project_block_summary):
         fuel_type_data = super(ProjectDetailView, self).get_fuel_type_data(fuel_type, meter_runs, project_block_summary)
 
+        # data for one fuel type for an individual project
         fuel_type_data["usage_data"] = self.get_monthly_gross_usage(meter_runs)
         fuel_type_data["total_gross_savings"] = self.get_total_gross_savings(meter_runs)
         fuel_type_data["total_annual_savings"] = self.get_total_annual_savings(meter_runs)
@@ -695,25 +718,6 @@ class ProjectDetailView(TemplateView, ProjectMixin):
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
         return np.nansum(savings)
-
-    def get_total_annual_usage(self, meter_runs):
-        baseline_u = []
-        reporting_u = []
-        for meter_run, _ in meter_runs:
-            baseline_u.append(meter_run.annual_usage_baseline)
-            reporting_u.append(meter_run.annual_usage_reporting)
-
-        baseline_u = np.nansum(baseline_u)
-        reporting_u = np.nansum(reporting_u)
-
-        pct_savings =  int((baseline_u-reporting_u)/baseline_u*100+.5)
-
-        usage = {
-            'baseline': baseline_u,
-            'reporting': reporting_u,
-            'percent_savings': pct_savings
-        }
-        return usage
 
     def get_monthly_gross_usage(self, meter_runs):
 
