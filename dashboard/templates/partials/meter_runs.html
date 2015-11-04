@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#meter-run-modal">
   <i class="fa fa-history fa-fw"></i>
   Meter History
@@ -7,35 +9,41 @@
 <div class="modal fade" id="meter-run-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+
+      <div class="modal-body">
+
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">
           Meter Run History
         </h4>
-      </div>
-      <div class="modal-body">
+        <br/>
         
         <table class="table">
           <tr>
             {% for h, unit in meter_run_history.header %}
-              <th>
-                {{ h }}
-                {% if unit %}
-                  <span class="muted">{{ unit }}</span>
-                {% endif %}
-              </th>
+              {% if unit %}
+                <th class="align-right">
+                  {{ h }} Usage 
+                  <span class="small">({{ unit }})</span>
+                </th>
+              {% else %}
+                <th>
+                  {{ h }}
+                </th>
+              {% endif %}
             {% endfor %}
           </tr>
           {% for date, val1, val2 in meter_run_history.current_run %}
-            <tr>
+            <tr class="text-muted">
               <td>
                 {{ date }}
+                <i class="text-info">Latest Meter Run</i>
               </td>
-              <td>
-                {{ val1 }}
+              <td class="align-right">
+                {{ val1 | floatformat:2 }}
               </td>
-              <td>
-                {{ val2 }}
+              <td class="align-right">
+                {{ val2 | floatformat:2 }}
               </td>
             </tr>
           {% endfor %}
@@ -44,11 +52,11 @@
               <td>
                 {{ date }}
               </td>
-              <td>
-                {{ val1 }}
+              <td class="align-right">
+                {{ val1 | floatformat:2 }}
               </td>
-              <td>
-                {{ val2 }}
+              <td class="align-right">
+                {{ val2 | floatformat:2 }}
               </td>
             </tr>
           {% endfor %}
