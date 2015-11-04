@@ -1,19 +1,62 @@
-<button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#meter-run-modal-{{ savings_data.energy_type_slug }}">
-  View {{ savings_data.energy_type }} Meter Runs
+<button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#meter-run-modal">
+  <i class="fa fa-history fa-fw"></i>
+  Meter History
 </button>
 
 <!-- Modal -->
-<div class="modal fade" id="meter-run-modal-{{ savings_data.energy_type_slug }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="meter-run-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">
-          {{ savings_data.energy_type }} Meter Runs
+          Meter Run History
         </h4>
       </div>
       <div class="modal-body">
-        ...
+        
+        <table class="table">
+          <tr>
+            {% for h, unit in meter_run_history.header %}
+              <th>
+                {{ h }}
+                {% if unit %}
+                  <span class="muted">{{ unit }}</span>
+                {% endif %}
+              </th>
+            {% endfor %}
+          </tr>
+          {% for date, val1, val2 in meter_run_history.current_run %}
+            <tr>
+              <td>
+                {{ date }}
+              </td>
+              <td>
+                {{ val1 }}
+              </td>
+              <td>
+                {{ val2 }}
+              </td>
+            </tr>
+          {% endfor %}
+          {% for date, val1, val2 in meter_run_history.past_runs %}
+            <tr class="text-muted">
+              <td>
+                {{ date }}
+              </td>
+              <td>
+                {{ val1 }}
+              </td>
+              <td>
+                {{ val2 }}
+              </td>
+            </tr>
+          {% endfor %}
+
+        </table>
+
+
+
       </div>
     </div>
   </div>
