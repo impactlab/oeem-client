@@ -5,8 +5,10 @@
 
 <div class="col-xs-6">
   <h5 class="no-pad-bottom">
-    <strong>Annual Usage</strong>
-    <span class="muted">{{savings_data.unit}}/yr</span>
+    <span data-toggle="popover" data-placement="top" data-content="placeholder explanation of where the annual usage numbers come from">
+      <strong>Annual Usage</strong>
+      <span class="muted">{{savings_data.unit}}/yr</span>
+    </span>
   </h5>
   <div id="usage-bar-{{savings_data.energy_type_slug}}">
   </div>
@@ -22,8 +24,10 @@
 
 <div class="col-xs-6">
   <h5 class="no-pad-bottom">
-    <strong>Annual Savings</strong>
-    <span class="muted">{{savings_data.unit}}/yr</span>
+    <span data-toggle="popover" data-placement="top" data-content="placeholder explanation of where the annual savings number comes from">
+      <strong>Annual Savings</strong>
+      <span class="muted">{{savings_data.unit}}/yr</span>
+    </span>
   </h5>
   <h2 id="total-annual-savings">
     {{ savings_data.total_annual_savings | floatformat:"0" | intcomma }}
