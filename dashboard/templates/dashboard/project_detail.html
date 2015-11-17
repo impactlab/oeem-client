@@ -25,7 +25,21 @@
 
         <div class="row-fluid" id="project-block-content">
 
-          <div class="col-sm-12">
+          <div class="col-sm-4">
+            <h5>
+              Related Project Blocks
+            </h5>
+            <p>
+              <ul>
+              {% for project_block in projectblock_set %}
+                <li>
+                  <a class="small" href="/dashboard/project_block/{{project_block.id}}">{{project_block.name}}</a>
+                </li>
+              {% endfor %}
+              </ul>
+            </p>
+          </div>
+          <div class="col-sm-4">
             <br/>
             {% if meter_run_history %}
               {% include 'partials/meter_runs.html' %}

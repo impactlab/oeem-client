@@ -33,6 +33,7 @@ Project = namedtuple("Project", [
     "baseline_period_end",
     "reporting_period_start",
     "reporting_period_end",
+    "projectblock_set",
 ])
 
 MeterRun = namedtuple("MeterRun", [
@@ -123,6 +124,7 @@ def get_projects(project_block_id=None, get_timeseries=False):
                     baseline_period_end=project_data["baseline_period_end"],
                     reporting_period_start=project_data["reporting_period_start"],
                     reporting_period_end=project_data["reporting_period_end"],
+                    projectblock_set=project_data["projectblock_set"],
                     )
             projects.append(project)
         return projects
@@ -674,6 +676,8 @@ class ProjectDetailView(TemplateView, ProjectMixin):
             'zoom': 10,
         }
 
+        context['projectblock_set'] = project.projectblock_set
+
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
         context['client_name'] = CLIENT_SETTINGS['name']
 
@@ -694,6 +698,7 @@ class ProjectDetailView(TemplateView, ProjectMixin):
                     baseline_period_end=project_data["baseline_period_end"],
                     reporting_period_start=project_data["reporting_period_start"],
                     reporting_period_end=project_data["reporting_period_end"],
+                    projectblock_set=project_data["projectblock_set"],
                     )
             return project
         else:
