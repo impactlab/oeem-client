@@ -13,7 +13,6 @@ RUN mkdir /srv/static /srv/logs
 
 VOLUME /srv/static
 
-
 RUN mkdir /code
 WORKDIR /code
 ADD requirements.txt /code/
