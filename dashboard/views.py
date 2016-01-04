@@ -785,7 +785,10 @@ class ProjectListingView(TemplateView, MultipleProjectMixin, ProjectTableMixin):
     def get_fuel_type_data(self, fuel_type, meter_runs, project_block_summary):
         fuel_type_data = super(ProjectListingView, self).get_fuel_type_data(fuel_type, meter_runs, project_block_summary)
 
-        project_table_data = self.get_project_table_data(meter_runs)
+        if meter_runs is None:
+            project_table_data = []
+        else:
+            project_table_data = self.get_project_table_data(meter_runs)
         fuel_type_data["project_table_data"] = project_table_data
 
         return fuel_type_data
