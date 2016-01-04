@@ -115,6 +115,35 @@ CLIENT_SETTINGS = {
     'logo': 'eemeter.png',
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s'
+        }
+    },
+    'handlers': {
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'formatter': 'verbose',
+            'filename': '/srv/logs/django.log',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+        'customer_registry.views': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
+
 try:
     from oeem_client.local_settings import *
 except ImportError:
