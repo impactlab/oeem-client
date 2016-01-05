@@ -164,8 +164,8 @@ def aggregate_savings(all_savings_data):
 
     if baseline_u and reporting_u:
         annual_usage = {
-            'baseline': baseline_u, 
-            'reporting': reporting_u, 
+            'baseline': baseline_u,
+            'reporting': reporting_u,
             'percent_savings': int((baseline_u-reporting_u)/baseline_u*100+.5)
         }
     else:
@@ -467,6 +467,10 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         baseline_grouped_by_month = defaultdict(list)
         actual_grouped_by_month = defaultdict(list)
         n_projects_by_month = defaultdict(lambda: 0)
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, reporting_period_start in meter_runs:
 
             # assumes same ordering of baseline and reporting data
@@ -549,18 +553,30 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 
     def get_total_gross_savings(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
         return np.nansum(savings)
 
     def get_total_annual_savings(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
         return np.nansum(savings)
 
     def get_gross_savings_hist_data(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
 
@@ -573,6 +589,10 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 
     def get_annual_savings_hist_data(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
 
@@ -677,12 +697,20 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
 
     def get_total_gross_savings(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
         return np.nansum(savings)
 
     def get_total_annual_savings(self, meter_runs):
         savings = []
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
         return np.nansum(savings)
@@ -690,8 +718,12 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
     def get_total_annual_usage(self, meter_runs):
         usage = {
             'baseline': [],
-            'reporting': [], 
+            'reporting': [],
         }
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, _ in meter_runs:
             usage['baseline'].append(meter_run.annual_usage_baseline)
             usage['reporting'].append(meter_run.annual_usage_reporting)
@@ -703,6 +735,10 @@ class ProjectDetailView(TemplateView, SingleProjectMixin):
 
         baseline_grouped_by_month = defaultdict(list)
         reporting_grouped_by_month = defaultdict(list)
+
+        if meter_runs is None:
+            meter_runs = []
+
         for meter_run, reporting_period_start in meter_runs:
 
             # assumes same ordering of baseline and reporting data
