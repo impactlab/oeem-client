@@ -572,10 +572,12 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         return np.nansum(savings)
 
     def get_gross_savings_hist_data(self, meter_runs):
+
         savings = []
+        name = '# projects'
 
         if meter_runs is None:
-            meter_runs = []
+            return self.format_hist_data(self, [], [], name):
 
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
@@ -584,14 +586,16 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 
         xlabels = [ "{:.0f}-{:.0f}".format(f,b) for f, b in zip(bin_edges, bin_edges[1:])]
         data = [int(v) for v in hist]
-        name = '# projects'
+
         return self.format_hist_data(xlabels, data, name)
 
     def get_annual_savings_hist_data(self, meter_runs):
+
         savings = []
+        name = '# projects'
 
         if meter_runs is None:
-            meter_runs = []
+            return self.format_hist_data(self, [], [], name):
 
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
@@ -600,7 +604,6 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
 
         xlabels = [ "{:.0f}-{:.0f}".format(f,b) for f, b in zip(bin_edges, bin_edges[1:])]
         data = [int(v) for v in hist]
-        name = '# projects'
 
         return self.format_hist_data(xlabels, data, name)
 
