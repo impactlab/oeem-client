@@ -577,7 +577,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         name = '# projects'
 
         if meter_runs is None:
-            return self.format_hist_data(self, [], [], name):
+            return self.format_hist_data([], [], name)
 
         for meter_run, _ in meter_runs:
             savings.append(meter_run.gross_savings)
@@ -595,7 +595,7 @@ class ProjectBlockDetailView(TemplateView, MultipleProjectMixin, ProjectTableMix
         name = '# projects'
 
         if meter_runs is None:
-            return self.format_hist_data(self, [], [], name):
+            return self.format_hist_data([], [], name)
 
         for meter_run, _ in meter_runs:
             savings.append(meter_run.annual_savings)
