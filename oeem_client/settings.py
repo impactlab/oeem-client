@@ -112,7 +112,7 @@ GRAPPELLI_ADMIN_TITLE = "Open Energy Efficiency Meter"
 CLIENT_SETTINGS = {
     'name': 'Demo',
     'slug': 'demo',
-    'logo': 'eemeter.png',
+    'logo': 'logo.png',
 }
 
 LOGGING = {
