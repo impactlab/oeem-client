@@ -18,7 +18,7 @@ tail -n 0 -f /srv/logs/*.log &
 exec gunicorn oeem_client.wsgi \
     --bind 0.0.0.0:8000 \
     --workers 3 \
-    --timeout 120 \
+    --timeout 180 \
     --log-level=info \
     --log-file=/srv/logs/gunicorn.log \
     --access-logfile=/srv/logs/access.log \
