@@ -1,9 +1,6 @@
 #!/bin/bash
 
-export DATABASE_URL=postgres://$(cat /etc/secret-volume/pg-user):$(cat /etc/secret-volume/pg-password)@$(cat /etc/secret-volume/pg-service-name).default.svc.cluster.local:5432/$(cat /etc/secret-volume/pg-user)
-export SECRET_KEY=$(cat /etc/secret-volume/secret-key)
-export DATASTORE_URL=$(cat /etc/secret-volume/datastore-url)
-export DATASTORE_ACCESS_TOKEN=$(cat /etc/secret-volume/datastore-access-token)
+source env.sh
 
 if [ -z "$SETUP" ]; then
 	echo "Skipping setup because SETUP is unset"
@@ -21,6 +18,7 @@ tail -n 0 -f /srv/logs/*.log &
 exec gunicorn oeem_client.wsgi \
     --bind 0.0.0.0:8000 \
     --workers 3 \
+    --timeout 120 \
     --log-level=info \
     --log-file=/srv/logs/gunicorn.log \
     --access-logfile=/srv/logs/access.log \
