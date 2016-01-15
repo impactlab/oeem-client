@@ -3,7 +3,6 @@ import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.environ.get("DEBUG", "false") == "true"
@@ -56,13 +55,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oeem_client.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = { 'default': dj_database_url.config() }
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -101,12 +94,18 @@ LOGGING = {
             'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s'
         }
     },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
     'handlers': {
         'logfile': {
             'level': 'DEBUG',
+            'filters': ['require_debug_false'],
             'class': 'logging.handlers.WatchedFileHandler',
             'formatter': 'verbose',
-            'filename': '/srv/logs/django.log',
+            'filename': os.environ.get("DJANGO_LOGFILE"),
         }
     },
     'loggers': {
