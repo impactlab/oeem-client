@@ -52,3 +52,16 @@ You might consider adding these to your virtualenv activate script
 #### Start a server
 
     python manage.py runserver
+
+### JSX offline transform (for React)
+
+Install babel:
+
+    npm install --global babel-cli
+    npm install babel-preset-react
+
+Run babel while editing the following files to build them offline:
+
+dashboard/static/dashboard/js/src/\*.jsx:
+
+    babel --presets react dashboard/static/dashboard/js/src/ --watch --out-dir dashboard/static/dashboard/js/build/
