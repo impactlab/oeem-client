@@ -24,8 +24,24 @@ var ProjectDataBox = React.createClass({
   displayName: "ProjectDataBox",
 
   loadProjects: function () {
+    var projectListURL = this.props.project_list_url;
+    var params = [];
+
+    var arrayLength = this.state.selectedProjectBlockIds.length;
+    for (var i = 0; i < arrayLength; i++) {
+      if (this.state.projectBlockIdFilterMode == "OR") {
+        params.push("projectblock_or" + "=" + this.state.selectedProjectBlockIds[i]);
+      } else {
+        params.push("projectblock_and" + "=" + this.state.selectedProjectBlockIds[i]);
+      }
+    }
+
+    if (params.length > 0) {
+      projectListURL += "?" + params.join("&");
+    }
+
     $.ajax({
-      url: this.props.project_list_url,
+      url: projectListURL,
       dataType: 'json',
       cache: false,
       success: (function (data) {
@@ -36,9 +52,19 @@ var ProjectDataBox = React.createClass({
       }).bind(this)
     });
   },
+  selectProjectBlocksCallback: function (data) {
+    console.log(data);
+    this.setState({
+      selectedProjectBlockIds: data.ids,
+      projectBlockIdFilterMode: data.filterMode
+    });
+    this.loadProjects();
+  },
   getInitialState: function () {
     return {
-      projects: []
+      projects: [],
+      selectedProjectBlockIds: [],
+      projectBlockIdFilterMode: "OR"
     };
   },
   componentDidMount: function () {
@@ -48,7 +74,10 @@ var ProjectDataBox = React.createClass({
     return React.createElement(
       "div",
       { className: "selectedProjectBlockBox" },
-      React.createElement(ProjectFilterBox, this.props),
+      React.createElement(ProjectFilterBox, _extends({
+        selectProjectBlocksCallback: this.selectProjectBlocksCallback,
+        projectBlockIdFilterMode: this.state.projectBlockIdFilterMode
+      }, this.props)),
       React.createElement(ProjectSummaryBox, null),
       React.createElement(ChartSelector, null),
       React.createElement(ChartBox, null),
@@ -62,9 +91,6 @@ var ProjectDataBox = React.createClass({
 var ProjectFilterBox = React.createClass({
   displayName: "ProjectFilterBox",
 
-  handleSelectProjectBlock: function (data) {
-    console.log(data);
-  },
   handleSelectEnergyType: function (data) {
     console.log(data);
   },
@@ -84,9 +110,7 @@ var ProjectFilterBox = React.createClass({
         React.createElement(
           "li",
           { className: "list-group-item" },
-          React.createElement(ProjectBlockFilter, _extends({
-            handleSelectProjectBlock: this.handleSelectProjectBlock
-          }, this.props))
+          React.createElement(ProjectBlockFilter, this.props)
         ),
         React.createElement(
           "li",
@@ -152,9 +176,37 @@ var ProjectBlockFilter = React.createClass({
       }).bind(this)
     });
   },
+  handleSelectProjectBlock: function (projectBlockId) {
+    var ids = this.state.selectedProjectBlockIds;
+    ids.push(projectBlockId);
+    this.setState({ selectedProjectBlockIds: ids });
+    this.callCallback();
+  },
+  handleDeselectProjectBlock: function (projectBlockId) {
+    var ids = this.state.selectedProjectBlockIds;
+    var index = ids.indexOf(projectBlockId);
+    if (index != -1) {
+      ids.splice(index, 1);
+    }
+    this.setState({ selectedProjectBlockIds: ids });
+    this.callCallback();
+  },
+  toggleFilterModeCallback: function () {
+    var filterMode = this.state.filterMode == "OR" ? "AND" : "OR";
+    this.setState({ filterMode: filterMode });
+    this.callCallback();
+  },
+  callCallback: function () {
+    this.props.selectProjectBlocksCallback({
+      ids: this.state.selectedProjectBlockIds,
+      filterMode: this.state.filterMode
+    });
+  },
   getInitialState: function () {
     return {
-      projectBlockList: []
+      projectBlockList: [],
+      selectedProjectBlockIds: [],
+      filterMode: this.props.projectBlockIdFilterMode
     };
   },
   componentDidMount: function () {
@@ -162,20 +214,21 @@ var ProjectBlockFilter = React.createClass({
   },
   render: function () {
 
-    var handleSelectProjectBlock = this.props.handleSelectProjectBlock;
+    var handleSelectProjectBlock = this.handleSelectProjectBlock;
+    var handleDeselectProjectBlock = this.handleDeselectProjectBlock;
+    var selectedProjectBlockIds = this.state.selectedProjectBlockIds;
+
     var projectBlockListItems = this.state.projectBlockList.map(function (d, i) {
+      var selected = selectedProjectBlockIds.indexOf(d.id) != -1;
       return React.createElement(ProjectBlockListItem, {
         key: d.id,
+        selected: selected,
         handleSelectProjectBlock: handleSelectProjectBlock,
+        handleDeselectProjectBlock: handleDeselectProjectBlock,
         projectBlock: d
       });
     });
 
-    projectBlockListItems.push(React.createElement(ProjectBlockListItem, {
-      key: "all-projects",
-      handleSelectProjectBlock: handleSelectProjectBlock,
-      projectBlock: null
-    }));
     return React.createElement(
       "div",
       { className: "projectBlockFilter" },
@@ -184,6 +237,10 @@ var ProjectBlockFilter = React.createClass({
         null,
         "Filter by project blocks"
       ),
+      React.createElement(FilterMode, {
+        toggleFilterModeCallback: this.toggleFilterModeCallback,
+        filterMode: this.state.filterMode
+      }),
       React.createElement(
         "ul",
         { className: "list-group" },
@@ -193,28 +250,61 @@ var ProjectBlockFilter = React.createClass({
   }
 });
 
+var FilterMode = React.createClass({
+  displayName: "FilterMode",
+
+  render: function () {
+    return React.createElement(
+      "div",
+      { className: "filterMode" },
+      React.createElement(
+        "span",
+        null,
+        "Filter Mode: ",
+        this.props.filterMode,
+        "  ",
+        React.createElement(
+          "a",
+          { onClick: this.props.toggleFilterModeCallback },
+          "toggle"
+        )
+      )
+    );
+  }
+});
+
 var ProjectBlockListItem = React.createClass({
   displayName: "ProjectBlockListItem",
 
   handleSelect: function () {
-    this.props.handleSelectProjectBlock(this.props.projectBlock);
+    if (this.props.selected) {
+      this.props.handleDeselectProjectBlock(this.props.projectBlock.id);
+    } else {
+      this.props.handleSelectProjectBlock(this.props.projectBlock.id);
+    }
   },
   render: function () {
 
-    var projectBlockListItemDescriptor;
-    if (this.props.projectBlock == null) {
-      projectBlockListItemDescriptor = "All projects";
+    var selectedText;
+    if (this.props.selected) {
+      selectedText = "Selected - click to deselect";
     } else {
-      projectBlockListItemDescriptor = this.props.projectBlock.name;
+      selectedText = "Unselected - click to select";
     }
 
     return React.createElement(
       "li",
       { className: "projectBlockListItem list-group-item clearfix" },
       React.createElement(
+        "span",
+        null,
+        this.props.projectBlock.name,
+        " "
+      ),
+      React.createElement(
         "a",
         { onClick: this.handleSelect },
-        projectBlockListItemDescriptor
+        selectedText
       )
     );
   }
@@ -368,15 +458,10 @@ var ProjectTable = React.createClass({
 
   render: function () {
     var projects = this.props.projects.map(function (d, i) {
-      return React.createElement(
-        "li",
-        { className: "list-group-item clearfix" },
-        React.createElement(
-          "a",
-          { onClick: this.handleSelect },
-          d.project_id
-        )
-      );
+      return React.createElement(ProjectTableItem, {
+        key: d.id,
+        project: d
+      });
     });
     return React.createElement(
       "div",
@@ -386,6 +471,25 @@ var ProjectTable = React.createClass({
         "ul",
         { className: "list-group" },
         projects
+      )
+    );
+  }
+});
+
+var ProjectTableItem = React.createClass({
+  displayName: "ProjectTableItem",
+
+  handleSelect: function () {
+    console.log(this.props.project);
+  },
+  render: function () {
+    return React.createElement(
+      "li",
+      { className: "list-group-item clearfix" },
+      React.createElement(
+        "a",
+        { onClick: this.handleSelect },
+        this.props.project.project_id
       )
     );
   }

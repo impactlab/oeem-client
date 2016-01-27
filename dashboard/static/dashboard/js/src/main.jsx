@@ -16,8 +16,24 @@ var DashboardBox = React.createClass({
 
 var ProjectDataBox = React.createClass({
   loadProjects: function() {
+    var projectListURL = this.props.project_list_url;
+    var params = [];
+
+    var arrayLength = this.state.selectedProjectBlockIds.length;
+    for (var i = 0; i < arrayLength; i++) {
+      if (this.state.projectBlockIdFilterMode == "OR") {
+        params.push( "projectblock_or" + "=" + this.state.selectedProjectBlockIds[i]);
+      } else {
+        params.push( "projectblock_and" + "=" + this.state.selectedProjectBlockIds[i]);
+      }
+    }
+
+    if (params.length > 0) {
+      projectListURL += "?" + params.join("&");
+    }
+
     $.ajax({
-      url: this.props.project_list_url,
+      url: projectListURL,
       dataType: 'json',
       cache: false,
       success: function(data) {
@@ -28,9 +44,19 @@ var ProjectDataBox = React.createClass({
       }.bind(this)
     });
   },
+  selectProjectBlocksCallback: function(data) {
+    console.log(data);
+    this.setState({
+      selectedProjectBlockIds: data.ids,
+      projectBlockIdFilterMode: data.filterMode,
+    });
+    this.loadProjects();
+  },
   getInitialState: function() {
     return {
       projects: [],
+      selectedProjectBlockIds: [],
+      projectBlockIdFilterMode: "OR",
     };
   },
   componentDidMount: function() {
@@ -40,6 +66,8 @@ var ProjectDataBox = React.createClass({
     return (
       <div className="selectedProjectBlockBox">
         <ProjectFilterBox
+          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
+          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
           {...this.props}
         />
         <ProjectSummaryBox />
@@ -54,9 +82,6 @@ var ProjectDataBox = React.createClass({
 });
 
 var ProjectFilterBox = React.createClass({
-  handleSelectProjectBlock: function(data) {
-    console.log(data);
-  },
   handleSelectEnergyType: function(data) {
     console.log(data);
   },
@@ -71,7 +96,6 @@ var ProjectFilterBox = React.createClass({
         <ul className="list-group">
           <li className="list-group-item">
             <ProjectBlockFilter
-              handleSelectProjectBlock={this.handleSelectProjectBlock}
               {...this.props}
             />
           </li>
@@ -107,9 +131,37 @@ var ProjectBlockFilter = React.createClass({
       }.bind(this)
     });
   },
+  handleSelectProjectBlock: function(projectBlockId) {
+    var ids = this.state.selectedProjectBlockIds;
+    ids.push(projectBlockId);
+    this.setState({selectedProjectBlockIds: ids});
+    this.callCallback();
+  },
+  handleDeselectProjectBlock: function(projectBlockId) {
+    var ids = this.state.selectedProjectBlockIds;
+    var index = ids.indexOf(projectBlockId);
+    if (index != -1) {
+      ids.splice(index, 1);
+    }
+    this.setState({selectedProjectBlockIds: ids});
+    this.callCallback();
+  },
+  toggleFilterModeCallback: function() {
+    var filterMode = (this.state.filterMode == "OR") ? "AND" : "OR";
+    this.setState({filterMode: filterMode});
+    this.callCallback();
+  },
+  callCallback: function() {
+    this.props.selectProjectBlocksCallback({
+      ids: this.state.selectedProjectBlockIds,
+      filterMode: this.state.filterMode,
+    });
+  },
   getInitialState: function() {
     return {
       projectBlockList: [],
+      selectedProjectBlockIds: [],
+      filterMode: this.props.projectBlockIdFilterMode,
     };
   },
   componentDidMount: function() {
@@ -117,27 +169,30 @@ var ProjectBlockFilter = React.createClass({
   },
   render: function() {
 
-    var handleSelectProjectBlock = this.props.handleSelectProjectBlock;
+    var handleSelectProjectBlock = this.handleSelectProjectBlock;
+    var handleDeselectProjectBlock = this.handleDeselectProjectBlock;
+    var selectedProjectBlockIds = this.state.selectedProjectBlockIds;
+
     var projectBlockListItems = this.state.projectBlockList.map(function(d, i) {
+      var selected = (selectedProjectBlockIds.indexOf(d.id) != -1);
       return (
         <ProjectBlockListItem
           key={d.id}
+          selected={selected}
           handleSelectProjectBlock={handleSelectProjectBlock}
+          handleDeselectProjectBlock={handleDeselectProjectBlock}
           projectBlock={d}
         />
       );
     });
 
-    projectBlockListItems.push(
-      <ProjectBlockListItem
-        key={"all-projects"}
-        handleSelectProjectBlock={handleSelectProjectBlock}
-        projectBlock={null}
-      />
-    );
     return (
       <div className="projectBlockFilter">
         <span>Filter by project blocks</span>
+        <FilterMode
+          toggleFilterModeCallback={this.toggleFilterModeCallback}
+          filterMode={this.state.filterMode}
+        />
         <ul className="list-group">
          {projectBlockListItems}
         </ul>
@@ -146,22 +201,40 @@ var ProjectBlockFilter = React.createClass({
   }
 });
 
+var FilterMode = React.createClass({
+  render: function() {
+    return (
+      <div className="filterMode">
+        <span>
+          Filter Mode: {this.props.filterMode} &nbsp;
+          <a onClick={this.props.toggleFilterModeCallback}>toggle</a>
+        </span>
+      </div>
+    )
+  }
+});
+
 var ProjectBlockListItem = React.createClass({
   handleSelect: function() {
-    this.props.handleSelectProjectBlock(this.props.projectBlock);
+    if (this.props.selected) {
+      this.props.handleDeselectProjectBlock(this.props.projectBlock.id);
+    }else{
+      this.props.handleSelectProjectBlock(this.props.projectBlock.id);
+    }
   },
   render: function() {
 
-    var projectBlockListItemDescriptor;
-    if (this.props.projectBlock == null) {
-      projectBlockListItemDescriptor = "All projects";
+    var selectedText;
+    if (this.props.selected) {
+      selectedText = "Selected - click to deselect";
     } else {
-      projectBlockListItemDescriptor = this.props.projectBlock.name;
+      selectedText = "Unselected - click to select";
     }
 
     return (
       <li className="projectBlockListItem list-group-item clearfix">
-        <a onClick={this.handleSelect}>{projectBlockListItemDescriptor}</a>
+        <span>{this.props.projectBlock.name}&nbsp;</span>
+        <a onClick={this.handleSelect}>{selectedText}</a>
       </li>
     )
   }
@@ -290,11 +363,10 @@ var ProjectTable = React.createClass({
   render: function() {
     var projects = this.props.projects.map(function(d,i) {
       return (
-        <li className="list-group-item clearfix">
-          <a onClick={this.handleSelect}>
-            {d.project_id}
-          </a>
-        </li>
+        <ProjectTableItem
+          key={d.id}
+          project={d}
+        />
       )
     });
     return (
@@ -304,6 +376,21 @@ var ProjectTable = React.createClass({
           {projects}
         </ul>
       </div>
+    )
+  }
+});
+
+var ProjectTableItem = React.createClass({
+  handleSelect: function() {
+    console.log(this.props.project);
+  },
+  render: function() {
+    return (
+      <li className="list-group-item clearfix">
+        <a onClick={this.handleSelect}>
+          {this.props.project.project_id}
+        </a>
+      </li>
     )
   }
 });
