@@ -18,9 +18,10 @@ var ProjectDataBox = React.createClass({
   loadProjects: function() {
     var projectListURL = this.props.project_list_url;
 
+    var filterParam = (this.state.projectBlockIdFilterMode == "OR") ?
+        "projectblock_or" : "projectblock_and";
     var params = this.state.selectedProjectBlockIds.map(function(d, i) {
-      return ((this.state.projectBlockIdFilterMode == "OR") ?
-        "projectblock_or" : "projectblock_and") + "=" + d;
+      return filterParam + "=" + d;
     });
 
     if (params.length > 0) {
@@ -35,12 +36,11 @@ var ProjectDataBox = React.createClass({
         this.setState({projects: data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(projectListURL, status, err.toString());
       }.bind(this)
     });
   },
   selectProjectBlocksCallback: function(data) {
-    console.log(data);
     this.setState({
       selectedProjectBlockIds: data.ids,
       projectBlockIdFilterMode: data.filterMode,
@@ -49,12 +49,20 @@ var ProjectDataBox = React.createClass({
   selectChartTypeCallback: function(chartTypeId) {
     this.setState({selectedChartTypeId: chartTypeId});
   },
+  selectFuelTypeCallback: function(fuelTypeId) {
+    this.setState({selectedFuelTypeId: fuelTypeId});
+  },
+  selectEnergyUnitCallback: function(energyUnitId) {
+    this.setState({selectedEnergyUnitId: energyUnitId});
+  },
   getInitialState: function() {
     return {
       projects: [],
       selectedProjectBlockIds: [],
       projectBlockIdFilterMode: "OR",
-      selectedChartTypeId: "histogram"
+      selectedChartTypeId: "histogram",
+      selectedFuelTypeId: "E",
+      selectedEnergyUnitId: "KWH",
     };
   },
   componentDidMount: function() {
@@ -62,25 +70,52 @@ var ProjectDataBox = React.createClass({
   },
   render: function() {
 
+    var chartTypes = [
+      {
+        id: "timeSeries",
+        name: "Time Series",
+      },
+      {
+        id: "histogram",
+        name: "Histogram",
+      }
+    ];
+
     return (
       <div className="selectedProjectBlockBox">
-        <ChartBox
-          selectedChartTypeId={this.state.selectedChartTypeId}
-          projects={this.state.projects}
-          recent_meter_run_list_url={this.props.recent_meter_run_list_url}
-        />
-        <ChartSelector
-          selectChartTypeCallback={this.selectChartTypeCallback}
-          selectedChartTypeId={this.state.selectedChartTypeId}
-        />
-        <ProjectFilterBox
-          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
-          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
-          {...this.props}
-        />
+
         <ProjectSelectionSummaryBox
           projects={this.state.projects}
         />
+
+        <ChartBox
+          chartType={this.state.selectedChartTypeId}
+          fuelType={this.state.selectedFuelTypeId}
+          energyUnit={this.state.selectedEnergyUnitId}
+          projects={this.state.projects}
+          meter_run_list_url={this.props.meter_run_list_url}
+        />
+
+        <CategorySelector
+          title={"Chart Type Selector"}
+          categories={chartTypes}
+          selectCategoryCallback={this.selectChartTypeCallback}
+          selectedCategoryId={this.state.selectedChartTypeId}
+        />
+
+        <ProjectFilterBox
+          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
+
+          selectFuelTypeCallback={this.selectFuelTypeCallback}
+          selectedFuelTypeId={this.state.selectedFuelTypeId}
+
+          selectEnergyUnitCallback={this.selectEnergyUnitCallback}
+          selectedEnergyUnitId={this.state.selectedEnergyUnitId}
+
+          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
+          {...this.props}
+        />
+
         <ProjectTable
           projects={this.state.projects}
         />
@@ -90,14 +125,32 @@ var ProjectDataBox = React.createClass({
 });
 
 var ProjectFilterBox = React.createClass({
-  handleSelectEnergyType: function(data) {
-    console.log(data);
-  },
   render: function() {
 
-    var energyTypes = [
-      {name: "Electricity"},
-      {name: "Natural Gas"},
+    var fuelTypes = [
+      {
+        id: "E",
+        name: "Electricity",
+      },
+      {
+        id: "NG",
+        name: "Natural Gas",
+      },
+      {
+        id: "BOTH",
+        name: "Combined",
+      },
+    ];
+
+    var energyUnits = [
+      {
+        id: "KWH",
+        name: "kWh",
+      },
+      {
+        id: "THERM",
+        name: "therms",
+      },
     ];
 
     var filters = [
@@ -106,11 +159,20 @@ var ProjectFilterBox = React.createClass({
           {...this.props}
         />
       </li>),
-      (<li className="list-group-item" key={"energyTypeFilter"}>
-        <EnergyTypeFilter
-          energyTypes={energyTypes}
-          handleSelectEnergyType={this.handleSelectEnergyType}
-          {...this.props}
+      (<li className="list-group-item" key={"fuelTypeFilter"}>
+        <CategorySelector
+          title={"Fuel Type Selector"}
+          categories={fuelTypes}
+          selectCategoryCallback={this.props.selectFuelTypeCallback}
+          selectedCategoryId={this.props.selectedFuelTypeId}
+        />
+      </li>),
+      (<li className="list-group-item" key={"energyUnitFilter"}>
+        <CategorySelector
+          title={"Energy Unit Selector"}
+          categories={energyUnits}
+          selectCategoryCallback={this.props.selectEnergyUnitCallback}
+          selectedCategoryId={this.props.selectedEnergyUnitId}
         />
       </li>),
       // (<li className="list-group-item" key={"dateRangesFilter"}> <DateRangesFilter/> </li>),
@@ -141,7 +203,7 @@ var ProjectBlockFilter = React.createClass({
         this.setState({projectBlockList: data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(this.props.project_block_list_url + "?name_only=true", status, err.toString());
       }.bind(this)
     });
   },
@@ -252,38 +314,38 @@ var ProjectBlockListItem = React.createClass({
 });
 
 
-var EnergyTypeFilter = React.createClass({
+var FuelTypeFilter = React.createClass({
   render: function() {
-    var handleSelectEnergyType = this.props.handleSelectEnergyType;
-    var energyTypeListItems = this.props.energyTypes.map(function(d,i) {
+    var handleSelectFuelType = this.props.handleSelectFuelType;
+    var fuelTypeListItems = this.props.fuelTypes.map(function(d,i) {
       return (
-        <EnergyTypeListItem
+        <FuelTypeListItem
           key={i}
-          energyType={d}
-          handleSelectEnergyType={handleSelectEnergyType}
+          fuelType={d}
+          handleSelectFuelType={handleSelectFuelType}
         />
       );
     });
     return (
-      <div className="energyTypeFilter">
+      <div className="fuelTypeFilter">
         <span>Filter by energy Type</span>
         <ul className="list-group">
-         {energyTypeListItems}
+         {fuelTypeListItems}
         </ul>
       </div>
     )
   }
 });
 
-var EnergyTypeListItem = React.createClass({
+var FuelTypeListItem = React.createClass({
   handleSelect: function() {
-    this.props.handleSelectEnergyType(this.props.energyType);
+    this.props.handleSelectFuelType(this.props.fuelType);
   },
   render: function() {
     return (
-      <li className="energyTypeListItem list-group-item clearfix">
+      <li className="fuelTypeListItem list-group-item clearfix">
         <a onClick={this.handleSelect}>
-          {this.props.energyType.name}
+          {this.props.fuelType.name}
         </a>
       </li>
     )
@@ -344,7 +406,7 @@ var ProjectSelectionSummaryBox = React.createClass({
   render: function() {
     return (
       <div className="projectSummaryBox">
-        <h5>Project Selection Summary</h5>
+        <h5>Stats</h5>
         <ul className="list-group">
           <li className="list-group-item">Number of projects: {this.props.projects.length}</li>
         </ul>
@@ -353,50 +415,39 @@ var ProjectSelectionSummaryBox = React.createClass({
   }
 });
 
-var ChartSelector = React.createClass({
+var CategorySelector = React.createClass({
   render: function() {
 
-    var chartTypes = [
-      {
-        id: "timeSeries",
-        name: "Time Series",
-      },
-      {
-        id: "histogram",
-        name: "Histogram",
-      }
-    ];
+    var selectCategoryCallback = this.props.selectCategoryCallback;
 
-    var selectChartTypeCallback = this.props.selectChartTypeCallback;
+    var selectedCategoryId = this.props.selectedCategoryId;
 
-    var selectedChartTypeId = this.props.selectedChartTypeId;
-
-    var chartTypeListItems = chartTypes.map(function(d, i) {
-      var selected = (selectedChartTypeId == d.id);
+    var categoryListItems = this.props.categories.map(function(d, i) {
+      var selected = (selectedCategoryId == d.id);
       return (
-        <ChartTypeListItem
+        <CategoryListItem
           key={i}
-          chartType={d}
+          category={d}
           selected={selected}
-          selectChartTypeCallback={selectChartTypeCallback}
+          selectCategoryCallback={selectCategoryCallback}
         />
       )
     });
 
     return (
-      <div className="chartSelector">
-        <h5>Chart Selector</h5>
+      <div className="categorySelector">
+        <h5>{this.props.title}</h5>
         <ul className="list-group">
-          {chartTypeListItems}
+          {categoryListItems}
         </ul>
       </div>
     )
   }
 });
 
-var ChartTypeListItem = React.createClass({
+var CategoryListItem = React.createClass({
   handleSelect: function() {
-    this.props.selectChartTypeCallback(this.props.chartType.id);
+    this.props.selectCategoryCallback(this.props.category.id);
   },
   render: function() {
     var toggleSelect;
@@ -406,8 +457,8 @@ var ChartTypeListItem = React.createClass({
       toggleSelect = <a onClick={this.handleSelect}>Select</a>
     }
     return (
-      <li className="chartTypeListItem list-group-item">
-        <span>{this.props.chartType.name}&nbsp;</span>
+      <li className="categoryItem list-group-item">
+        <span>{this.props.category.name}&nbsp;</span>
         {toggleSelect}
       </li>
     )
@@ -418,14 +469,16 @@ var ChartBox = React.createClass({
   render: function() {
 
     var chartComponent;
-    if (this.props.selectedChartTypeId == "histogram") {
+    if (this.props.chartType == "histogram") {
       chartComponent = (
         <Histogram
           projects={this.props.projects}
-          recent_meter_run_list_url={this.props.recent_meter_run_list_url}
+          fuelType={this.props.fuelType}
+          energyUnit={this.props.energyUnit}
+          meter_run_list_url={this.props.meter_run_list_url}
         />
       )
-    } else if (this.props.selectedChartTypeId == "timeSeries") {
+    } else if (this.props.chartType == "timeSeries") {
       chartComponent = (
         <TimeSeries
         />
@@ -448,11 +501,19 @@ var ChartBox = React.createClass({
 });
 
 var Histogram = React.createClass({
-  loadMeterRuns: function() {
-    var meterRunListURL = this.props.recent_meter_run_list_url;
+  loadMeterRuns: function(nextProps) {
+    var meterRunListURL = nextProps.meter_run_list_url + "?summary=True";
 
-    if (this.props.projects.length > 0) {
-      meterRunListURL += "?projects=" + this.props.projects.map(function(d, i){
+    if (this.props.fuelType == "E" || this.props.fuelType == "BOTH") {
+      meterRunListURL += "&fuel_type=E"
+    }
+
+    if (this.props.fuelType == "NG" || this.props.fuelType == "BOTH") {
+      meterRunListURL += "&fuel_type=NG"
+    }
+
+    if (nextProps.projects.length > 0) {
+      meterRunListURL += "&projects=" + nextProps.projects.map(function(d, i){
         return d.id;
       }).join("+");
     }
@@ -462,30 +523,60 @@ var Histogram = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log(data);
-        this.setState({meterRuns: data});
+        this.setState({meterRuns: data}, this.renderChart);
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(meterRunListURL, status, err.toString());
       }.bind(this)
     });
   },
   histogramChart: function() {
     var margin = {top: 20, right: 25, bottom: 25, left: 20},
-      width = 760,
-      height = 120;
+      width = this.state.width,
+      height = 150;
+
+    var project_meter_runs = {};
+    this.state.meterRuns.forEach(function(d, i) {
+      if (d.project in project_meter_runs) {
+        project_meter_runs[d.project].push(d)
+      } else {
+        project_meter_runs[d.project] = [d]
+      }
+    });
+
+    var values = [];
+    for (var project_id in project_meter_runs) {
+      if (project_meter_runs.hasOwnProperty(project_id)) {
+
+        var annual_savings = {E: 0, NG: 0};
+        project_meter_runs[project_id].forEach(function(meter_run) {
+          if (meter_run.annual_savings != null) {
+            if (meter_run.fuel_type == "E") {
+              annual_savings.E += meter_run.annual_savings;
+            } else if (meter_run.fuel_type == "NG") {
+              annual_savings.NG += meter_run.annual_savings;
+            }
+          }
+        });
+
+        if (this.props.energyUnit == "KWH") {
+          values.push(annual_savings.E + (annual_savings.NG * 29.3001));
+        } else if (this.props.energyUnit == "THERM") {
+          values.push((annual_savings.E * 0.034) + (annual_savings.NG));
+        }
+      }
+    }
+
+    console.log(values);
 
     function chart(selection) {
       selection.each(function() {
-
-        // Generate a Bates distribution of 10 random variables.
-        var values = d3.range(1000).map(d3.random.bates(10));
 
         // A formatter for counts.
         var formatCount = d3.format(",.0f");
 
         var x = d3.scale.linear()
-            .domain([0, 1])
+            .domain(d3.extent(values, function(d) { return d; }))
             .range([0, width]);
 
         // Generate a histogram using twenty uniformly-spaced bins.
@@ -502,7 +593,7 @@ var Histogram = React.createClass({
             .orient("bottom");
 
         var svg = d3.select(this);
-        svg.selectAll("*").remove();
+          svg.selectAll("*").remove();
 
         svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -556,15 +647,37 @@ var Histogram = React.createClass({
 
     return chart;
   },
+  handleResize: function(e) {
+    this.setState({
+      width: this.getCurrentWidth(),
+    });
+    this.renderChart();
+  },
+  getCurrentWidth: function() {
+    return $(ReactDOM.findDOMNode(this)).parent().width();
+  },
   componentDidMount: function() {
-    this.loadMeterRuns();
-    this.renderChart(this.props);
+    this.setState({
+      width: this.getCurrentWidth(),
+    });
+    window.addEventListener('resize', this.handleResize);
+  },
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  componentWillReceiveProps: function(nextProps) {
+    this.loadMeterRuns(nextProps);
   },
   shouldComponentUpdate: function(props) {
-    this.renderChart(this.props);
     return false;
   },
-  renderChart: function(props) {
+  getInitialState: function() {
+    return {
+      width: 0,
+      meterRuns: [],
+    }
+  },
+  renderChart: function() {
     d3.select(ReactDOM.findDOMNode(this))
       .call(this.histogramChart());
   },

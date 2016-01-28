@@ -29,8 +29,8 @@ class ProjectListProxyView(DatastoreMixin, ProxyView):
 class ProjectDetailProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/projects/%(pk)s/"
 
-class RecentMeterRunListProxyView(DatastoreMixin, ProxyView):
-    source = "api/v1/recent_meter_runs/"
+class MeterRunListProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/meter_runs/"
 
-class RecentMeterRunDetailProxyView(DatastoreMixin, ProxyView):
-    source = "api/v1/recent_meter_runs/%(pk)s/"
+class MeterRunDetailProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/meter_runs/%(pk)s/"
