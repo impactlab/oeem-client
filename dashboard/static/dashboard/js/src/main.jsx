@@ -37,7 +37,7 @@ var ProjectDataBox = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({projects: data})
+        this.setState({projects: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -49,30 +49,41 @@ var ProjectDataBox = React.createClass({
     this.setState({
       selectedProjectBlockIds: data.ids,
       projectBlockIdFilterMode: data.filterMode,
-    });
-    this.loadProjects();
+    }, this.loadProjects);
+  },
+  selectChartTypeCallback: function(chartTypeId) {
+    this.setState({selectedChartTypeId: chartTypeId});
   },
   getInitialState: function() {
     return {
       projects: [],
       selectedProjectBlockIds: [],
       projectBlockIdFilterMode: "OR",
+      selectedChartTypeId: "histogram"
     };
   },
   componentDidMount: function() {
     this.loadProjects();
   },
   render: function() {
+
     return (
       <div className="selectedProjectBlockBox">
+        <ChartBox
+          selectedChartTypeId={this.state.selectedChartTypeId}
+        />
+        <ChartSelector
+          selectChartTypeCallback={this.selectChartTypeCallback}
+          selectedChartTypeId={this.state.selectedChartTypeId}
+        />
         <ProjectFilterBox
           selectProjectBlocksCallback={this.selectProjectBlocksCallback}
           projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
           {...this.props}
         />
-        <ProjectSummaryBox />
-        <ChartSelector />
-        <ChartBox />
+        <ProjectSelectionSummaryBox
+          projects={this.state.projects}
+        />
         <ProjectTable
           projects={this.state.projects}
         />
@@ -86,31 +97,37 @@ var ProjectFilterBox = React.createClass({
     console.log(data);
   },
   render: function() {
+
     var energyTypes = [
       {name: "Electricity"},
       {name: "Natural Gas"},
     ];
+
+    var filters = [
+      (<li className="list-group-item" key={"projectBlockFilter"}>
+        <ProjectBlockFilter
+          {...this.props}
+        />
+      </li>),
+      (<li className="list-group-item" key={"energyTypeFilter"}>
+        <EnergyTypeFilter
+          energyTypes={energyTypes}
+          handleSelectEnergyType={this.handleSelectEnergyType}
+          {...this.props}
+        />
+      </li>),
+      // (<li className="list-group-item" key={"dateRangesFilter"}> <DateRangesFilter/> </li>),
+      // (<li className="list-group-item" key={"zipCodeFilter"}> <ZipCodeFilter/> </li>),
+      // (<li className="list-group-item" key={"projectCostFilter"}> <ProjectCostFilter/> </li>),
+      // (<li className="list-group-item" key={"climateZoneFilter"}> <ClimateZoneFilter/> </li>),
+      // (<li className="list-group-item" key={"ecmFilter"}> <EnergyConservationMeasureFilter/> </li>),
+    ];
+
     return (
       <div className="projectFilterBox">
         <h5>Project Filters</h5>
         <ul className="list-group">
-          <li className="list-group-item">
-            <ProjectBlockFilter
-              {...this.props}
-            />
-          </li>
-          <li className="list-group-item">
-            <EnergyTypeFilter
-              energyTypes={energyTypes}
-              handleSelectEnergyType={this.handleSelectEnergyType}
-              {...this.props}
-            />
-          </li>
-          <li className="list-group-item"> <ClimateZoneFilter/> </li>
-          <li className="list-group-item"> <DateRangesFilter/> </li>
-          <li className="list-group-item"> <ZipCodeFilter/> </li>
-          <li className="list-group-item"> <ProjectCostFilter/> </li>
-          <li className="list-group-item"> <EnergyConservationMeasureFilter/> </li>
+          {filters}
         </ul>
       </div>
     )
@@ -124,7 +141,7 @@ var ProjectBlockFilter = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        this.setState({projectBlockList: data})
+        this.setState({projectBlockList: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -134,8 +151,7 @@ var ProjectBlockFilter = React.createClass({
   handleSelectProjectBlock: function(projectBlockId) {
     var ids = this.state.selectedProjectBlockIds;
     ids.push(projectBlockId);
-    this.setState({selectedProjectBlockIds: ids});
-    this.callCallback();
+    this.setState({selectedProjectBlockIds: ids}, this.callCallback);
   },
   handleDeselectProjectBlock: function(projectBlockId) {
     var ids = this.state.selectedProjectBlockIds;
@@ -143,13 +159,11 @@ var ProjectBlockFilter = React.createClass({
     if (index != -1) {
       ids.splice(index, 1);
     }
-    this.setState({selectedProjectBlockIds: ids});
-    this.callCallback();
+    this.setState({selectedProjectBlockIds: ids}, this.callCallback);
   },
   toggleFilterModeCallback: function() {
     var filterMode = (this.state.filterMode == "OR") ? "AND" : "OR";
-    this.setState({filterMode: filterMode});
-    this.callCallback();
+    this.setState({filterMode: filterMode}, this.callCallback);
   },
   callCallback: function() {
     this.props.selectProjectBlocksCallback({
@@ -329,11 +343,14 @@ var EnergyConservationMeasureFilter = React.createClass({
   }
 });
 
-var ProjectSummaryBox = React.createClass({
+var ProjectSelectionSummaryBox = React.createClass({
   render: function() {
     return (
       <div className="projectSummaryBox">
-        Project Summaries
+        <h5>Project Selection Summary</h5>
+        <ul className="list-group">
+          <li className="list-group-item">Number of projects: {this.props.projects.length}</li>
+        </ul>
       </div>
     )
   }
@@ -341,19 +358,206 @@ var ProjectSummaryBox = React.createClass({
 
 var ChartSelector = React.createClass({
   render: function() {
+
+    var chartTypes = [
+      {
+        id: "timeSeries",
+        name: "Time Series",
+      },
+      {
+        id: "histogram",
+        name: "Histogram",
+      }
+    ];
+
+    var selectChartTypeCallback = this.props.selectChartTypeCallback;
+
+    var selectedChartTypeId = this.props.selectedChartTypeId;
+
+    var chartTypeListItems = chartTypes.map(function(d, i) {
+      var selected = (selectedChartTypeId == d.id);
+      return (
+        <ChartTypeListItem
+          key={i}
+          chartType={d}
+          selected={selected}
+          selectChartTypeCallback={selectChartTypeCallback}
+        />
+      )
+    });
+
     return (
       <div className="chartSelector">
-        Chart Selector
+        <h5>Chart Selector</h5>
+        <ul className="list-group">
+          {chartTypeListItems}
+        </ul>
       </div>
+    )
+  }
+});
+
+var ChartTypeListItem = React.createClass({
+  handleSelect: function() {
+    this.props.selectChartTypeCallback(this.props.chartType.id);
+  },
+  render: function() {
+    var toggleSelect;
+    if (this.props.selected) {
+      toggleSelect = <span>Selected</span>
+    } else {
+      toggleSelect = <a onClick={this.handleSelect}>Select</a>
+    }
+    return (
+      <li className="chartTypeListItem list-group-item">
+        <span>{this.props.chartType.name}&nbsp;</span>
+        {toggleSelect}
+      </li>
     )
   }
 });
 
 var ChartBox = React.createClass({
   render: function() {
+
+    var chartComponent;
+    if (this.props.selectedChartTypeId == "histogram") {
+      chartComponent = (
+        <Histogram
+        />
+      )
+    } else if (this.props.selectedChartTypeId == "timeSeries") {
+      chartComponent = (
+        <TimeSeries
+        />
+      )
+    } else {
+      chartComponent = <span>Please Select a Chart</span>
+    }
+
     return (
       <div className="chartBox">
-        Chart Box
+        <h5>Chart Box</h5>
+        <div className="panel panel-default">
+          <div className="panel-body">
+            {chartComponent}
+          </div>
+        </div>
+      </div>
+    )
+  }
+});
+
+var Histogram = React.createClass({
+  histogramChart: function() {
+    var margin = {top: 20, right: 25, bottom: 25, left: 20},
+      width = 760,
+      height = 120;
+
+    function chart(selection) {
+      selection.each(function() {
+
+        // Generate a Bates distribution of 10 random variables.
+        var values = d3.range(1000).map(d3.random.bates(10));
+
+        // A formatter for counts.
+        var formatCount = d3.format(",.0f");
+
+        var x = d3.scale.linear()
+            .domain([0, 1])
+            .range([0, width]);
+
+        // Generate a histogram using twenty uniformly-spaced bins.
+        var data = d3.layout.histogram()
+            .bins(x.ticks(20))
+            (values);
+
+        var y = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d.y; })])
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var svg = d3.select(this);
+        svg.selectAll("*").remove();
+
+        svg.attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        var bar = svg.selectAll(".bar")
+            .data(data)
+          .enter().append("g")
+            .attr("class", "bar")
+            .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+
+        bar.append("rect")
+            .attr("x", 1)
+            .attr("width", x(data[0].dx) - 1)
+            .attr("height", function(d) { return height - y(d.y); });
+
+        bar.append("text")
+            .attr("dy", ".75em")
+            .attr("y", 6)
+            .attr("x", x(data[0].dx) / 2)
+            .attr("text-anchor", "middle")
+            .text(function(d) { return formatCount(d.y); });
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+      });
+    }
+
+    chart.margin = function(_) {
+      if (!arguments.length) return margin;
+      margin = _;
+      return chart;
+    };
+
+    chart.width = function(_) {
+      if (!arguments.length) return width;
+      width = _;
+      return chart;
+    };
+
+    chart.height = function(_) {
+      if (!arguments.length) return height;
+      height = _;
+      return chart;
+    };
+
+    return chart;
+  },
+  componentDidMount: function() {
+    this.renderChart(this.props);
+  },
+  shouldComponentUpdate: function(props) {
+    this.renderChart(this.props);
+    return false;
+  },
+  renderChart: function(props) {
+    d3.select(ReactDOM.findDOMNode(this))
+      .call(this.histogramChart());
+  },
+  render: function() {
+    return (
+      <svg className="histogram"></svg>
+    )
+  }
+});
+
+var TimeSeries = React.createClass({
+  render: function() {
+    return (
+      <div className="timeSeries">
+        Time Series
       </div>
     )
   }

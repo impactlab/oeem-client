@@ -57,30 +57,41 @@ var ProjectDataBox = React.createClass({
     this.setState({
       selectedProjectBlockIds: data.ids,
       projectBlockIdFilterMode: data.filterMode
-    });
-    this.loadProjects();
+    }, this.loadProjects);
+  },
+  selectChartTypeCallback: function (chartTypeId) {
+    this.setState({ selectedChartTypeId: chartTypeId });
   },
   getInitialState: function () {
     return {
       projects: [],
       selectedProjectBlockIds: [],
-      projectBlockIdFilterMode: "OR"
+      projectBlockIdFilterMode: "OR",
+      selectedChartTypeId: "histogram"
     };
   },
   componentDidMount: function () {
     this.loadProjects();
   },
   render: function () {
+
     return React.createElement(
       "div",
       { className: "selectedProjectBlockBox" },
+      React.createElement(ChartBox, {
+        selectedChartTypeId: this.state.selectedChartTypeId
+      }),
+      React.createElement(ChartSelector, {
+        selectChartTypeCallback: this.selectChartTypeCallback,
+        selectedChartTypeId: this.state.selectedChartTypeId
+      }),
       React.createElement(ProjectFilterBox, _extends({
         selectProjectBlocksCallback: this.selectProjectBlocksCallback,
         projectBlockIdFilterMode: this.state.projectBlockIdFilterMode
       }, this.props)),
-      React.createElement(ProjectSummaryBox, null),
-      React.createElement(ChartSelector, null),
-      React.createElement(ChartBox, null),
+      React.createElement(ProjectSelectionSummaryBox, {
+        projects: this.state.projects
+      }),
       React.createElement(ProjectTable, {
         projects: this.state.projects
       })
@@ -95,7 +106,27 @@ var ProjectFilterBox = React.createClass({
     console.log(data);
   },
   render: function () {
+
     var energyTypes = [{ name: "Electricity" }, { name: "Natural Gas" }];
+
+    var filters = [React.createElement(
+      "li",
+      { className: "list-group-item", key: "projectBlockFilter" },
+      React.createElement(ProjectBlockFilter, this.props)
+    ), React.createElement(
+      "li",
+      { className: "list-group-item", key: "energyTypeFilter" },
+      React.createElement(EnergyTypeFilter, _extends({
+        energyTypes: energyTypes,
+        handleSelectEnergyType: this.handleSelectEnergyType
+      }, this.props))
+    )];
+
+    // (<li className="list-group-item" key={"dateRangesFilter"}> <DateRangesFilter/> </li>),
+    // (<li className="list-group-item" key={"zipCodeFilter"}> <ZipCodeFilter/> </li>),
+    // (<li className="list-group-item" key={"projectCostFilter"}> <ProjectCostFilter/> </li>),
+    // (<li className="list-group-item" key={"climateZoneFilter"}> <ClimateZoneFilter/> </li>),
+    // (<li className="list-group-item" key={"ecmFilter"}> <EnergyConservationMeasureFilter/> </li>),
     return React.createElement(
       "div",
       { className: "projectFilterBox" },
@@ -107,54 +138,7 @@ var ProjectFilterBox = React.createClass({
       React.createElement(
         "ul",
         { className: "list-group" },
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          React.createElement(ProjectBlockFilter, this.props)
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          React.createElement(EnergyTypeFilter, _extends({
-            energyTypes: energyTypes,
-            handleSelectEnergyType: this.handleSelectEnergyType
-          }, this.props))
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          " ",
-          React.createElement(ClimateZoneFilter, null),
-          " "
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          " ",
-          React.createElement(DateRangesFilter, null),
-          " "
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          " ",
-          React.createElement(ZipCodeFilter, null),
-          " "
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          " ",
-          React.createElement(ProjectCostFilter, null),
-          " "
-        ),
-        React.createElement(
-          "li",
-          { className: "list-group-item" },
-          " ",
-          React.createElement(EnergyConservationMeasureFilter, null),
-          " "
-        )
+        filters
       )
     );
   }
@@ -179,8 +163,7 @@ var ProjectBlockFilter = React.createClass({
   handleSelectProjectBlock: function (projectBlockId) {
     var ids = this.state.selectedProjectBlockIds;
     ids.push(projectBlockId);
-    this.setState({ selectedProjectBlockIds: ids });
-    this.callCallback();
+    this.setState({ selectedProjectBlockIds: ids }, this.callCallback);
   },
   handleDeselectProjectBlock: function (projectBlockId) {
     var ids = this.state.selectedProjectBlockIds;
@@ -188,13 +171,11 @@ var ProjectBlockFilter = React.createClass({
     if (index != -1) {
       ids.splice(index, 1);
     }
-    this.setState({ selectedProjectBlockIds: ids });
-    this.callCallback();
+    this.setState({ selectedProjectBlockIds: ids }, this.callCallback);
   },
   toggleFilterModeCallback: function () {
     var filterMode = this.state.filterMode == "OR" ? "AND" : "OR";
-    this.setState({ filterMode: filterMode });
-    this.callCallback();
+    this.setState({ filterMode: filterMode }, this.callCallback);
   },
   callCallback: function () {
     this.props.selectProjectBlocksCallback({
@@ -417,14 +398,28 @@ var EnergyConservationMeasureFilter = React.createClass({
   }
 });
 
-var ProjectSummaryBox = React.createClass({
-  displayName: "ProjectSummaryBox",
+var ProjectSelectionSummaryBox = React.createClass({
+  displayName: "ProjectSelectionSummaryBox",
 
   render: function () {
     return React.createElement(
       "div",
       { className: "projectSummaryBox" },
-      "Project Summaries"
+      React.createElement(
+        "h5",
+        null,
+        "Project Selection Summary"
+      ),
+      React.createElement(
+        "ul",
+        { className: "list-group" },
+        React.createElement(
+          "li",
+          { className: "list-group-item" },
+          "Number of projects: ",
+          this.props.projects.length
+        )
+      )
     );
   }
 });
@@ -433,10 +428,77 @@ var ChartSelector = React.createClass({
   displayName: "ChartSelector",
 
   render: function () {
+
+    var chartTypes = [{
+      id: "timeSeries",
+      name: "Time Series"
+    }, {
+      id: "histogram",
+      name: "Histogram"
+    }];
+
+    var selectChartTypeCallback = this.props.selectChartTypeCallback;
+
+    var selectedChartTypeId = this.props.selectedChartTypeId;
+
+    var chartTypeListItems = chartTypes.map(function (d, i) {
+      var selected = selectedChartTypeId == d.id;
+      return React.createElement(ChartTypeListItem, {
+        key: i,
+        chartType: d,
+        selected: selected,
+        selectChartTypeCallback: selectChartTypeCallback
+      });
+    });
+
     return React.createElement(
       "div",
       { className: "chartSelector" },
-      "Chart Selector"
+      React.createElement(
+        "h5",
+        null,
+        "Chart Selector"
+      ),
+      React.createElement(
+        "ul",
+        { className: "list-group" },
+        chartTypeListItems
+      )
+    );
+  }
+});
+
+var ChartTypeListItem = React.createClass({
+  displayName: "ChartTypeListItem",
+
+  handleSelect: function () {
+    this.props.selectChartTypeCallback(this.props.chartType.id);
+  },
+  render: function () {
+    var toggleSelect;
+    if (this.props.selected) {
+      toggleSelect = React.createElement(
+        "span",
+        null,
+        "Selected"
+      );
+    } else {
+      toggleSelect = React.createElement(
+        "a",
+        { onClick: this.handleSelect },
+        "Select"
+      );
+    }
+    return React.createElement(
+      "li",
+      { className: "chartTypeListItem list-group-item" },
+      React.createElement(
+        "span",
+        null,
+        this.props.chartType.name,
+        " "
+      ),
+      toggleSelect
     );
   }
 });
@@ -445,10 +507,133 @@ var ChartBox = React.createClass({
   displayName: "ChartBox",
 
   render: function () {
+
+    var chartComponent;
+    if (this.props.selectedChartTypeId == "histogram") {
+      chartComponent = React.createElement(Histogram, null);
+    } else if (this.props.selectedChartTypeId == "timeSeries") {
+      chartComponent = React.createElement(TimeSeries, null);
+    } else {
+      chartComponent = React.createElement(
+        "span",
+        null,
+        "Please Select a Chart"
+      );
+    }
+
     return React.createElement(
       "div",
       { className: "chartBox" },
-      "Chart Box"
+      React.createElement(
+        "h5",
+        null,
+        "Chart Box"
+      ),
+      React.createElement(
+        "div",
+        { className: "panel panel-default" },
+        React.createElement(
+          "div",
+          { className: "panel-body" },
+          chartComponent
+        )
+      )
+    );
+  }
+});
+
+var Histogram = React.createClass({
+  displayName: "Histogram",
+
+  histogramChart: function () {
+    var margin = { top: 20, right: 25, bottom: 25, left: 20 },
+        width = 760,
+        height = 120;
+
+    function chart(selection) {
+      selection.each(function () {
+
+        // Generate a Bates distribution of 10 random variables.
+        var values = d3.range(1000).map(d3.random.bates(10));
+
+        // A formatter for counts.
+        var formatCount = d3.format(",.0f");
+
+        var x = d3.scale.linear().domain([0, 1]).range([0, width]);
+
+        // Generate a histogram using twenty uniformly-spaced bins.
+        var data = d3.layout.histogram().bins(x.ticks(20))(values);
+
+        var y = d3.scale.linear().domain([0, d3.max(data, function (d) {
+          return d.y;
+        })]).range([height, 0]);
+
+        var xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+        var svg = d3.select(this);
+        svg.selectAll("*").remove();
+
+        svg.attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) {
+          return "translate(" + x(d.x) + "," + y(d.y) + ")";
+        });
+
+        bar.append("rect").attr("x", 1).attr("width", x(data[0].dx) - 1).attr("height", function (d) {
+          return height - y(d.y);
+        });
+
+        bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) {
+          return formatCount(d.y);
+        });
+
+        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+      });
+    }
+
+    chart.margin = function (_) {
+      if (!arguments.length) return margin;
+      margin = _;
+      return chart;
+    };
+
+    chart.width = function (_) {
+      if (!arguments.length) return width;
+      width = _;
+      return chart;
+    };
+
+    chart.height = function (_) {
+      if (!arguments.length) return height;
+      height = _;
+      return chart;
+    };
+
+    return chart;
+  },
+  componentDidMount: function () {
+    this.renderChart(this.props);
+  },
+  shouldComponentUpdate: function (props) {
+    this.renderChart(this.props);
+    return false;
+  },
+  renderChart: function (props) {
+    d3.select(ReactDOM.findDOMNode(this)).call(this.histogramChart());
+  },
+  render: function () {
+    return React.createElement("svg", { className: "histogram" });
+  }
+});
+
+var TimeSeries = React.createClass({
+  displayName: "TimeSeries",
+
+  render: function () {
+    return React.createElement(
+      "div",
+      { className: "timeSeries" },
+      "Time Series"
     );
   }
 });

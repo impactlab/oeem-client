@@ -202,5 +202,20 @@
     color: #eee;
 }
 
+/* histogram */
 
+.histogram .bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.histogram .bar text {
+  fill: #fff;
+}
+
+.histogram .axis path, .histogram .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
