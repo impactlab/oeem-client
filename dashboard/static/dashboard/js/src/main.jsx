@@ -17,16 +17,11 @@ var DashboardBox = React.createClass({
 var ProjectDataBox = React.createClass({
   loadProjects: function() {
     var projectListURL = this.props.project_list_url;
-    var params = [];
 
-    var arrayLength = this.state.selectedProjectBlockIds.length;
-    for (var i = 0; i < arrayLength; i++) {
-      if (this.state.projectBlockIdFilterMode == "OR") {
-        params.push( "projectblock_or" + "=" + this.state.selectedProjectBlockIds[i]);
-      } else {
-        params.push( "projectblock_and" + "=" + this.state.selectedProjectBlockIds[i]);
-      }
-    }
+    var params = this.state.selectedProjectBlockIds.map(function(d, i) {
+      return ((this.state.projectBlockIdFilterMode == "OR") ?
+        "projectblock_or" : "projectblock_and") + "=" + d;
+    });
 
     if (params.length > 0) {
       projectListURL += "?" + params.join("&");
@@ -71,6 +66,8 @@ var ProjectDataBox = React.createClass({
       <div className="selectedProjectBlockBox">
         <ChartBox
           selectedChartTypeId={this.state.selectedChartTypeId}
+          projects={this.state.projects}
+          recent_meter_run_list_url={this.props.recent_meter_run_list_url}
         />
         <ChartSelector
           selectChartTypeCallback={this.selectChartTypeCallback}
@@ -424,6 +421,8 @@ var ChartBox = React.createClass({
     if (this.props.selectedChartTypeId == "histogram") {
       chartComponent = (
         <Histogram
+          projects={this.props.projects}
+          recent_meter_run_list_url={this.props.recent_meter_run_list_url}
         />
       )
     } else if (this.props.selectedChartTypeId == "timeSeries") {
@@ -449,6 +448,28 @@ var ChartBox = React.createClass({
 });
 
 var Histogram = React.createClass({
+  loadMeterRuns: function() {
+    var meterRunListURL = this.props.recent_meter_run_list_url;
+
+    if (this.props.projects.length > 0) {
+      meterRunListURL += "?projects=" + this.props.projects.map(function(d, i){
+        return d.id;
+      }).join("+");
+    }
+
+    $.ajax({
+      url: meterRunListURL,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        console.log(data);
+        this.setState({meterRuns: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
   histogramChart: function() {
     var margin = {top: 20, right: 25, bottom: 25, left: 20},
       width = 760,
@@ -536,6 +557,7 @@ var Histogram = React.createClass({
     return chart;
   },
   componentDidMount: function() {
+    this.loadMeterRuns();
     this.renderChart(this.props);
   },
   shouldComponentUpdate: function(props) {
