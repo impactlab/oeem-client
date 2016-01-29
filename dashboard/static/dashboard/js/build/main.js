@@ -79,53 +79,11 @@ var ProjectDataBox = React.createClass({
 
     var chartTypes = [{
       id: "timeSeries",
-      name: "Time Series"
+      name: "Gross Savings Time Series"
     }, {
       id: "histogram",
-      name: "Histogram"
+      name: "Annual Savings Histogram"
     }];
-
-    return React.createElement(
-      "div",
-      { className: "selectedProjectBlockBox" },
-      React.createElement(ProjectSelectionSummaryBox, {
-        projects: this.state.projects
-      }),
-      React.createElement(ChartBox, {
-        chartType: this.state.selectedChartTypeId,
-        fuelType: this.state.selectedFuelTypeId,
-        energyUnit: this.state.selectedEnergyUnitId,
-        projects: this.state.projects,
-        meter_run_list_url: this.props.meter_run_list_url
-      }),
-      React.createElement(CategorySelector, {
-        title: "Chart Type Selector",
-        categories: chartTypes,
-        selectCategoryCallback: this.selectChartTypeCallback,
-        selectedCategoryId: this.state.selectedChartTypeId
-      }),
-      React.createElement(ProjectFilterBox, _extends({
-        selectProjectBlocksCallback: this.selectProjectBlocksCallback,
-
-        selectFuelTypeCallback: this.selectFuelTypeCallback,
-        selectedFuelTypeId: this.state.selectedFuelTypeId,
-
-        selectEnergyUnitCallback: this.selectEnergyUnitCallback,
-        selectedEnergyUnitId: this.state.selectedEnergyUnitId,
-
-        projectBlockIdFilterMode: this.state.projectBlockIdFilterMode
-      }, this.props)),
-      React.createElement(ProjectTable, {
-        projects: this.state.projects
-      })
-    );
-  }
-});
-
-var ProjectFilterBox = React.createClass({
-  displayName: "ProjectFilterBox",
-
-  render: function () {
 
     var fuelTypes = [{
       id: "E",
@@ -146,28 +104,58 @@ var ProjectFilterBox = React.createClass({
       name: "therms"
     }];
 
+    return React.createElement(
+      "div",
+      { className: "selectedProjectBlockBox" },
+      React.createElement(ProjectSelectionSummaryBox, {
+        projects: this.state.projects
+      }),
+      React.createElement(ChartBox, {
+        chartType: this.state.selectedChartTypeId,
+        fuelType: this.state.selectedFuelTypeId,
+        energyUnit: this.state.selectedEnergyUnitId,
+        projects: this.state.projects,
+        meter_run_list_url: this.props.meter_run_list_url
+      }),
+      React.createElement(CategorySelector, {
+        title: null,
+        categories: chartTypes,
+        selectCategoryCallback: this.selectChartTypeCallback,
+        selectedCategoryId: this.state.selectedChartTypeId
+      }),
+      React.createElement(CategorySelector, {
+        title: null,
+        categories: fuelTypes,
+        selectCategoryCallback: this.selectFuelTypeCallback,
+        selectedCategoryId: this.state.selectedFuelTypeId
+      }),
+      React.createElement(CategorySelector, {
+        title: null,
+        categories: energyUnits,
+        selectCategoryCallback: this.selectEnergyUnitCallback,
+        selectedCategoryId: this.state.selectedEnergyUnitId
+      }),
+      React.createElement(ProjectFilterBox, _extends({
+        selectProjectBlocksCallback: this.selectProjectBlocksCallback,
+
+        projectBlockIdFilterMode: this.state.projectBlockIdFilterMode
+      }, this.props)),
+      React.createElement(ProjectTable, {
+        projects: this.state.projects
+      })
+    );
+  }
+});
+
+var ProjectFilterBox = React.createClass({
+  displayName: "ProjectFilterBox",
+
+  render: function () {
+
     var filters = [React.createElement(
       "li",
       { className: "list-group-item", key: "projectBlockFilter" },
       React.createElement(ProjectBlockFilter, this.props)
-    ), React.createElement(
-      "li",
-      { className: "list-group-item", key: "fuelTypeFilter" },
-      React.createElement(CategorySelector, {
-        title: "Fuel Type Selector",
-        categories: fuelTypes,
-        selectCategoryCallback: this.props.selectFuelTypeCallback,
-        selectedCategoryId: this.props.selectedFuelTypeId
-      })
-    ), React.createElement(
-      "li",
-      { className: "list-group-item", key: "energyUnitFilter" },
-      React.createElement(CategorySelector, {
-        title: "Energy Unit Selector",
-        categories: energyUnits,
-        selectCategoryCallback: this.props.selectEnergyUnitCallback,
-        selectedCategoryId: this.props.selectedEnergyUnitId
-      })
     )];
 
     // (<li className="list-group-item" key={"dateRangesFilter"}> <DateRangesFilter/> </li>),
@@ -242,21 +230,16 @@ var ProjectBlockFilter = React.createClass({
     this.loadProjectBlocks();
   },
   render: function () {
-
-    var handleSelectProjectBlock = this.handleSelectProjectBlock;
-    var handleDeselectProjectBlock = this.handleDeselectProjectBlock;
-    var selectedProjectBlockIds = this.state.selectedProjectBlockIds;
-
     var projectBlockListItems = this.state.projectBlockList.map(function (d, i) {
-      var selected = selectedProjectBlockIds.indexOf(d.id) != -1;
+      var selected = this.state.selectedProjectBlockIds.indexOf(d.id) != -1;
       return React.createElement(ProjectBlockListItem, {
         key: d.id,
         selected: selected,
-        handleSelectProjectBlock: handleSelectProjectBlock,
-        handleDeselectProjectBlock: handleDeselectProjectBlock,
+        handleSelectProjectBlock: this.handleSelectProjectBlock,
+        handleDeselectProjectBlock: this.handleDeselectProjectBlock,
         projectBlock: d
       });
-    });
+    }, this);
 
     return React.createElement(
       "div",
@@ -343,14 +326,13 @@ var FuelTypeFilter = React.createClass({
   displayName: "FuelTypeFilter",
 
   render: function () {
-    var handleSelectFuelType = this.props.handleSelectFuelType;
     var fuelTypeListItems = this.props.fuelTypes.map(function (d, i) {
       return React.createElement(FuelTypeListItem, {
         key: i,
         fuelType: d,
-        handleSelectFuelType: handleSelectFuelType
+        handleSelectFuelType: this.props.handleSelectFuelType
       });
-    });
+    }, this);
     return React.createElement(
       "div",
       { className: "fuelTypeFilter" },
@@ -476,32 +458,34 @@ var CategorySelector = React.createClass({
   displayName: "CategorySelector",
 
   render: function () {
-
-    var selectCategoryCallback = this.props.selectCategoryCallback;
-
-    var selectedCategoryId = this.props.selectedCategoryId;
-
     var categoryListItems = this.props.categories.map(function (d, i) {
-      var selected = selectedCategoryId == d.id;
+      var selected = this.props.selectedCategoryId == d.id;
       return React.createElement(CategoryListItem, {
         key: i,
         category: d,
         selected: selected,
-        selectCategoryCallback: selectCategoryCallback
+        selectCategoryCallback: this.props.selectCategoryCallback
       });
-    });
+    }, this);
+
+    var title;
+    if (this.props.title != null) {
+      title = React.createElement(
+        "h5",
+        null,
+        this.props.title
+      );
+    } else {
+      title = null;
+    }
 
     return React.createElement(
       "div",
       { className: "categorySelector" },
+      title,
       React.createElement(
-        "h5",
-        null,
-        this.props.title
-      ),
-      React.createElement(
-        "ul",
-        { className: "list-group" },
+        "div",
+        { className: "btn-group", "data-toggle": "buttons" },
         categoryListItems
       )
     );
@@ -511,34 +495,25 @@ var CategorySelector = React.createClass({
 var CategoryListItem = React.createClass({
   displayName: "CategoryListItem",
 
-  handleSelect: function () {
+  handleSelect: function (e) {
     this.props.selectCategoryCallback(this.props.category.id);
   },
   render: function () {
-    var toggleSelect;
+    var bootstrap_class;
     if (this.props.selected) {
-      toggleSelect = React.createElement(
-        "span",
-        null,
-        "Selected"
-      );
+      bootstrap_class = "categoryListItem btn btn-primary active";
     } else {
-      toggleSelect = React.createElement(
-        "a",
-        { onClick: this.handleSelect },
-        "Select"
-      );
+      bootstrap_class = "categoryListItem btn btn-primary";
     }
     return React.createElement(
-      "li",
-      { className: "categoryItem list-group-item" },
-      React.createElement(
-        "span",
-        null,
-        this.props.category.name,
-        " "
-      ),
-      toggleSelect
+      "label",
+      { className: bootstrap_class, onClick: this.handleSelect },
+      React.createElement("input", {
+        type: "radio",
+        checked: this.props.selected,
+        readOnly: true
+      }),
+      this.props.category.name
     );
   }
 });
@@ -547,9 +522,9 @@ var ChartBox = React.createClass({
   displayName: "ChartBox",
 
   render: function () {
-
     var chartComponent;
     if (this.props.chartType == "histogram") {
+
       chartComponent = React.createElement(Histogram, {
         projects: this.props.projects,
         fuelType: this.props.fuelType,
@@ -609,6 +584,18 @@ var Histogram = React.createClass({
 
     var targetStateCounter = this.state.renderCounter;
 
+    if (this.state.spinner == null) {
+
+      var opts = { lines: 9, length: 9, width: 5, radius: 10, corners: 1,
+        color: '#001', opacity: 0.2, className: 'spinner', top: '75px',
+        position: 'relative'
+      };
+      var spinner = new Spinner(opts).spin(ReactDOM.findDOMNode(this).parentElement);
+      this.setState({ spinner: spinner });
+    } else {
+      this.state.spinner.spin();
+    }
+
     $.ajax({
       url: meterRunListURL,
       dataType: 'json',
@@ -627,47 +614,75 @@ var Histogram = React.createClass({
   histogramChart: function (values) {
     var w = this.state.width;
     var h = 150;
-    var margin = { top: 20, right: 20 + w / 4, bottom: 25, left: 20 + w / 4 },
+    var bins = 20;
+    var margin = { top: 30, right: 100, bottom: 25, left: 100 },
         width = w - margin.right - margin.left,
-        height = h - margin.top - margin.bottom;
+        height = h - margin.top - margin.bottom,
+        barWidth = Math.floor(width / bins) - 2;
+
+    var energyUnit;
+    if (this.props.energyUnit == "KWH") {
+      energyUnit = "kWh";
+    } else {
+      energyUnit = "therms";
+    }
+
+    var fuelType;
+    if (this.props.fuelType == "E") {
+      fuelType = "Electricity";
+    } else if (this.props.fuelType == "NG") {
+      fuelType = "Natural Gas";
+    } else {
+      fuelType = "Combined";
+    }
 
     function chart(selection) {
       selection.each(function () {
 
         // A formatter for counts.
         var formatCount = d3.format(",.0f");
+        var formatAxis = d3.format(".2s");
 
         var x = d3.scale.linear().domain(d3.extent(values, function (d) {
           return d;
         })).range([0, width]);
 
         // Generate a histogram using twenty uniformly-spaced bins.
-        var data = d3.layout.histogram().bins(x.ticks(20))(values);
+        var data = d3.layout.histogram().bins(bins)(values);
 
         var y = d3.scale.linear().domain([0, d3.max(data, function (d) {
           return d.y;
         })]).range([height, 0]);
 
-        var xAxis = d3.svg.axis().scale(x).orient("bottom");
+        console.log(x.domain());
+        var tempScale = d3.scale.linear().domain([0, bins]).range(x.domain());
+        var tickArray = d3.range(bins + 1).map(tempScale);
+        var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(formatAxis).orient("bottom");
 
         var svg = d3.select(this);
         svg.selectAll("*").remove();
 
-        svg.attr("width", w).attr("height", h).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg = svg.attr("width", w).attr("height", h).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) {
           return "translate(" + x(d.x) + "," + y(d.y) + ")";
         });
 
-        bar.append("rect").attr("x", 1).attr("width", x(data[0].dx) - 1).attr("height", function (d) {
+        // bars
+        bar.append("rect").attr("x", 1).attr("width", barWidth).attr("height", function (d) {
           return height - y(d.y);
         });
 
-        bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) {
+        // counts
+        bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", barWidth / 2).attr("text-anchor", "middle").text(function (d) {
           return formatCount(d.y);
         });
 
+        // x axis
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+
+        // title
+        svg.append("text").attr("x", width / 2).attr("y", 0 - margin.top / 2).attr("text-anchor", "middle").style("font-size", "16px").text("Histogram of Annual Project Savings - " + fuelType + " (" + energyUnit + " / year)");
       });
     }
 
@@ -701,6 +716,8 @@ var Histogram = React.createClass({
     return $(ReactDOM.findDOMNode(this)).parent().width();
   },
   componentDidMount: function () {
+
+    this.loadMeterRuns(this.props);
     this.setState({
       width: this.getCurrentWidth()
     });
@@ -718,6 +735,7 @@ var Histogram = React.createClass({
   getInitialState: function () {
     return {
       width: 0,
+      spinner: null,
       meterRuns: [],
       renderCounter: 0 };
   },
@@ -728,6 +746,7 @@ var Histogram = React.createClass({
   renderChart: function () {
     this.incrementRenderCounter();
     d3.select(ReactDOM.findDOMNode(this)).call(this.histogramChart(this.getChartValues()));
+    this.state.spinner.stop();
   },
   getChartValues: function () {
 
