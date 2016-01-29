@@ -607,56 +607,29 @@ var Histogram = React.createClass({
       }).join("+");
     }
 
+    var targetStateCounter = this.state.renderCounter;
+
     $.ajax({
       url: meterRunListURL,
       dataType: 'json',
       cache: false,
       success: (function (data) {
-        this.setState({ meterRuns: data }, this.renderChart);
+        // don't render if old (slow) ajax call. TODO find source of error.
+        if (targetStateCounter == this.state.renderCounter) {
+          this.setState({ meterRuns: data }, this.renderChart);
+        }
       }).bind(this),
       error: (function (xhr, status, err) {
         console.error(meterRunListURL, status, err.toString());
       }).bind(this)
     });
   },
-  histogramChart: function () {
-    var margin = { top: 20, right: 25, bottom: 25, left: 20 },
-        width = this.state.width,
-        height = 150;
-
-    var project_meter_runs = {};
-    this.state.meterRuns.forEach(function (d, i) {
-      if (d.project in project_meter_runs) {
-        project_meter_runs[d.project].push(d);
-      } else {
-        project_meter_runs[d.project] = [d];
-      }
-    });
-
-    var values = [];
-    for (var project_id in project_meter_runs) {
-      if (project_meter_runs.hasOwnProperty(project_id)) {
-
-        var annual_savings = { E: 0, NG: 0 };
-        project_meter_runs[project_id].forEach(function (meter_run) {
-          if (meter_run.annual_savings != null) {
-            if (meter_run.fuel_type == "E") {
-              annual_savings.E += meter_run.annual_savings;
-            } else if (meter_run.fuel_type == "NG") {
-              annual_savings.NG += meter_run.annual_savings;
-            }
-          }
-        });
-
-        if (this.props.energyUnit == "KWH") {
-          values.push(annual_savings.E + annual_savings.NG * 29.3001);
-        } else if (this.props.energyUnit == "THERM") {
-          values.push(annual_savings.E * 0.034 + annual_savings.NG);
-        }
-      }
-    }
-
-    console.log(values);
+  histogramChart: function (values) {
+    var w = this.state.width;
+    var h = 150;
+    var margin = { top: 20, right: 20 + w / 4, bottom: 25, left: 20 + w / 4 },
+        width = w - margin.right - margin.left,
+        height = h - margin.top - margin.bottom;
 
     function chart(selection) {
       selection.each(function () {
@@ -680,7 +653,7 @@ var Histogram = React.createClass({
         var svg = d3.select(this);
         svg.selectAll("*").remove();
 
-        svg.attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.attr("width", w).attr("height", h).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) {
           return "translate(" + x(d.x) + "," + y(d.y) + ")";
@@ -745,11 +718,52 @@ var Histogram = React.createClass({
   getInitialState: function () {
     return {
       width: 0,
-      meterRuns: []
-    };
+      meterRuns: [],
+      renderCounter: 0 };
+  },
+  // catching an extra rerender that (TODO) needs to be found
+  incrementRenderCounter: function () {
+    this.setState({ renderCounter: this.state.renderCounter + 1 });
   },
   renderChart: function () {
-    d3.select(ReactDOM.findDOMNode(this)).call(this.histogramChart());
+    this.incrementRenderCounter();
+    d3.select(ReactDOM.findDOMNode(this)).call(this.histogramChart(this.getChartValues()));
+  },
+  getChartValues: function () {
+
+    var project_meter_runs = {};
+    this.state.meterRuns.forEach(function (d, i) {
+      if (d.project in project_meter_runs) {
+        project_meter_runs[d.project].push(d);
+      } else {
+        project_meter_runs[d.project] = [d];
+      }
+    });
+
+    var values = [];
+    for (var project_id in project_meter_runs) {
+      if (project_meter_runs.hasOwnProperty(project_id)) {
+
+        var annual_savings = { E: 0, NG: 0 };
+        project_meter_runs[project_id].forEach(function (meter_run) {
+          if (meter_run.annual_savings != null) {
+            if (meter_run.fuel_type == "E") {
+              annual_savings.E += meter_run.annual_savings;
+            } else if (meter_run.fuel_type == "NG") {
+              annual_savings.NG += meter_run.annual_savings;
+            }
+          }
+        });
+
+        if (this.props.energyUnit == "KWH") {
+          values.push(annual_savings.E + annual_savings.NG * 29.3001);
+        } else if (this.props.energyUnit == "THERM") {
+          values.push(annual_savings.E * 0.034 + annual_savings.NG);
+        }
+      }
+    }
+
+    return values;
   },
   render: function () {
     return React.createElement("svg", { className: "histogram" });
