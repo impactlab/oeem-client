@@ -78,7 +78,15 @@ var ProjectDataBox = React.createClass({
       {
         id: "histogram",
         name: "Annual Savings Histogram",
-      }
+      },
+      {
+        id: "scatterPlot",
+        name: "Realization Rate Scatterplot",
+      },
+      {
+        id: "map",
+        name: "Map",
+      },
     ];
 
     var fuelTypes = [
@@ -114,6 +122,13 @@ var ProjectDataBox = React.createClass({
           projects={this.state.projects}
         />
 
+        <CategorySelector
+          title={null}
+          categories={chartTypes}
+          selectCategoryCallback={this.selectChartTypeCallback}
+          selectedCategoryId={this.state.selectedChartTypeId}
+        />
+
         <ChartBox
           chartType={this.state.selectedChartTypeId}
           fuelType={this.state.selectedFuelTypeId}
@@ -122,26 +137,25 @@ var ProjectDataBox = React.createClass({
           meter_run_list_url={this.props.meter_run_list_url}
         />
 
-        <CategorySelector
-          title={null}
-          categories={chartTypes}
-          selectCategoryCallback={this.selectChartTypeCallback}
-          selectedCategoryId={this.state.selectedChartTypeId}
-        />
+        <div className="row">
+          <div className="col-md-4">
+            <CategorySelector
+              title={null}
+              categories={fuelTypes}
+              selectCategoryCallback={this.selectFuelTypeCallback}
+              selectedCategoryId={this.state.selectedFuelTypeId}
+            />
+          </div>
 
-        <CategorySelector
-          title={null}
-          categories={fuelTypes}
-          selectCategoryCallback={this.selectFuelTypeCallback}
-          selectedCategoryId={this.state.selectedFuelTypeId}
-        />
-
-        <CategorySelector
-          title={null}
-          categories={energyUnits}
-          selectCategoryCallback={this.selectEnergyUnitCallback}
-          selectedCategoryId={this.state.selectedEnergyUnitId}
-        />
+          <div className="col-md-4">
+            <CategorySelector
+              title={null}
+              categories={energyUnits}
+              selectCategoryCallback={this.selectEnergyUnitCallback}
+              selectedCategoryId={this.state.selectedEnergyUnitId}
+            />
+          </div>
+        </div>
 
         <ProjectFilterBox
           selectProjectBlocksCallback={this.selectProjectBlocksCallback}
@@ -475,6 +489,16 @@ var ChartBox = React.createClass({
         <TimeSeries
         />
       )
+    } else if (this.props.chartType == "scatterPlot") {
+      chartComponent = (
+        <ScatterPlot
+        />
+      )
+    } else if (this.props.chartType == "map") {
+      chartComponent = (
+        <Map
+        />
+      )
     } else {
       chartComponent = <span>Please Select a Chart</span>
     }
@@ -516,7 +540,7 @@ var Histogram = React.createClass({
     if (this.state.spinner == null) {
 
       var opts = { lines: 9, length: 9, width: 5, radius: 10, corners: 1,
-        color: '#001', opacity: 0.2, className: 'spinner', top: '75px',
+        color: '#001', opacity: 0.2, className: 'spinner', top: '95px',
         position: 'relative',
       }
       var spinner = new Spinner(opts).spin(ReactDOM.findDOMNode(this).parentElement);
@@ -542,9 +566,9 @@ var Histogram = React.createClass({
   },
   histogramChart: function(values) {
     var w = this.state.width;
-    var h = 150;
+    var h = 200;
     var bins = 20;
-    var margin = { top: 30, right: 100, bottom: 25, left: 100},
+    var margin = { top: 30, right: 100, bottom: 50, left: 100},
       width = w - margin.right - margin.left,
       height = h - margin.top - margin.bottom,
       barWidth = Math.floor(width / bins) - 2;
@@ -594,12 +618,21 @@ var Histogram = React.createClass({
             .tickFormat(formatAxis)
             .orient("bottom");
 
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+            return "<span>" + d.y + " projects</span>";
+          })
+
         var svg = d3.select(this);
         svg.selectAll("*").remove();
 
         svg = svg.attr("width", w).attr("height", h)
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.call(tip);
 
         var bar = svg.selectAll(".bar")
             .data(data)
@@ -611,21 +644,21 @@ var Histogram = React.createClass({
         bar.append("rect")
             .attr("x", 1)
             .attr("width", barWidth)
-            .attr("height", function(d) { return height - y(d.y); });
-
-        // counts
-        bar.append("text")
-            .attr("dy", ".75em")
-            .attr("y", 6)
-            .attr("x", barWidth / 2)
-            .attr("text-anchor", "middle")
-            .text(function(d) { return formatCount(d.y); });
+            .attr("height", function(d) { return height - y(d.y); })
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
 
         // x axis
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
+
+        // rotate the axis labels
+        svg.selectAll(".x.axis text")
+          .attr("transform", function(d) {
+             return "translate(" + -1 * this.getBBox().height + "," + 0.5*this.getBBox().height + ")rotate(-30)";
+         });
 
         // title
         svg.append("text")
@@ -741,7 +774,7 @@ var Histogram = React.createClass({
   },
   render: function() {
     return (
-      <svg className="histogram"></svg>
+      <svg className="histogram" height="200"></svg>
     )
   }
 });
@@ -751,6 +784,26 @@ var TimeSeries = React.createClass({
     return (
       <div className="timeSeries">
         Time Series
+      </div>
+    )
+  }
+});
+
+var ScatterPlot = React.createClass({
+  render: function() {
+    return (
+      <div className="timeSeries">
+        Scatterplot
+      </div>
+    )
+  }
+});
+
+var Map = React.createClass({
+  render: function() {
+    return (
+      <div className="timeSeries">
+        Map
       </div>
     )
   }
