@@ -24,6 +24,7 @@ gulp.task('watch', function() {
 
   return watcher.on('update', function () {
     watcher.bundle()
+      .on('error', function(err) { console.error(err); this.emit('end'); })
       .pipe(source(path.OUT))
       .pipe(gulp.dest(path.DEST))
       console.log('Updated');
