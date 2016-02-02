@@ -51,3 +51,10 @@ class ProjectAttributeListProxyView(DatastoreMixin, ProxyView):
 
 class ProjectAttributeDetailProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/project_attributes/%(pk)s/"
+
+
+class ConsumptionMetadataListProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/consumption_metadatas/"
+
+class ConsumptionMetadataDetailProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/consumption_metadatas/%(pk)s/"

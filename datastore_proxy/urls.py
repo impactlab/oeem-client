@@ -16,4 +16,7 @@ urlpatterns = [
 
 	url(r'^project_attribute_keys/', views.ProjectAttributeKeyListProxyView.as_view(), name='project_attribute_key_list'),
 	url(r'^project_attribute_keys/(?P<pk>[0-9]+)/', views.ProjectAttributeKeyDetailProxyView.as_view(), name='project_attribute_key_detail'),
+
+	url(r'^consumption_metadatas/', views.ConsumptionMetadataListProxyView.as_view(), name='consumption_metadata_list'),
+	url(r'^consumption_metadatas/(?P<pk>[0-9]+)/', views.ConsumptionMetadataDetailProxyView.as_view(), name='consumption_metadata_detail'),
 ]

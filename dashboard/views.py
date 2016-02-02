@@ -34,6 +34,7 @@ class MainView(TemplateView):
         context['meter_run_list_url'] = reverse('datastore_proxy:meter_run_list')
         context['project_attribute_key_list_url'] = reverse('datastore_proxy:project_attribute_key_list')
         context['project_attribute_list_url'] = reverse('datastore_proxy:project_attribute_list')
+        context['consumption_metadata_list_url'] = reverse('datastore_proxy:consumption_metadata_list')
         context['logo'] = 'client_logos/'+CLIENT_SETTINGS['logo']
 
         return context

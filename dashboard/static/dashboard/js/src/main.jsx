@@ -1,3 +1,14 @@
+var CategorySelector = require('./CategorySelector.jsx');
+var ProjectTable = require('./ProjectTable.jsx');
+var ProjectSelectionSummaryBox = require('./ProjectSelectionSummaryBox.jsx');
+
+// Charts
+var Scatterplot = require('./Scatterplot.jsx');
+var Histogram = require('./Histogram.jsx');
+var Timeseries = require('./Timeseries.jsx');
+var Map = require('./Map.jsx');
+
+
 window.DashboardBox = React.createClass({
   render: function() {
     return (
@@ -145,6 +156,8 @@ var ProjectDataBox = React.createClass({
           <div className="col-md-4">
             <ProjectSelectionSummaryBox
               projects={this.state.projects}
+              consumption_metadata_list_url={this.props.consumption_metadata_list_url}
+              meter_run_list_url={this.props.meter_run_list_url}
             />
           </div>
         </div>
@@ -413,80 +426,6 @@ var EnergyConservationMeasureFilter = React.createClass({
     )
   }
 });
-
-var ProjectSelectionSummaryBox = React.createClass({
-  render: function() {
-    return (
-      <div className="projectSummaryBox">
-        <ul className="list-group">
-          <li className="list-group-item">Number of projects: {this.props.projects.length}</li>
-        </ul>
-      </div>
-    )
-  }
-});
-
-var CategorySelector = React.createClass({
-  render: function() {
-    var categoryListItems = this.props.categories.map(function(d, i) {
-      var selected = (this.props.selectedCategoryId == d.id);
-      return (
-        <CategoryListItem
-          key={i}
-          category={d}
-          selected={selected}
-          selectCategoryCallback={this.props.selectCategoryCallback}
-        />
-      )
-    }, this);
-
-    var title;
-    if (this.props.title != null) {
-      title = <h5>{this.props.title}</h5>
-    } else {
-      title = null;
-    }
-
-    return (
-      <div className="categorySelector">
-        {title}
-        <div className="btn-group" data-toggle="buttons">
-          {categoryListItems}
-        </div>
-      </div>
-    )
-  }
-});
-
-var CategoryListItem = React.createClass({
-  handleSelect: function(e) {
-    this.props.selectCategoryCallback(this.props.category.id);
-  },
-  render: function() {
-    var bootstrap_class;
-    if (this.props.selected) {
-      bootstrap_class = "categoryListItem btn btn-primary active";
-    } else {
-      bootstrap_class = "categoryListItem btn btn-primary";
-    }
-    return (
-      <label className={bootstrap_class} onClick={this.handleSelect}>
-        <input
-          type="radio"
-          checked={this.props.selected}
-          readOnly={true}
-        />
-        {this.props.category.name}
-      </label>
-    )
-  }
-});
-
-var Scatterplot = require('./Scatterplot.jsx');
-var Histogram = require('./Histogram.jsx');
-var Timeseries = require('./Timeseries.jsx');
-var Map = require('./Map.jsx');
-
 var ChartBox = React.createClass({
   render: function() {
     var chartComponent;
@@ -539,42 +478,6 @@ var ChartBox = React.createClass({
           </div>
         </div>
       </div>
-    )
-  }
-});
-
-var ProjectTable = React.createClass({
-  render: function() {
-    var projects = this.props.projects.map(function(d,i) {
-      return (
-        <ProjectTableItem
-          key={d.id}
-          project={d}
-        />
-      )
-    });
-    return (
-      <div className="projectTable">
-        Project Table
-        <ul className="list-group">
-          {projects}
-        </ul>
-      </div>
-    )
-  }
-});
-
-var ProjectTableItem = React.createClass({
-  handleSelect: function() {
-    console.log(this.props.project);
-  },
-  render: function() {
-    return (
-      <li className="list-group-item clearfix">
-        <a onClick={this.handleSelect}>
-          {this.props.project.project_id}
-        </a>
-      </li>
     )
   }
 });
