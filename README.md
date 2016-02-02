@@ -55,13 +55,10 @@ You might consider adding these to your virtualenv activate script
 
 ### JSX offline transform (for React)
 
-Install babel:
+Install javascript deps (gulp):
 
-    npm install --global babel-cli
-    npm install babel-preset-react
+    npm install
 
-Run babel while editing the following files to build them offline:
+Run default gulp task, which watches the file dashboard/static/dashboard/js/src/main.jsx:
 
-dashboard/static/dashboard/js/src/\*.jsx:
-
-    babel --presets react dashboard/static/dashboard/js/src/ --watch --out-dir dashboard/static/dashboard/js/build/
+    gulp

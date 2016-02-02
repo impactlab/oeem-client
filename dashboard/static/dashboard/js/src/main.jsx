@@ -1,4 +1,4 @@
-var DashboardBox = React.createClass({
+window.DashboardBox = React.createClass({
   render: function() {
     return (
       <div className="dashboardBox container-fluid">
@@ -118,24 +118,35 @@ var ProjectDataBox = React.createClass({
     return (
       <div className="selectedProjectBlockBox">
 
-        <ProjectSelectionSummaryBox
-          projects={this.state.projects}
-        />
+        <div className="row">
+          <div className="col-md-12">
+            <CategorySelector
+              title={null}
+              categories={chartTypes}
+              selectCategoryCallback={this.selectChartTypeCallback}
+              selectedCategoryId={this.state.selectedChartTypeId}
+            />
+          </div>
+        </div>
 
-        <CategorySelector
-          title={null}
-          categories={chartTypes}
-          selectCategoryCallback={this.selectChartTypeCallback}
-          selectedCategoryId={this.state.selectedChartTypeId}
-        />
 
-        <ChartBox
-          chartType={this.state.selectedChartTypeId}
-          fuelType={this.state.selectedFuelTypeId}
-          energyUnit={this.state.selectedEnergyUnitId}
-          projects={this.state.projects}
-          meter_run_list_url={this.props.meter_run_list_url}
-        />
+        <div className="row">
+          <div className="col-md-8">
+            <ChartBox
+              chartType={this.state.selectedChartTypeId}
+              fuelType={this.state.selectedFuelTypeId}
+              energyUnit={this.state.selectedEnergyUnitId}
+              projects={this.state.projects}
+              meter_run_list_url={this.props.meter_run_list_url}
+            />
+          </div>
+
+          <div className="col-md-4">
+            <ProjectSelectionSummaryBox
+              projects={this.state.projects}
+            />
+          </div>
+        </div>
 
         <div className="row">
           <div className="col-md-4">
@@ -567,8 +578,8 @@ var Histogram = React.createClass({
   histogramChart: function(values) {
     var w = this.state.width;
     var h = 200;
-    var bins = 20;
-    var margin = { top: 30, right: 100, bottom: 50, left: 100},
+    var bins = 15;
+    var margin = { top: 30, right: 10, bottom: 40, left: 40},
       width = w - margin.right - margin.left,
       height = h - margin.top - margin.bottom,
       barWidth = Math.floor(width / bins) - 2;
@@ -779,21 +790,29 @@ var Histogram = React.createClass({
   }
 });
 
-var TimeSeries = React.createClass({
+
+var ScatterPlot = React.createClass({
+  shouldComponentUpdate: function(props) {
+    return false;
+  },
+  getInitialState: function() {
+    return {
+    }
+  },
   render: function() {
     return (
-      <div className="timeSeries">
-        Time Series
+      <div>
+      <svg className="scatterBlot" height="200"></svg>
       </div>
     )
   }
 });
 
-var ScatterPlot = React.createClass({
+var TimeSeries = React.createClass({
   render: function() {
     return (
       <div className="timeSeries">
-        Scatterplot
+        Time Series
       </div>
     )
   }

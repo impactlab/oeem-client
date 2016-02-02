@@ -17,11 +17,13 @@ class DatastoreMixin(object):
         headers['Authorization'] = "Bearer {}".format(settings.DATASTORE_ACCESS_TOKEN)
         return headers
 
+
 class ProjectBlockListProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/project_blocks/"
 
 class ProjectBlockDetailProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/project_blocks/%(pk)s/"
+
 
 class ProjectListProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/projects/"
@@ -29,8 +31,23 @@ class ProjectListProxyView(DatastoreMixin, ProxyView):
 class ProjectDetailProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/projects/%(pk)s/"
 
+
 class MeterRunListProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/meter_runs/"
 
 class MeterRunDetailProxyView(DatastoreMixin, ProxyView):
     source = "api/v1/meter_runs/%(pk)s/"
+
+
+class ProjectAttributeKeyListProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/project_attribute_keys/"
+
+class ProjectAttributeKeyDetailProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/project_attribute_keys/%(pk)s/"
+
+
+class ProjectAttributeListProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/project_attributes/"
+
+class ProjectAttributeDetailProxyView(DatastoreMixin, ProxyView):
+    source = "api/v1/project_attributes/%(pk)s/"
