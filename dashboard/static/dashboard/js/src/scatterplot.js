@@ -40,7 +40,7 @@ scatterplot.destroy = function(el) {
 
 /* SHAPE */
 
-scatterplot._margin = {top: 30, right: 20, bottom: 25, left: 55};
+scatterplot._margin = {top: 30, right: 10, bottom: 20, left: 40};
 scatterplot._w = null;
 scatterplot._h = null;
 scatterplot._width = function(w, margin) {
