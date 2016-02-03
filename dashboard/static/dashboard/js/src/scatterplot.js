@@ -2,56 +2,185 @@ var scatterplot = {};
 
 scatterplot.create = function(el, props, state) {
 
-  var margin = this._margin;
 
-  var w = this._w(el);
-  var h = props.height;
-  this._h = h;
+  this._w = $(el).parent().width();
+  this._h = props.height;
 
-  var width = this._width(w, margin);
-  var height = this._height(h, margin);
+  var shape = this._shape();
 
   var svg = d3.select(el).append('svg')
       .attr('class', 'scatterplot')
-      .attr('width', w)
-      .attr('height', h);
+      .attr('width', shape.w)
+      .attr('height', shape.h);
 
-  svg.append('g')
+  var g = svg.append('g')
       .attr('class', 'scatterplot-points')
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + shape.margin.left + "," + shape.margin.top + ")");
 
   svg.append("text")
-    .attr("x", (w / 2))
-    .attr("y", (margin.top / 2))
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Predicted vs. Actual Annual Savings");
+      .attr("x", (shape.w / 2))
+      .attr("y", (shape.margin.top / 2))
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Predicted vs. Actual Annual Savings");
+
+  this._initAxis(el, state.domain);
 
   this.update(el, state);
 };
 
 scatterplot.update = function(el, state) {
-  var scales = this._scales(el, state.domain);
+  var scales = this._scales(state.domain);
+  this._updateAxis(el, state.domain);
   this._drawPoints(el, scales, state.data);
 };
 
 scatterplot.destroy = function(el) {
 };
 
-scatterplot._margin = {top: 30, right: 20, bottom: 20, left: 20};
 
-scatterplot._w = function(el) {
-  return $(el).parent().width();
-};
+/* SHAPE */
+
+scatterplot._margin = {top: 30, right: 20, bottom: 25, left: 55};
+scatterplot._w = null;
 scatterplot._h = null;
-
 scatterplot._width = function(w, margin) {
   return w - margin.left - margin.right;
 };
-
 scatterplot._height = function(h, margin) {
-  return h - margin.top - margin.left;
+  return h - margin.top - margin.bottom;
 };
+
+scatterplot._shape = function() {
+  var w = this._w;
+  var h = this._h;
+  var margin = this._margin;
+  var width = this._width(w, margin);
+  var height = this._height(h, margin);
+  return {
+    h: h, w: w,
+    margin: margin,
+    height: height,
+    width: width
+  }
+}
+
+/* DRAWING */
+scatterplot._initAxis = function(el, domain) {
+
+  var scales = this._scales(domain);
+  var shape = this._shape();
+
+  var xAxis = d3.svg.axis()
+      .scale(scales.x)
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+      .scale(scales.y)
+      .orient("left");
+
+  var g = d3.select(el).selectAll('.scatterplot-points');
+
+  g.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + shape.height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", shape.width)
+      .attr("transform", "translate(-10, 0)")
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Actual");
+
+  g.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(0,0)")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90) translate(-10,0)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Predicted");
+
+  var min_max = Math.min(scales.x.domain()[1], scales.y.domain()[1]);
+
+  var equivalence_line = g.append("g")
+      .attr("class", "equivalence");
+
+  var lineFunction = d3.svg.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; })
+    .interpolate("linear");
+
+  var equivalenceLineData = [
+    {x: scales.x(0), y: scales.y(0)},
+    {x: scales.x(min_max), y: scales.y(min_max)},
+  ];
+
+  equivalence_line.append("path")
+    .attr("id", "equivalence_path")
+    .attr("stroke","black")
+    .attr("d", lineFunction(equivalenceLineData));
+
+  equivalence_line.append("text")
+      .attr("class", "label")
+      .attr("dy", ".71em")
+      .attr("transform", "translate(0,5)")
+  .append("textPath")
+      .style("text-anchor","end")
+      .attr("startOffset","96%")
+      .attr("xlink:href","#equivalence_path")
+      .text("Savings Realized");
+
+  equivalence_line.append("text")
+      .attr("class", "label")
+      .attr("dy", ".71em")
+      .attr("transform", "translate(0,-14)")
+  .append("textPath")
+      .style("text-anchor","end")
+      .attr("startOffset","97%")
+      .attr("xlink:href","#equivalence_path")
+      .text("Savings Not Realized");
+
+}
+
+scatterplot._updateAxis = function(el, domain) {
+
+  var scales = this._scales(domain);
+  var shape = this._shape();
+
+  var xAxis = d3.svg.axis()
+      .scale(scales.x)
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+      .scale(scales.y)
+      .orient("left");
+
+  d3.select(el).selectAll('.x.axis')
+      .call(xAxis);
+
+  d3.select(el).selectAll('.y.axis')
+      .call(yAxis);
+
+  var min_max = Math.min(scales.x.domain()[1], scales.y.domain()[1]);
+
+  var lineFunction = d3.svg.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; })
+    .interpolate("linear");
+
+  var equivalenceLineData = [
+    {x: scales.x(0), y: scales.y(0)},
+    {x: scales.x(min_max), y: scales.y(min_max)},
+  ];
+
+  d3.select(el).selectAll("path#equivalence_path")
+    .attr("d", lineFunction(equivalenceLineData));
+}
 
 scatterplot._drawPoints = function(el, scales, data) {
 
@@ -68,16 +197,8 @@ scatterplot._drawPoints = function(el, scales, data) {
       );
     });
 
+
   var g = d3.select(el).selectAll('.scatterplot-points');
-
-  var min_max = Math.min(scales.x.domain()[1], scales.y.domain()[1]);
-
-  g.append("line")
-    .style("stroke", "black")
-    .attr("x1", scales.x(0))
-    .attr("y1", scales.y(0))
-    .attr("x2", scales.x(min_max))
-    .attr("y2", scales.y(min_max));
 
   g.call(tip);
 
@@ -100,25 +221,22 @@ scatterplot._drawPoints = function(el, scales, data) {
       .remove();
 };
 
-scatterplot._scales = function(el, domain) {
+scatterplot._scales = function(domain) {
+
   if (!domain) {
     return null;
   }
 
-  var margin = this._margin;
+  var shape = this._shape();
 
-  var w = this._w(el);
-  var h = this._h;
-
-  var width = this._width(w, margin);
-  var height = this._height(h, margin);
+  scatter_margin = 10;
 
   var x = d3.scale.linear()
-    .range([0, width])
+    .range([scatter_margin, shape.width - scatter_margin])
     .domain(domain.x);
 
   var y = d3.scale.linear()
-    .range([height, 0])
+    .range([shape.height - scatter_margin, scatter_margin])
     .domain(domain.y);
 
   return {x: x, y: y};

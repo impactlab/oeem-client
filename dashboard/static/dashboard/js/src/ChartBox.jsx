@@ -138,6 +138,11 @@ var ChartBox = React.createClass({
             _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
           ],
         };
+
+        // add buffer if necessary
+        domain.x[0] = Math.min(domain.x[0], 0);
+        domain.y[0] = Math.min(domain.y[0], 0);
+
         this.setState({
           scatterplotData: {
             data: projectData,

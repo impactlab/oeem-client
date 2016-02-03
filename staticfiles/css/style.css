@@ -228,6 +228,29 @@
   fill: #bbb;
 }
 
+/* histogram */
+
+.scatterplot text {
+  fill: #333;
+}
+
+.scatterplot .axis path, .scatterplot .axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+}
+
+.scatterplot .axis text {
+  fill: #bbb;
+}
+
+.scatterplot .equivalence path {
+  stroke: #ddd;
+}
+
+.scatterplot .equivalence textPath {
+  fill: #ddd;
+}
 
 /* tooltip */
 .d3-tip {
