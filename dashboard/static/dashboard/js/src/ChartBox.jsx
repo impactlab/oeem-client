@@ -99,7 +99,8 @@ var ChartBox = React.createClass({
   },
 
   getProjectAttributes: function() {
-    var projectListURL = this.props.project_list_url + "?with_attributes=True&with_meter_runs=True";
+    var projectListURL = this.props.project_list_url +
+      "?with_attributes=True&with_meter_runs=True";
 
     if (this.props.projects.length > 0) {
       meterRunListURL += "&projects=" + this.props.projects.map(function(d, i){
@@ -118,7 +119,7 @@ var ChartBox = React.createClass({
 
           if (predictedSavings != null && actualSavings != null) {
             return {
-              id: i,
+              id: d.project_id,
               x: actualSavings,
               y: predictedSavings,
             }
@@ -137,8 +138,6 @@ var ChartBox = React.createClass({
             _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
           ],
         };
-        console.log(domain);
-
         this.setState({
           scatterplotData: {
             data: projectData,
@@ -150,17 +149,6 @@ var ChartBox = React.createClass({
         console.error(projectListURL, status, err.toString());
       }.bind(this)
     });
-
-    var sampleData = [
-      {id: '5fbmzmtc', x: 7, y: 41},
-      {id: 's4f8phwm', x: 11, y: 45},
-    ];
-
-    var sampleDomain = {
-      x: [0, 30],
-      y: [0, 100],
-    };
-
   },
   getInitialState: function() {
     return {

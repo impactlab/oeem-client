@@ -8,15 +8,15 @@ var Scatterplot = React.createClass({
 
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this);
+
     scatterplot.create(el, {
-      width: '100%',
-      height: '200px'
+      height: 200
     }, this.getChartState());
   },
 
   componentDidUpdate: function() {
     var el = ReactDOM.findDOMNode(this);
-    scatterplot.update(el, this.getChartState());
+    scatterplot.update(el, this.props, this.getChartState());
   },
 
   getChartState: function() {
