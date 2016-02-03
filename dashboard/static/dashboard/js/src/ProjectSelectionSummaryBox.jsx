@@ -18,15 +18,15 @@ var ProjectSelectionSummaryBox = React.createClass({
   },
 
   componentDidMount: function() {
-    this.getProjectCounts();
-    this.getMeterRunCounts();
+    this.getProjectCounts(this.props);
+    this.getMeterRunCounts(this.props);
   },
 
-  getProjectCounts: function() {
-    var consumptionMetadataListURL = this.props.consumption_metadata_list_url + "?summary=True";
+  getProjectCounts: function(props) {
+    var consumptionMetadataListURL = props.consumption_metadata_list_url + "?summary=True";
 
-    if (this.props.projects.length > 0) {
-      consumptionMetadataListURL += "&projects=" + this.props.projects.map(function(d, i){
+    if (props.projects.length > 0) {
+      consumptionMetadataListURL += "&projects=" + props.projects.map(function(d, i){
         return d.id;
       }).join("+");
     }
@@ -45,11 +45,11 @@ var ProjectSelectionSummaryBox = React.createClass({
     });
   },
 
-  getMeterRunCounts: function() {
-    var meterRunListURL = this.props.meter_run_list_url + "?summary=True&most_recent=True";
+  getMeterRunCounts: function(props) {
+    var meterRunListURL = props.meter_run_list_url + "?summary=True&most_recent=True";
 
-    if (this.props.projects.length > 0) {
-      meterRunListURL += "&projects=" + this.props.projects.map(function(d, i){
+    if (props.projects.length > 0) {
+      meterRunListURL += "&projects=" + props.projects.map(function(d, i){
         return d.id;
       }).join("+");
     }
@@ -67,6 +67,11 @@ var ProjectSelectionSummaryBox = React.createClass({
         console.error(meterRunListURL, status, err.toString());
       }.bind(this)
     });
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.getProjectCounts(nextProps);
+    this.getMeterRunCounts(nextProps);
   },
 
   render: function() {
