@@ -145,6 +145,8 @@ var ProjectDataBox = React.createClass({
               energyUnit={this.state.selectedEnergyUnitId}
               projects={this.state.projects}
               meter_run_list_url={this.props.meter_run_list_url}
+              project_attribute_key_list_url={this.props.project_attribute_key_list_url}
+              project_list_url={this.props.project_list_url}
             />
           </div>
 

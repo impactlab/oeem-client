@@ -80,7 +80,6 @@ var Histogram = React.createClass({
             .domain([0, d3.max(data, function(d) { return d.y; })])
             .range([height, 0]);
 
-        console.log(x.domain());
         var tempScale = d3.scale.linear().domain([0, bins]).range(x.domain());
         var tickArray = d3.range(bins + 1).map(tempScale);
         var xAxis = d3.svg.axis()
