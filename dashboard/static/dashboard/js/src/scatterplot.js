@@ -232,7 +232,6 @@ scatterplot._drawPoints = function(el, scales, data) {
       .on('mouseout', tip.hide);
 
   // EXIT
-  console.log(point.exit());
   point.exit()
       .remove();
 };
