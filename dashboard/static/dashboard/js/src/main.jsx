@@ -66,7 +66,7 @@ var ProjectDataBox = React.createClass({
       projects: [],
       selectedProjectBlockIds: [],
       projectBlockIdFilterMode: "OR",
-      selectedChartTypeId: "histogram",
+      selectedChartTypeId: "scatterPlot",
       selectedFuelTypeId: "E",
       selectedEnergyUnitId: "KWH",
     };
