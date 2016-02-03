@@ -20,9 +20,12 @@ var ScatterplotBox = React.createClass({
     this.getProjectAttributeKeys();
   },
 
-  componentWillUpdate: function(nextProps, nextState) {
+  componentWillReceiveProps: function(nextProps) {
     if (nextProps.fuelType != this.props.fuelType || nextProps.energyUnit != this.props.energyUnit) {
-      this.computeScatterplotData(nextProps)();
+      this.computeScatterplotData(nextProps);
+    }
+    if (nextProps.projects != this.props.projects) {
+      this.getProjectAttributes(nextProps);
     }
   },
 
@@ -142,12 +145,15 @@ var ScatterplotBox = React.createClass({
     return actualSavings;
   },
 
-  getProjectAttributes: function() {
-    var projectListURL = this.props.project_list_url +
+  getProjectAttributes: function(props) {
+    if (!props) {
+      props = this.props;
+    }
+    var projectListURL = props.project_list_url +
       "?with_attributes=True&with_meter_runs=True";
 
-    if (this.props.projects.length > 0) {
-      projectListURL += "&projects=" + this.props.projects.map(function(d, i){
+    if (props.projects.length > 0) {
+      projectListURL += "&projects=" + props.projects.map(function(d, i){
         return d.id;
       }).join("+");
     }
@@ -159,54 +165,56 @@ var ScatterplotBox = React.createClass({
       success: function(data) {
         this.setState({
           scatterplotRawData: data,
-        }, this.computeScatterplotData(this.props));
+        }, this.computeScatterplotData);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(projectListURL, status, err.toString());
       }.bind(this)
     });
   },
+
   computeScatterplotData: function(props) {
-    return function () {
-      var projectData = this.state.scatterplotRawData.map(function(d, i) {
-        var predictedSavings = this.getPredictedSavings(d, props);
-        var actualSavings = this.getActualSavings(d, props);
+    if (!props) {
+      props = this.props;
+    }
+    var projectData = this.state.scatterplotRawData.map(function(d, i) {
+      var predictedSavings = this.getPredictedSavings(d, props);
+      var actualSavings = this.getActualSavings(d, props);
 
-        if (predictedSavings != null && actualSavings != null) {
-          return {
-            id: d.project_id,
-            x: actualSavings,
-            y: predictedSavings,
-          }
-        } else {
-          return null;
-        };
-      }, this);
-
-      projectData = _.compact(projectData);
-
-      var domain = {
-        x: [
-          _.result(_.minBy(projectData, function(o) { return o.x; }), 'x'),
-          _.result(_.maxBy(projectData, function(o) { return o.x; }), 'x'),
-        ],
-        y: [
-          _.result(_.minBy(projectData, function(o) { return o.y; }), 'y'),
-          _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
-        ],
-      };
-
-      // add buffer if necessary
-      domain.x[0] = Math.min(domain.x[0], 0);
-      domain.y[0] = Math.min(domain.y[0], 0);
-
-      this.setState({
-        scatterplotData: {
-          data: projectData,
-          domain: domain,
+      if (predictedSavings != null && actualSavings != null) {
+        return {
+          id: d.project_id,
+          x: actualSavings,
+          y: predictedSavings,
         }
-      });
-    }.bind(this);
+      } else {
+        return null;
+      };
+    }, this);
+
+    projectData = _.compact(projectData);
+
+    var domain = {
+      x: [
+        _.result(_.minBy(projectData, function(o) { return o.x; }), 'x'),
+        _.result(_.maxBy(projectData, function(o) { return o.x; }), 'x'),
+      ],
+      y: [
+        _.result(_.minBy(projectData, function(o) { return o.y; }), 'y'),
+        _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
+      ],
+    };
+
+    // add buffer if necessary
+    domain.x[0] = Math.min(domain.x[0], 0);
+    domain.y[0] = Math.min(domain.y[0], 0);
+
+    this.setState({
+      scatterplotData: {
+        data: projectData,
+        domain: domain,
+      }
+    });
   },
   render: function() {
     return (
