@@ -242,14 +242,15 @@
 
 .scatterplot .axis text {
   fill: #bbb;
+  font-size: 0.72em;
 }
 
 .scatterplot .equivalence path {
-  stroke: #ddd;
+  stroke: #bbb;
 }
 
 .scatterplot .equivalence textPath {
-  fill: #ddd;
+  fill: #bbb;
 }
 
 /* tooltip */

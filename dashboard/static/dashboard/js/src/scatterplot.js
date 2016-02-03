@@ -2,7 +2,6 @@ var scatterplot = {};
 
 scatterplot.create = function(el, props, state) {
 
-
   this._w = $(el).parent().width();
   this._h = props.height;
 
@@ -24,14 +23,14 @@ scatterplot.create = function(el, props, state) {
       .style("font-size", "16px")
       .text("Predicted vs. Actual Annual Savings");
 
-  this._initAxis(el, state.domain);
+  this._initAxis(el, state.domain, state.energyUnit);
 
   this.update(el, state);
 };
 
 scatterplot.update = function(el, state) {
   var scales = this._scales(state.domain);
-  this._updateAxis(el, state.domain);
+  this._updateAxis(el, state.domain, state.energyUnit);
   this._drawPoints(el, scales, state.data);
 };
 
@@ -66,7 +65,7 @@ scatterplot._shape = function() {
 }
 
 /* DRAWING */
-scatterplot._initAxis = function(el, domain) {
+scatterplot._initAxis = function(el, domain, energyUnit) {
 
   var scales = this._scales(domain);
   var shape = this._shape();
@@ -81,6 +80,13 @@ scatterplot._initAxis = function(el, domain) {
 
   var g = d3.select(el).selectAll('.scatterplot-points');
 
+  var energyUnitText;
+  if (energyUnit == "KWH") {
+    energyUnitText = "kWh";
+  } else if (energyUnit == "THERM"){
+    energyUnitText = "therms";
+  }
+
   g.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + shape.height + ")")
@@ -91,7 +97,7 @@ scatterplot._initAxis = function(el, domain) {
       .attr("transform", "translate(-10, 0)")
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("Actual");
+      .text("Actual (" + energyUnitText + ")");
 
   g.append("g")
       .attr("class", "y axis")
@@ -147,7 +153,7 @@ scatterplot._initAxis = function(el, domain) {
 
 }
 
-scatterplot._updateAxis = function(el, domain) {
+scatterplot._updateAxis = function(el, domain, energyUnit) {
 
   var scales = this._scales(domain);
   var shape = this._shape();
@@ -165,6 +171,15 @@ scatterplot._updateAxis = function(el, domain) {
 
   d3.select(el).selectAll('.y.axis')
       .call(yAxis);
+
+  var energyUnitText;
+  if (energyUnit == "KWH") {
+    energyUnitText = "kWh";
+  } else if (energyUnit == "THERM"){
+    energyUnitText = "therms";
+  }
+  d3.select(el).selectAll('.x.axis text.label')
+      .text("Actual (" + energyUnitText + ")");
 
   var min_max = Math.min(scales.x.domain()[1], scales.y.domain()[1]);
 
@@ -207,7 +222,7 @@ scatterplot._drawPoints = function(el, scales, data) {
 
   // ENTER
   point.enter().append('circle')
-      .attr('class', 'd3-point');
+      .attr('class', 'scatterplot-point');
 
   // ENTER & UPDATE
   point.attr('cx', function(d) { return scales.x(d.x); })
@@ -217,6 +232,7 @@ scatterplot._drawPoints = function(el, scales, data) {
       .on('mouseout', tip.hide);
 
   // EXIT
+  console.log(point.exit());
   point.exit()
       .remove();
 };

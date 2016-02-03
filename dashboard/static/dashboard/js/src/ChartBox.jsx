@@ -24,7 +24,7 @@ var ChartBox = React.createClass({
     });
   },
 
-  getPredictedSavings: function(projectData) {
+  getPredictedSavings: function(projectData, props) {
     var predictedElectricitySavingsKeyID = null;
     var predictedNaturalGasSavingsKeyID = null;
     this.state.projectAttributeKeys.forEach(function(d, i) {
@@ -46,18 +46,30 @@ var ChartBox = React.createClass({
     ), 'value');
 
     var predictedSavings = null;
-    if (this.props.fuelType == "E" || this.props.fuelType == "BOTH") {
+    if (props.fuelType == "E" || props.fuelType == "BOTH") {
       if (predictedElectricitySavings != null) {
-        predictedSavings = predictedElectricitySavings;
+        if (props.energyUnit == "KWH") {
+          predictedSavings = predictedElectricitySavings;
+        } else if (props.energyUnit == "THERM") {
+          predictedSavings = predictedElectricitySavings * 0.03413;
+        }
       }
     }
 
-    if (this.props.fuelType == "NG" || this.props.fuelType == "BOTH") {
+    if (props.fuelType == "NG" || props.fuelType == "BOTH") {
       if (predictedNaturalGasSavings != null) {
         if (predictedSavings != null) {
-          predictedSavings += predictedNaturalGasSavings;
+          if (props.energyUnit == "KWH") {
+            predictedSavings += predictedNaturalGasSavings * 29.3001;
+          } else if (props.energyUnit == "THERM") {
+            predictedSavings += predictedNaturalGasSavings;
+          }
         } else {
-          predictedSavings = predictedNaturalGasSavings;
+          if (props.energyUnit == "KWH") {
+            predictedSavings = predictedNaturalGasSavings * 29.3001;
+          } else if (props.energyUnit == "THERM") {
+            predictedSavings = predictedNaturalGasSavings;
+          }
         }
       }
     }
@@ -65,7 +77,7 @@ var ChartBox = React.createClass({
     return predictedSavings;
   },
 
-  getActualSavings: function(projectData) {
+  getActualSavings: function(projectData, props) {
 
     var actualElectricitySavings = _.result(_.find(
       projectData.recent_meter_runs,
@@ -73,24 +85,36 @@ var ChartBox = React.createClass({
     ), 'annual_savings');
 
     var actualNaturalGasSavings = _.result(_.find(
-      projectData.attributes,
+      projectData.recent_meter_runs,
       { 'fuel_type': 'NG'}
     ), 'annual_savings');
 
 
     var actualSavings = null;
-    if (this.props.fuelType == "E" || this.props.fuelType == "BOTH") {
+    if (props.fuelType == "E" || props.fuelType == "BOTH") {
       if (actualElectricitySavings != null) {
-        actualSavings = actualElectricitySavings;
+        if (props.energyUnit == "KWH") {
+          actualSavings = actualElectricitySavings;
+        } else if (props.energyUnit == "THERM") {
+          actualSavings = actualElectricitySavings * 0.03413;
+        }
       }
     }
 
-    if (this.props.fuelType == "NG" || this.props.fuelType == "BOTH") {
+    if (props.fuelType == "NG" || props.fuelType == "BOTH") {
       if (actualNaturalGasSavings != null) {
         if (actualSavings != null) {
-          actualSavings += actualNaturalGasSavings;
+          if (props.energyUnit == "KWH") {
+            actualSavings += actualNaturalGasSavings * 29.3001;
+          } else if (props.energyUnit == "THERM") {
+            actualSavings += actualNaturalGasSavings;
+          }
         } else {
-          actualSavings = actualNaturalGasSavings;
+          if (props.energyUnit == "KWH") {
+            actualSavings = actualNaturalGasSavings * 29.3001;
+          } else if (props.energyUnit == "THERM") {
+            actualSavings = actualNaturalGasSavings;
+          }
         }
       }
     }
@@ -113,51 +137,61 @@ var ChartBox = React.createClass({
       dataType: 'json',
       cache: false,
       success: function(data) {
-        var projectData = data.map(function(d, i) {
-          var predictedSavings = this.getPredictedSavings(d);
-          var actualSavings = this.getActualSavings(d);
-
-          if (predictedSavings != null && actualSavings != null) {
-            return {
-              id: d.project_id,
-              x: actualSavings,
-              y: predictedSavings,
-            }
-          } else {
-            return null;
-          };
-        }, this);
-
-        var domain = {
-          x: [
-            _.result(_.minBy(projectData, function(o) { return o.x; }), 'x'),
-            _.result(_.maxBy(projectData, function(o) { return o.x; }), 'x'),
-          ],
-          y: [
-            _.result(_.minBy(projectData, function(o) { return o.y; }), 'y'),
-            _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
-          ],
-        };
-
-        // add buffer if necessary
-        domain.x[0] = Math.min(domain.x[0], 0);
-        domain.y[0] = Math.min(domain.y[0], 0);
-
         this.setState({
-          scatterplotData: {
-            data: projectData,
-            domain: domain,
-          }
-        });
+          scatterplotRawData:data
+        }, this.computeScatterplotData(this.props));
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(projectListURL, status, err.toString());
       }.bind(this)
     });
   },
+  computeScatterplotData: function(props) {
+    return function () {
+      var projectData = this.state.scatterplotRawData.map(function(d, i) {
+        var predictedSavings = this.getPredictedSavings(d, props);
+        var actualSavings = this.getActualSavings(d, props);
+
+        if (predictedSavings != null && actualSavings != null) {
+          return {
+            id: d.project_id,
+            x: actualSavings,
+            y: predictedSavings,
+          }
+        } else {
+          return null;
+        };
+      }, this);
+
+      projectData = _.compact(projectData);
+
+      var domain = {
+        x: [
+          _.result(_.minBy(projectData, function(o) { return o.x; }), 'x'),
+          _.result(_.maxBy(projectData, function(o) { return o.x; }), 'x'),
+        ],
+        y: [
+          _.result(_.minBy(projectData, function(o) { return o.y; }), 'y'),
+          _.result(_.maxBy(projectData, function(o) { return o.y; }), 'y'),
+        ],
+      };
+
+      // add buffer if necessary
+      domain.x[0] = Math.min(domain.x[0], 0);
+      domain.y[0] = Math.min(domain.y[0], 0);
+
+      this.setState({
+        scatterplotData: {
+          data: projectData,
+          domain: domain,
+        }
+      });
+    }.bind(this);
+  },
   getInitialState: function() {
     return {
       projectAttributeKeys: [],
+      scatterplotRawData: [],
       scatterplotData: {
         data: [],
         domain: {
@@ -169,6 +203,11 @@ var ChartBox = React.createClass({
   },
   componentDidMount: function() {
     this.getProjectAttributeKeys();
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    if (nextProps.fuelType != this.props.fuelType || nextProps.energyUnit != this.props.energyUnit) {
+      this.computeScatterplotData(nextProps)();
+    }
   },
   render: function() {
     var chartComponent;
@@ -193,6 +232,8 @@ var ChartBox = React.createClass({
         <Scatterplot
           data={this.state.scatterplotData.data}
           domain={this.state.scatterplotData.domain}
+          fuelType={this.props.fuelType}
+          energyUnit={this.props.energyUnit}
         />
       )
     } else if (this.props.chartType == "map") {
