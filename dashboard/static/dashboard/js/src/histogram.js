@@ -58,7 +58,7 @@ histogram.destroy = function(el) {
 
 /* SHAPE */
 
-histogram._margin = {top: 30, right: 10, bottom: 40, left: 40};
+histogram._margin = {top: 30, right: 20, bottom: 40, left: 40};
 histogram._w = null;
 histogram._h = null;
 histogram._width = function() {
@@ -166,11 +166,6 @@ histogram._updateAxis = function(el, domain, energyUnit) {
 
   d3.select(el).selectAll('.y.axis')
       .call(yAxis);
-
-  d3.select(el).selectAll(".x.axis text")
-    .attr("transform", function(d) {
-       return "translate(" + -1 * this.getBBox().height + "," + 0.5*this.getBBox().height + ")rotate(-30)";
-   });
 }
 
 histogram._drawPoints = function(el, scales, data) {
