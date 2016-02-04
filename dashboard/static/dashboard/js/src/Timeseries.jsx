@@ -2,7 +2,7 @@ var timeseries = require('./timeseries');
 
 var Timeseries = React.createClass({
   propTypes: {
-    data: React.PropTypes.object,
+    data: React.PropTypes.array,
     domain: React.PropTypes.object,
     fuelType: React.PropTypes.string,
     energyUnit: React.PropTypes.string,

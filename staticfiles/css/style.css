@@ -262,6 +262,25 @@
   shape-rendering: crispEdges;
 }
 
+.timeseries .axis text {
+  fill: #bbb;
+  font-size: 0.72em;
+}
+
+.timeseries .line {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+.timeseries .baseline.area {
+  fill: #CFC;
+}
+
+.timeseries .reporting.area {
+  fill: #FCC;
+}
+
 /* tooltip */
 .d3-tip {
   line-height: 1;

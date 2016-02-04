@@ -119,8 +119,9 @@ histogram._initAxis = function(el, domain, energyUnit) {
       .call(yAxis);
 
   g.selectAll(".x.axis text")
+    .style("text-anchor", "end")
     .attr("transform", function(d) {
-       return "translate(" + -1 * this.getBBox().height + "," + 0.5*this.getBBox().height + ")rotate(-30)";
+       return "translate(" + -0.7 * this.getBBox().height + "," + 0.3*this.getBBox().height + ")rotate(-20)";
    });
 }
 

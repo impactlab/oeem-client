@@ -47,15 +47,17 @@ timeseries.create = function(el, props, state) {
 };
 
 timeseries.update = function(el, state) {
-  // var scales = this._scales(state.domain);
+  var scales = this._scales(state.domain);
   this._updateTitle(el, state);
+  this._updateAxis(el, state.domain);
+  this._drawData(el, scales, state.data);
 };
 
 timeseries.destroy = function(el) {
 };
 
 
-timeseries._margin = {top: 30, right: 10, bottom: 40, left: 40};
+timeseries._margin = {top: 30, right: 20, bottom: 20, left: 40};
 timeseries._w = null;
 timeseries._h = null;
 timeseries._width = function() {
@@ -107,7 +109,7 @@ timeseries._scales = function(domain) {
     return null;
   }
 
-  var x = d3.scale.linear()
+  var x = d3.time.scale()
     .range([0, this._width()])
     .domain(domain.x);
 
@@ -125,6 +127,7 @@ timeseries._initAxis = function(el, domain) {
 
   var xAxis = d3.svg.axis()
       .scale(scales.x)
+      .tickFormat(d3.time.format("%Y-%m"))
       .orient("bottom");
 
   var yAxis = d3.svg.axis()
@@ -142,6 +145,115 @@ timeseries._initAxis = function(el, domain) {
       .attr("class", "y axis")
       .call(yAxis);
 
+  // g.selectAll(".x.axis text")
+  //   .style("text-anchor", "end")
+  //   .attr("transform", function(d) {
+  //      return "translate(" + -0.0*this.getBBox().height + "," + 0.0*this.getBBox().height + ")rotate(-20)";
+  //  });
+
 }
+
+timeseries._updateAxis = function(el, domain) {
+
+  var scales = this._scales(domain);
+  var shape = this._shape();
+
+  var xAxis = d3.svg.axis()
+      .scale(scales.x)
+      .tickFormat(d3.time.format("%Y-%m"))
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+      .scale(scales.y)
+      .orient("left");
+
+  var g = d3.select(el).selectAll('.x.axis')
+      .call(xAxis);
+
+  var g = d3.select(el).selectAll('.y.axis')
+      .call(yAxis);
+}
+
+timeseries._drawData = function(el, scales, data) {
+
+  var shape = this._shape()
+
+  var formatFloat = d3.format(",.0f");
+
+  var baselineLine = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d) { return scales.x(d.date); })
+      .y(function(d) { return scales.y(d.baseline_sum); });
+
+  var reportingLine = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d) { return scales.x(d.date); })
+      .y(function(d) { return scales.y(d.reporting_sum); });
+
+  var areaAboveBaselineLine = d3.svg.area()
+      .interpolate("basis")
+      .x(baselineLine.x())
+      .y0(baselineLine.y())
+      .y1(0);
+  var areaBelowBaselineLine = d3.svg.area()
+      .interpolate("basis")
+      .x(baselineLine.x())
+      .y0(baselineLine.y())
+      .y1(shape.height);
+  var areaAboveReportingLine = d3.svg.area()
+      .interpolate("basis")
+      .x(reportingLine.x())
+      .y0(reportingLine.y())
+      .y1(0);
+  var areaBelowReportingLine = d3.svg.area()
+      .interpolate("basis")
+      .x(reportingLine.x())
+      .y0(reportingLine.y())
+      .y1(shape.height);
+
+  var g = d3.select(el).selectAll('.timeseries-plot');
+
+  g.selectAll('defs').remove();
+  g.selectAll('path.line').remove();
+
+  var defs = g.append('defs');
+
+  defs.append('clipPath')
+      .attr('id', 'clip-baseline')
+      .append('path')
+      .datum(data)
+      .attr('d', areaAboveBaselineLine);
+
+  defs.append('clipPath')
+    .attr('id', 'clip-reporting')
+    .append('path')
+    .datum(data)
+    .attr('d', areaAboveReportingLine);
+
+
+  g.append("path")
+      .datum(data)
+      .attr("class", "baseline area")
+      .attr("d", areaBelowBaselineLine)
+      .attr('clip-path', 'url(#clip-reporting)');
+
+  g.append("path")
+      .datum(data)
+      .attr("class", "reporting area")
+      .attr("d", areaBelowReportingLine)
+      .attr('clip-path', 'url(#clip-baseline)');
+
+  g.append("path")
+      .datum(data)
+      .attr("class", "baseline line")
+      .attr("d", baselineLine);
+
+  g.append("path")
+      .datum(data)
+      .attr("class", "reporting line")
+      .attr("d", reportingLine);
+
+}
+
 
 module.exports = timeseries;

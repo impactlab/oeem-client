@@ -27,88 +27,131 @@ var TimeseriesBox = React.createClass({
   },
 
   computeTimeSeries: function() {
-    var baseline = {};
-    var reporting = {};
+    var timeseries = {};
+
     this.state.rawProjectData.forEach(function(p, i) {
       p.recent_meter_runs.forEach(function(m, i) {
         if (m.fuel_type == "E" && (this.props.fuelType == "E" || this.props.fuelType == "BOTH")) {
           m.monthlyaverageusagebaseline_set.forEach(function(d, i) {
-            var value = d.value;
+            var value = +d.value;
+            var date = d.date;
             if (this.energyUnit == "THERM") {
               value *= 0.03413;
             }
-            if (d.date in baseline) {
-              baseline[d.date] += value;
+            if (date in timeseries) {
+              timeseries[date].baseline.value += value;
+              timeseries[date].baseline.n += 1;
             } else {
-              baseline[d.date] = value;
+              timeseries[date] = {
+                baseline: {
+                  value: value,
+                  n: 1,
+                },
+                reporting: {
+                  value: 0,
+                  n: 0,
+                }
+              }
             }
           }, this);
           m.monthlyaverageusagereporting_set.forEach(function(d, i) {
-            var value = d.value;
+            var value = +d.value;
+            var date = d.date;
             if (this.energyUnit == "THERM") {
               value *= 0.03413;
             }
-            if (d.date in reporting) {
-              reporting[d.date] += value;
+            if (date in timeseries) {
+              timeseries[date].reporting.value += value;
+              timeseries[date].reporting.n += 1;
             } else {
-              reporting[d.date] = value;
+              timeseries[date] = {
+                baseline: {
+                  value: 0,
+                  n: 0,
+                },
+                reporting: {
+                  value: value,
+                  n: 1,
+                },
+              }
             }
           }, this);
         }
         if (m.fuel_type == "NG" && (this.props.fuelType == "NG" || this.props.fuelType == "BOTH")) {
           m.monthlyaverageusagebaseline_set.forEach(function(d, i) {
-            var value = d.value;
+            var value = +d.value;
+            var date = d.date;
             if (this.energyUnit == "KWH") {
               value *= 29.3001;
             }
-            if (d.date in baseline) {
-              baseline[d.date] += value;
+            if (d.date in timeseries) {
+              timeseries[date].baseline.value += value;
+              timeseries[date].baseline.n += 1;
             } else {
-              baseline[d.date] = value;
+              timeseries[date] = {
+                baseline: {
+                  value: value,
+                  n: 1,
+                },
+                reporting: {
+                  value: 0,
+                  n: 0,
+                }
+              }
             }
           }, this);
           m.monthlyaverageusagereporting_set.forEach(function(d, i) {
-            var value = d.value;
+            var value = +d.value;
+            var date = d.date;
             if (this.energyUnit == "KWH") {
               value *= 29.3001;
             }
 
-            if (d.date in reporting) {
-              reporting[d.date] += value;
+            if (date in timeseries) {
+              timeseries[date].reporting.value += value;
+              timeseries[date].reporting.n += 1;
             } else {
-              reporting[d.date] = value;
+              timeseries[date] = {
+                baseline: {
+                  value: 0,
+                  n: 0,
+                },
+                reporting: {
+                  value: value,
+                  n: 1,
+                }
+              }
             }
           }, this);
         }
       }, this);
     }, this);
 
-    var baseline = _.sortBy(_.toPairs(baseline), function(o) { return o[0]; }).map(function(d, i) {
+    var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+    var timeseries = _.sortBy(_.toPairs(timeseries), function(o) { return o[0]; }).map(function(d, i) {
+      var baseline_avg = isNaN(d[1].baseline.value / d[1].baseline.n) ?
+        null : d[1].baseline.value / d[1].baseline.n;
+      var reporting_avg = isNaN(d[1].reporting.value / d[1].reporting.n) ?
+        null : d[1].reporting.value / d[1].reporting.n;
       return {
-        date: d[0],
-        value: d[1],
+        date: parseDate(d[0]),
+        baseline_avg: baseline_avg,
+        baseline_sum: d[1].baseline.value,
+        baseline_n: d[1].baseline.n,
+        reporting_avg: reporting_avg,
+        reporting_sum: d[1].reporting.value,
+        reporting_n: d[1].reporting.n,
+        difference_avg: baseline_avg - reporting_avg, // only works if reporting.n == baseline.n
+        difference_sum: d[1].baseline.value - d[1].reporting.value,
       };
     });
 
-    var reporting = _.sortBy(_.toPairs(reporting), function(o) { return o[0]; }).map(function(d, i) {
-      return {
-        date: d[0],
-        value: d[1],
-      };
-    });
+    var date_extent = d3.extent(timeseries, function(d) { return d.date});
 
-    var data = {
-      baseline: baseline,
-      reporting: reporting,
-    }
-
-    var baseline_date_extent = d3.extent(baseline, function(d) { return d.date});
-    var reporting_date_extent = d3.extent(reporting, function(d) { return d.date});
-    var date_extent = d3.extent(baseline_date_extent.concat(reporting_date_extent));
-
-    var baseline_value_extent = d3.extent(baseline, function(d) { return d.value});
-    var reporting_value_extent = d3.extent(reporting, function(d) { return d.value});
-    var value_extent = d3.extent(baseline_value_extent.concat(reporting_value_extent));
+    var baseline_sum_extent = d3.extent(timeseries, function(d) { return d.baseline_sum});
+    var reporting_sum_extent = d3.extent(timeseries, function(d) { return d.reporting_sum});
+    var value_extent = d3.extent(baseline_sum_extent.concat(reporting_sum_extent));
 
     var domain = {
       x: date_extent,
@@ -117,7 +160,7 @@ var TimeseriesBox = React.createClass({
 
     this.setState({
       timeseriesData: {
-        data: data,
+        data: timeseries,
         domain: domain,
       },
     });
@@ -128,12 +171,9 @@ var TimeseriesBox = React.createClass({
       height: 200,
       rawProjectData: [],
       timeseriesData: {
-        data: {
-          baseline: [],
-          reporting: [],
-        },
+        data: [],
         domain: {
-          x: [0, 10],
+          x: [new Date("2000-01-01"), new Date("2001-01-02")],
           y: [0, 10],
         },
       }
