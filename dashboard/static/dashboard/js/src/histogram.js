@@ -117,12 +117,6 @@ histogram._initAxis = function(el, domain, energyUnit) {
   g.append("g")
       .attr("class", "y axis")
       .call(yAxis);
-
-  g.selectAll(".x.axis text")
-    .style("text-anchor", "end")
-    .attr("transform", function(d) {
-       return "translate(" + -0.7 * this.getBBox().height + "," + 0.3*this.getBBox().height + ")rotate(-20)";
-   });
 }
 
 histogram._updateTitle = function(el, state) {

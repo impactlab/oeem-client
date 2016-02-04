@@ -2,11 +2,15 @@ var Timeseries = require("./Timeseries.jsx");
 var _ = require("lodash");
 
 var TimeseriesBox = React.createClass({
-  loadProjects: function() {
-    var projectListURL = this.props.project_list_url + "?with_monthly_summary=True";
+  loadProjects: function(props) {
+    if (!props) {
+      props = this.props;
+    }
 
-    if (this.props.projects.length > 0) {
-      projectListURL += "&projects=" + this.props.projects.map(function(d, i){
+    var projectListURL = props.project_list_url + "?with_monthly_summary=True";
+
+    if (props.projects.length > 0) {
+      projectListURL += "&projects=" + props.projects.map(function(d, i){
         return d.id;
       }).join("+");
     }
@@ -26,16 +30,19 @@ var TimeseriesBox = React.createClass({
     });
   },
 
-  computeTimeSeries: function() {
+  computeTimeSeries: function(props) {
+    if (!props) {
+      props = this.props;
+    }
     var timeseries = {};
 
     this.state.rawProjectData.forEach(function(p, i) {
       p.recent_meter_runs.forEach(function(m, i) {
-        if (m.fuel_type == "E" && (this.props.fuelType == "E" || this.props.fuelType == "BOTH")) {
+        if (m.fuel_type == "E" && (props.fuelType == "E" || props.fuelType == "BOTH")) {
           m.monthlyaverageusagebaseline_set.forEach(function(d, i) {
             var value = +d.value;
             var date = d.date;
-            if (this.energyUnit == "THERM") {
+            if (props.energyUnit == "THERM") {
               value *= 0.03413;
             }
             if (date in timeseries) {
@@ -57,7 +64,7 @@ var TimeseriesBox = React.createClass({
           m.monthlyaverageusagereporting_set.forEach(function(d, i) {
             var value = +d.value;
             var date = d.date;
-            if (this.energyUnit == "THERM") {
+            if (props.energyUnit == "THERM") {
               value *= 0.03413;
             }
             if (date in timeseries) {
@@ -77,11 +84,11 @@ var TimeseriesBox = React.createClass({
             }
           }, this);
         }
-        if (m.fuel_type == "NG" && (this.props.fuelType == "NG" || this.props.fuelType == "BOTH")) {
+        if (m.fuel_type == "NG" && (props.fuelType == "NG" || props.fuelType == "BOTH")) {
           m.monthlyaverageusagebaseline_set.forEach(function(d, i) {
             var value = +d.value;
             var date = d.date;
-            if (this.energyUnit == "KWH") {
+            if (props.energyUnit == "KWH") {
               value *= 29.3001;
             }
             if (d.date in timeseries) {
@@ -103,7 +110,7 @@ var TimeseriesBox = React.createClass({
           m.monthlyaverageusagereporting_set.forEach(function(d, i) {
             var value = +d.value;
             var date = d.date;
-            if (this.energyUnit == "KWH") {
+            if (props.energyUnit == "KWH") {
               value *= 29.3001;
             }
 
@@ -130,20 +137,22 @@ var TimeseriesBox = React.createClass({
     var parseDate = d3.time.format("%Y-%m-%d").parse;
 
     var timeseries = _.sortBy(_.toPairs(timeseries), function(o) { return o[0]; }).map(function(d, i) {
+      var date = parseDate(d[0]);
+      var n_days_in_month = new Date(date.getYear(), date.getMonth() + 1, 0).getDate()
       var baseline_avg = isNaN(d[1].baseline.value / d[1].baseline.n) ?
         null : d[1].baseline.value / d[1].baseline.n;
       var reporting_avg = isNaN(d[1].reporting.value / d[1].reporting.n) ?
         null : d[1].reporting.value / d[1].reporting.n;
       return {
-        date: parseDate(d[0]),
-        baseline_avg: baseline_avg,
-        baseline_sum: d[1].baseline.value,
+        date: date,
+        baseline_avg: baseline_avg * n_days_in_month,
+        baseline_sum: d[1].baseline.value * n_days_in_month,
         baseline_n: d[1].baseline.n,
-        reporting_avg: reporting_avg,
-        reporting_sum: d[1].reporting.value,
+        reporting_avg: reporting_avg * n_days_in_month,
+        reporting_sum: d[1].reporting.value * n_days_in_month,
         reporting_n: d[1].reporting.n,
-        difference_avg: baseline_avg - reporting_avg, // only works if reporting.n == baseline.n
-        difference_sum: d[1].baseline.value - d[1].reporting.value,
+        difference_avg: (baseline_avg - reporting_avg) * n_days_in_month, // only works if reporting.n == baseline.n
+        difference_sum: (d[1].baseline.value - d[1].reporting.value) * n_days_in_month,
       };
     });
 
@@ -164,6 +173,15 @@ var TimeseriesBox = React.createClass({
         domain: domain,
       },
     });
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.fuelType != this.props.fuelType || nextProps.energyUnit != this.props.energyUnit) {
+      this.computeTimeSeries(nextProps);
+    }
+    if (nextProps.projects != this.props.projects) {
+      this.loadProjects(nextProps);
+    }
   },
 
   getInitialState: function() {

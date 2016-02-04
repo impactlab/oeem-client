@@ -204,13 +204,13 @@
 
 /* histogram */
 
+.histogram text {
+  fill: #333;
+}
+
 .histogram .bar rect {
   fill: #7162f9;
   shape-rendering: crispEdges;
-}
-
-.histogram text {
-  fill: #333;
 }
 
 .histogram .bar:hover rect {
@@ -233,6 +233,14 @@
 
 .scatterplot text {
   fill: #333;
+}
+
+.scatterplot circle.scatterplot-point {
+  fill: #000;
+}
+
+.scatterplot circle.scatterplot-point:hover {
+  fill: #95aef9;
 }
 
 .scatterplot .axis path, .scatterplot .axis line {
@@ -270,7 +278,7 @@
 .timeseries .line {
   fill: none;
   stroke: #333;
-  stroke-width: 1.5px;
+  stroke-width: 0.7px;
 }
 
 .timeseries .baseline.area {
@@ -279,6 +287,21 @@
 
 .timeseries .reporting.area {
   fill: #FCC;
+}
+
+.timeseries .overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.timeseries .focus circle {
+  fill: none;
+  stroke: #333;
+}
+
+.timeseries .focus text {
+  fill: #777;
+  font-size: 0.72em;
 }
 
 /* tooltip */
