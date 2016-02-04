@@ -43,11 +43,11 @@ scatterplot.destroy = function(el) {
 scatterplot._margin = {top: 30, right: 10, bottom: 20, left: 40};
 scatterplot._w = null;
 scatterplot._h = null;
-scatterplot._width = function(w, margin) {
-  return w - margin.left - margin.right;
+scatterplot._width = function() {
+  return this._w - this._margin.left - this._margin.right;
 };
 scatterplot._height = function(h, margin) {
-  return h - margin.top - margin.bottom;
+  return this._h - this._margin.top - this._margin.bottom;
 };
 
 scatterplot._shape = function() {
