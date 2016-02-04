@@ -226,6 +226,7 @@
 
 .histogram .axis text {
   fill: #bbb;
+  font-size: 0.72em;
 }
 
 /* histogram */

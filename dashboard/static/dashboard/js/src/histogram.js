@@ -93,7 +93,7 @@ histogram._initAxis = function(el, domain, energyUnit) {
   var shape = this._shape();
   var bins = this._bins;
 
-  var formatAxis = d3.format('.2s');
+  var formatAxis = d3.format(",.0f");
   var tempScale = d3.scale.linear().domain([0, bins]).range(scales.x.domain());
   var tickArray = d3.range(bins + 1).map(tempScale);
 
@@ -103,12 +103,20 @@ histogram._initAxis = function(el, domain, energyUnit) {
       .tickFormat(formatAxis)
       .orient("bottom");
 
+  var yAxis = d3.svg.axis()
+      .scale(scales.y)
+      .orient("left");
+
   var g = d3.select(el).selectAll('.histogram-bars');
 
   g.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + shape.height + ")")
       .call(xAxis);
+
+  g.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
 
   g.selectAll(".x.axis text")
     .attr("transform", function(d) {
@@ -144,7 +152,7 @@ histogram._updateAxis = function(el, domain, energyUnit) {
   var shape = this._shape();
   var bins = this._bins;
 
-  var formatAxis = d3.format('.2s');
+  var formatAxis = d3.format(",.0f");
   var tempScale = d3.scale.linear().domain([0, bins]).range(scales.x.domain());
   var tickArray = d3.range(bins + 1).map(tempScale);
 
@@ -154,8 +162,15 @@ histogram._updateAxis = function(el, domain, energyUnit) {
       .tickFormat(formatAxis)
       .orient("bottom");
 
+  var yAxis = d3.svg.axis()
+      .scale(scales.y)
+      .orient("left");
+
   d3.select(el).selectAll('.x.axis')
       .call(xAxis);
+
+  d3.select(el).selectAll('.y.axis')
+      .call(yAxis);
 
   d3.select(el).selectAll(".x.axis text")
     .attr("transform", function(d) {
