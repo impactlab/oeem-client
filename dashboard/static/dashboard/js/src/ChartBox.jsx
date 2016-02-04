@@ -1,6 +1,6 @@
 var ScatterplotBox = require('./ScatterplotBox.jsx');
 var HistogramBox = require('./HistogramBox.jsx');
-var Timeseries = require('./Timeseries.jsx');
+var TimeseriesBox = require('./TimeseriesBox.jsx');
 var Map = require('./Map.jsx');
 
 var ChartBox = React.createClass({
@@ -18,7 +18,10 @@ var ChartBox = React.createClass({
       )
     } else if (this.props.chartType == "timeSeries") {
       chartComponent = (
-        <Timeseries
+        <TimeseriesBox
+          projects={this.props.projects}
+          fuelType={this.props.fuelType}
+          energyUnit={this.props.energyUnit}
         />
       )
     } else if (this.props.chartType == "scatterPlot") {
