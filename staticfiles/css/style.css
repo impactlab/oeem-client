@@ -229,7 +229,7 @@
   font-size: 0.72em;
 }
 
-/* histogram */
+/* scatterplot */
 
 .scatterplot text {
   fill: #333;
@@ -252,6 +252,14 @@
 
 .scatterplot .equivalence textPath {
   fill: #bbb;
+}
+
+/* timeseries */
+
+.timeseries .axis path, .timeseries .axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
 }
 
 /* tooltip */

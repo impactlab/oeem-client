@@ -22,6 +22,7 @@ var ChartBox = React.createClass({
           projects={this.props.projects}
           fuelType={this.props.fuelType}
           energyUnit={this.props.energyUnit}
+          project_list_url={this.props.project_list_url}
         />
       )
     } else if (this.props.chartType == "scatterPlot") {
