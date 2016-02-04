@@ -58,7 +58,7 @@ histogram.destroy = function(el) {
 
 /* SHAPE */
 
-histogram._margin = {top: 30, right: 20, bottom: 40, left: 40};
+histogram._margin = {top: 30, right: 20, bottom: 20, left: 40};
 histogram._w = null;
 histogram._h = null;
 histogram._width = function() {
