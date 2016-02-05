@@ -17,7 +17,6 @@ var DownloadButton = React.createClass({
           dataType: 'json',
           cache: false,
           success: function(data) {
-            console.log(data);
             var csvData = [];
             var projectDataKeys = [
               "project_id",
