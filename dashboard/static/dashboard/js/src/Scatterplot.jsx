@@ -12,7 +12,7 @@ var Scatterplot = React.createClass({
     var el = ReactDOM.findDOMNode(this);
 
     scatterplot.create(el, {
-      height: 200,
+      height: this.props.height,
     }, this.getChartState());
   },
 

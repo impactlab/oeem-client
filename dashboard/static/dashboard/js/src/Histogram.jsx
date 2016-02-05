@@ -6,13 +6,14 @@ var Histogram = React.createClass({
     domain: React.PropTypes.object,
     fuelType: React.PropTypes.string,
     energyUnit: React.PropTypes.string,
+    height: React.PropTypes.integer,
   },
 
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this);
 
     histogram.create(el, {
-      height: 200,
+      height: this.props.height,
     }, this.getChartState());
   },
 

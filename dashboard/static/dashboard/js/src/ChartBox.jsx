@@ -14,6 +14,7 @@ var ChartBox = React.createClass({
           fuelType={this.props.fuelType}
           energyUnit={this.props.energyUnit}
           meter_run_list_url={this.props.meter_run_list_url}
+          height={300}
         />
       )
     } else if (this.props.chartType == "timeSeries") {
@@ -23,6 +24,7 @@ var ChartBox = React.createClass({
           fuelType={this.props.fuelType}
           energyUnit={this.props.energyUnit}
           project_list_url={this.props.project_list_url}
+          height={300}
         />
       )
     } else if (this.props.chartType == "scatterPlot") {
@@ -34,11 +36,14 @@ var ChartBox = React.createClass({
           energyUnit={this.props.energyUnit}
           project_attribute_key_list_url={this.props.project_attribute_key_list_url}
           project_list_url={this.props.project_list_url}
+          height={300}
         />
       )
     } else if (this.props.chartType == "map") {
       chartComponent = (
-        <Map />
+        <Map
+          height={300}
+        />
       )
     } else {
       chartComponent = <span>Please Select a Chart</span>

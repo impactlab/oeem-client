@@ -26,18 +26,9 @@ var HistogramBox = React.createClass({
       }.bind(this)
     });
   },
-  handleResize: function(e) {
-    this.setState({
-      width: $(ReactDOM.findDOMNode(this)).parent().width(),
-    });
-  },
+
   componentDidMount: function() {
     this.loadMeterRuns(this.props);
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  },
-  componentWillUnmount: function() {
-    window.removeEventListener('resize', this.handleResize);
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -50,8 +41,6 @@ var HistogramBox = React.createClass({
   },
   getInitialState: function() {
     return {
-      width: 0,
-      height: 200,
       meterRuns: [],
       histogramData: {
         data: [],
@@ -137,6 +126,7 @@ var HistogramBox = React.createClass({
         domain={this.state.histogramData.domain}
         fuelType={this.props.fuelType}
         energyUnit={this.props.energyUnit}
+        height={this.props.height}
       />
     )
   }

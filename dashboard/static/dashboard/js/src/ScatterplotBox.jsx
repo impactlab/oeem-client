@@ -223,6 +223,7 @@ var ScatterplotBox = React.createClass({
         domain={this.state.scatterplotData.domain}
         fuelType={this.props.fuelType}
         energyUnit={this.props.energyUnit}
+        height={this.props.height}
       />
     )
   }

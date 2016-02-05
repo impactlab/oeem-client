@@ -1,7 +1,7 @@
 var Map = React.createClass({
   render: function() {
     return (
-      <svg className="map" height="200px" width="100%" />
+      <svg className="map" height={this.props.height + "px"} width="100%" />
     )
   }
 });

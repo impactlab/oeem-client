@@ -186,7 +186,6 @@ var TimeseriesBox = React.createClass({
 
   getInitialState: function() {
     return {
-      height: 200,
       rawProjectData: [],
       timeseriesData: {
         data: [],
@@ -209,6 +208,7 @@ var TimeseriesBox = React.createClass({
         domain={this.state.timeseriesData.domain}
         fuelType={this.props.fuelType}
         energyUnit={this.props.energyUnit}
+        height={this.props.height}
       />
     )
   }

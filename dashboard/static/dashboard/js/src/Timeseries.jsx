@@ -12,7 +12,7 @@ var Timeseries = React.createClass({
     var el = ReactDOM.findDOMNode(this);
 
     timeseries.create(el, {
-      height: 200,
+      height: this.props.height,
     }, this.getChartState());
   },
 
