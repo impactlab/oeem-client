@@ -103,7 +103,7 @@ var ProjectSelectionSummaryBox = React.createClass({
           annualSavings: formatFloat(annualSavings),
           annualSavingsNaturalGas: formatFloat(annualSavingsNaturalGas),
           annualSavingsElectricity: formatFloat(annualSavingsElectricity),
-          grossSavings: formatFloat(parseFloat(grossSavings)),
+          grossSavings: formatFloat(grossSavings),
           grossSavingsNaturalGas: formatFloat(grossSavingsNaturalGas),
           grossSavingsElectricity: formatFloat(grossSavingsElectricity),
         });

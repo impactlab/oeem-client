@@ -66,12 +66,12 @@ var Map = React.createClass({
       }
     }.bind(this));
 
-    map.addLayer(newLayer);
-    map.addInteraction(newSelectInteraction);
-
     this.setState({
       vectorLayer: newLayer,
       selectInteraction: newSelectInteraction,
+    }, function () {
+      map.addLayer(newLayer);
+      map.addInteraction(newSelectInteraction);
     });
   },
 
@@ -79,6 +79,11 @@ var Map = React.createClass({
     if (this.props.points != nextProps.points) {
       this.swapLayer(nextProps);
     }
+  },
+
+  componentWillUnmount: function() {
+    map.removeLayer(this.state.vectorLayer);
+    map.removeInteraction(this.state.selectInteraction);
   },
 
   render: function() {
