@@ -6,6 +6,7 @@ var Timeseries = React.createClass({
     domain: React.PropTypes.object,
     fuelType: React.PropTypes.string,
     energyUnit: React.PropTypes.string,
+    height: React.PropTypes.number,
   },
 
   componentDidMount: function() {

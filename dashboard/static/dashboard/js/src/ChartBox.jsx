@@ -1,7 +1,7 @@
 var ScatterplotBox = require('./ScatterplotBox.jsx');
 var HistogramBox = require('./HistogramBox.jsx');
 var TimeseriesBox = require('./TimeseriesBox.jsx');
-var Map = require('./Map.jsx');
+var MapBox = require('./MapBox.jsx');
 
 var ChartBox = React.createClass({
   render: function() {
@@ -41,7 +41,9 @@ var ChartBox = React.createClass({
       )
     } else if (this.props.chartType == "map") {
       chartComponent = (
-        <Map
+        <MapBox
+          projects={this.props.projects}
+          project_list_url={this.props.project_list_url}
           height={300}
         />
       )
