@@ -54,9 +54,13 @@ var DownloadButton = React.createClass({
               meterRunNames.forEach(function(ft) {
                 var meterRun = _.find(d.recent_meter_runs, {'fuel_type': fuelTypeMapping[ft]});
                 meterRunKeys.forEach(function(k) {
-                  var attribute = meterRun[k];
-                  if (attribute != null) {
-                    dataRow.push(attribute);
+                  if (meterRun != null) {
+                    var attribute = meterRun[k];
+                    if (attribute != null) {
+                      dataRow.push(attribute);
+                    } else {
+                      dataRow.push("");
+                    }
                   } else {
                     dataRow.push("");
                   }
