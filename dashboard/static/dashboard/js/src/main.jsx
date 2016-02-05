@@ -3,6 +3,7 @@ var ProjectTable = require('./ProjectTable.jsx');
 var ProjectSelectionSummaryBox = require('./ProjectSelectionSummaryBox.jsx');
 var ProjectFilterBox = require('./ProjectFilterBox.jsx');
 var ChartBox = require('./ChartBox.jsx');
+var DownloadButton = require('./DownloadButton.jsx');
 
 window.DashboardBox = React.createClass({
   render: function() {
@@ -77,55 +78,28 @@ var ProjectDataBox = React.createClass({
   render: function() {
 
     var chartTypes = [
-      {
-        id: "timeSeries",
-        name: "Gross Savings Time Series",
-      },
-      {
-        id: "histogram",
-        name: "Annual Savings Histogram",
-      },
-      {
-        id: "scatterPlot",
-        name: "Realization Rate Scatterplot",
-      },
-      {
-        id: "map",
-        name: "Map",
-      },
+      { id: "timeSeries", name: "Gross Savings Time Series", },
+      { id: "histogram", name: "Annual Savings Histogram", },
+      { id: "scatterPlot", name: "Realization Rate Scatterplot", },
+      { id: "map", name: "Map", },
     ];
 
     var fuelTypes = [
-      {
-        id: "E",
-        name: "Electricity",
-      },
-      {
-        id: "NG",
-        name: "Natural Gas",
-      },
-      {
-        id: "BOTH",
-        name: "Combined",
-      },
+      { id: "E", name: "Electricity", },
+      { id: "NG", name: "Natural Gas", },
+      { id: "BOTH", name: "Combined", },
     ];
 
     var energyUnits = [
-      {
-        id: "KWH",
-        name: "kWh",
-      },
-      {
-        id: "THERM",
-        name: "therms",
-      },
+      { id: "KWH", name: "kWh", },
+      { id: "THERM", name: "therms", },
     ];
 
     return (
       <div className="selectedProjectBlockBox">
 
         <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-9">
             <CategorySelector
               title={null}
               categories={chartTypes}
@@ -133,6 +107,12 @@ var ProjectDataBox = React.createClass({
               selectedCategoryId={this.state.selectedChartTypeId}
             />
             <br/>
+          </div>
+          <div className="col-md-3">
+           <DownloadButton
+              project_list_url={this.props.project_list_url}
+              project_attribute_key_list_url={this.props.project_attribute_key_list_url}
+           />
           </div>
         </div>
 
