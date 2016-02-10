@@ -72,11 +72,17 @@ scatterplot._initAxis = function(el, domain, energyUnit) {
 
   var xAxis = d3.svg.axis()
       .scale(scales.x)
-      .orient("bottom");
+      .orient("bottom")
+      .innerTickSize(- (shape.height - 10))
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-(shape.width - 10))
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var g = d3.select(el).selectAll('.scatterplot-points');
 
@@ -90,24 +96,24 @@ scatterplot._initAxis = function(el, domain, energyUnit) {
   g.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + shape.height + ")")
-      .call(xAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("x", shape.width)
-      .attr("transform", "translate(-10, 0)")
-      .attr("y", -6)
-      .style("text-anchor", "end")
-      .text("Actual (" + energyUnitText + ")");
+      .call(xAxis);
 
   g.append("g")
       .attr("class", "y axis")
       .attr("transform", "translate(0,0)")
-      .call(yAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90) translate(-10,0)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
+      .call(yAxis);
+
+  g.append("text")
+      .attr("class", "x axis label")
+      .attr("x", shape.width)
+      .attr("y", shape.height - 6)
+      .attr("transform", "translate(-10,0)")
+      .style("text-anchor", "end")
+      .text("Actual (" + energyUnitText + ")");
+
+  g.append("text")
+      .attr("class", "y axis label")
+      .attr("transform", "rotate(-90) translate(-10,13)")
       .style("text-anchor", "end")
       .text("Predicted");
 
@@ -160,11 +166,17 @@ scatterplot._updateAxis = function(el, domain, energyUnit) {
 
   var xAxis = d3.svg.axis()
       .scale(scales.x)
-      .orient("bottom");
+      .orient("bottom")
+      .innerTickSize(-(shape.height - 10))
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-(shape.width - 10))
+      .outerTickSize(0)
+      .tickPadding(10);
 
   d3.select(el).selectAll('.x.axis')
       .call(xAxis);
@@ -178,7 +190,7 @@ scatterplot._updateAxis = function(el, domain, energyUnit) {
   } else if (energyUnit == "THERM"){
     energyUnitText = "therms";
   }
-  d3.select(el).selectAll('.x.axis text.label')
+  d3.select(el).selectAll('text.x.axis.label')
       .text("Actual (" + energyUnitText + ")");
 
   var min_max = Math.min(scales.x.domain()[1], scales.y.domain()[1]);

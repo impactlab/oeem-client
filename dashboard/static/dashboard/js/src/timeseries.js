@@ -128,11 +128,17 @@ timeseries._initAxis = function(el, domain) {
   var xAxis = d3.svg.axis()
       .scale(scales.x)
       .tickFormat(d3.time.format("%Y-%m"))
-      .orient("bottom");
+      .orient("bottom")
+      .innerTickSize(-shape.height)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-shape.width)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var g = d3.select(el).selectAll('.timeseries-plot');
 
@@ -155,11 +161,17 @@ timeseries._updateAxis = function(el, domain) {
   var xAxis = d3.svg.axis()
       .scale(scales.x)
       .tickFormat(d3.time.format("%Y-%m"))
-      .orient("bottom");
+      .orient("bottom")
+      .innerTickSize(-shape.height)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-shape.width)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var g = d3.select(el).selectAll('.x.axis')
       .call(xAxis);

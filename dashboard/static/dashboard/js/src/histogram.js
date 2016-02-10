@@ -47,9 +47,9 @@ histogram.create = function(el, props, state) {
 
 histogram.update = function(el, state) {
   var scales = this._scales(state.domain);
-  this._updateAxis(el, state.domain, state.energyUnit);
   this._updateTitle(el, state);
-  this._drawPoints(el, scales, state.data);
+  this._drawBars(el, scales, state.data);
+  this._updateAxis(el, state.domain, state.energyUnit);
 };
 
 histogram.destroy = function(el) {
@@ -69,7 +69,7 @@ histogram._height = function() {
 };
 histogram._bins = 15;
 histogram._barWidth = function() {
-  return (this._width() / this._bins) - 2;
+  return (this._width() / this._bins) - 3;
 }
 
 histogram._shape = function() {
@@ -105,7 +105,10 @@ histogram._initAxis = function(el, domain, energyUnit) {
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-shape.width)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   var g = d3.select(el).selectAll('.histogram-bars');
 
@@ -159,7 +162,10 @@ histogram._updateAxis = function(el, domain, energyUnit) {
 
   var yAxis = d3.svg.axis()
       .scale(scales.y)
-      .orient("left");
+      .orient("left")
+      .innerTickSize(-shape.width)
+      .outerTickSize(0)
+      .tickPadding(10);
 
   d3.select(el).selectAll('.x.axis')
       .call(xAxis);
@@ -168,7 +174,7 @@ histogram._updateAxis = function(el, domain, energyUnit) {
       .call(yAxis);
 }
 
-histogram._drawPoints = function(el, scales, data) {
+histogram._drawBars = function(el, scales, data) {
 
   var tip = d3.tip()
     .attr('class', 'd3-tip')

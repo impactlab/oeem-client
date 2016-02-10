@@ -209,12 +209,12 @@
 }
 
 .histogram .bar rect {
-  fill: #7162f9;
+  fill: rgba(0,0,0,0.7);
   shape-rendering: crispEdges;
 }
 
 .histogram .bar:hover rect {
-  fill: #95aef9;
+  fill: rgba(25, 129, 170, 0.7);
   shape-rendering: crispEdges;
 }
 
@@ -229,6 +229,10 @@
   font-size: 0.72em;
 }
 
+.histogram .tick line {
+  stroke: #F0F0F0;
+}
+
 /* scatterplot */
 
 .scatterplot text {
@@ -240,7 +244,7 @@
 }
 
 .scatterplot circle.scatterplot-point:hover {
-  fill: #95aef9;
+  fill: #0A91B6;
 }
 
 .scatterplot .axis path, .scatterplot .axis line {
@@ -250,7 +254,12 @@
 }
 
 .scatterplot .axis text {
-  fill: #bbb;
+  fill: #aaa;
+  font-size: 0.72em;
+}
+
+.scatterplot text.axis {
+  fill: #aaa;
   font-size: 0.72em;
 }
 
@@ -260,6 +269,10 @@
 
 .scatterplot .equivalence textPath {
   fill: #bbb;
+}
+
+.scatterplot .tick line {
+  stroke: #F0F0F0;
 }
 
 /* timeseries */
@@ -282,11 +295,11 @@
 }
 
 .timeseries .baseline.area {
-  fill: #CFC;
+  fill: rgba(100, 255, 100, 0.2);
 }
 
 .timeseries .reporting.area {
-  fill: #FCC;
+  fill: rgba(255, 50, 50, 0.4);
 }
 
 .timeseries .overlay {
@@ -302,6 +315,10 @@
 .timeseries .focus text {
   fill: #777;
   font-size: 0.72em;
+}
+
+.timeseries .tick line{
+  opacity: 0.2;
 }
 
 /* tooltip */
