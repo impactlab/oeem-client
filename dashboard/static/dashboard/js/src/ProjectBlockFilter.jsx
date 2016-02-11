@@ -1,3 +1,5 @@
+var React = require('react');
+
 var ProjectBlockFilter = React.createClass({
   loadProjectBlocks: function() {
     $.ajax({
@@ -61,11 +63,11 @@ var ProjectBlockFilter = React.createClass({
 
     return (
       <div className="projectBlockFilter">
-        <span>Filter by project blocks</span>
-        <FilterMode
-          toggleFilterModeCallback={this.toggleFilterModeCallback}
-          filterMode={this.state.filterMode}
-        />
+        <span>Project block (mode:&nbsp;
+          <a onClick={this.toggleFilterModeCallback}>
+            {this.state.filterMode}
+          </a>)
+        </span>
         <ul className="list-group">
          {projectBlockListItems}
         </ul>

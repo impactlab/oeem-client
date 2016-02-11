@@ -1,3 +1,5 @@
+var React = require('react');
+
 var CategorySelector = React.createClass({
   render: function() {
     var categoryListItems = this.props.categories.map(function(d, i) {

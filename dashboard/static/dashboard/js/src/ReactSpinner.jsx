@@ -1,3 +1,5 @@
+var React = require('react');
+
 var ReactSpinner = React.createClass({
   propTypes: {
     config: React.PropTypes.object,

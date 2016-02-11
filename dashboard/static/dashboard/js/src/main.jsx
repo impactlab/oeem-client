@@ -1,3 +1,5 @@
+var React = require('react');
+var ReactDOM = require('react-dom');
 var CategorySelector = require('./CategorySelector.jsx');
 var ProjectTable = require('./ProjectTable.jsx');
 var ProjectSelectionSummaryBox = require('./ProjectSelectionSummaryBox.jsx');
@@ -5,7 +7,7 @@ var ProjectFilterBox = require('./ProjectFilterBox.jsx');
 var ChartBox = require('./ChartBox.jsx');
 var DownloadButton = require('./DownloadButton.jsx');
 
-window.DashboardBox = React.createClass({
+DashboardBox = React.createClass({
   render: function() {
     return (
       <div className="dashboardBox container-fluid">
@@ -30,6 +32,24 @@ var ProjectDataBox = React.createClass({
     var params = this.state.selectedProjectBlockIds.map(function(d, i) {
       return filterParam + "=" + d;
     });
+
+    if (this.state.selectedBaselineEndDateRange != null) {
+      if (this.state.selectedBaselineEndDateRange.start != null) {
+        params.push("baseline_period_end_0=" + this.state.selectedBaselineEndDateRange.start.format('YYYY-MM-DD'));
+      }
+      if (this.state.selectedBaselineEndDateRange.end != null) {
+        params.push("baseline_period_end_1=" + this.state.selectedBaselineEndDateRange.end.format('YYYY-MM-DD'));
+      }
+    }
+
+    if (this.state.selectedReportingStartDateRange != null) {
+      if (this.state.selectedReportingStartDateRange.start != null) {
+        params.push("reporting_period_start_0=" + this.state.selectedReportingStartDateRange.start.format('YYYY-MM-DD'));
+      }
+      if (this.state.selectedReportingStartDateRange.end != null) {
+        params.push("reporting_period_start_1=" + this.state.selectedReportingStartDateRange.end.format('YYYY-MM-DD'));
+      }
+    }
 
     if (params.length > 0) {
       projectListURL += "?" + params.join("&");
@@ -62,6 +82,20 @@ var ProjectDataBox = React.createClass({
   selectEnergyUnitCallback: function(energyUnitId) {
     this.setState({selectedEnergyUnitId: energyUnitId});
   },
+  selectBaselineEndDateRangeCallback: function(dateRange) {
+    console.log("baseline");
+    console.log(dateRange);
+    this.setState({
+      selectedBaselineEndDateRange: dateRange,
+    }, this.loadProjects);
+  },
+  selectReportingStartDateRangeCallback: function(dateRange) {
+    console.log("reporting");
+    console.log(dateRange);
+    this.setState({
+      selectedReportingStartDateRange: dateRange,
+    }, this.loadProjects);
+  },
   getInitialState: function() {
     return {
       projects: [],
@@ -70,6 +104,8 @@ var ProjectDataBox = React.createClass({
       selectedChartTypeId: "scatterPlot",
       selectedFuelTypeId: "E",
       selectedEnergyUnitId: "KWH",
+      selectedBaselineEndDateRange: null,
+      selectedReportingStartDateRange: null,
     };
   },
   componentDidMount: function() {
@@ -78,9 +114,9 @@ var ProjectDataBox = React.createClass({
   render: function() {
 
     var chartTypes = [
-      { id: "timeSeries", name: "Gross Savings Time Series", },
-      { id: "histogram", name: "Annual Savings Histogram", },
-      { id: "scatterPlot", name: "Realization Rate Scatterplot", },
+      { id: "timeSeries", name: "Gross Savings", },
+      { id: "histogram", name: "Annual Savings", },
+      { id: "scatterPlot", name: "Realization Rate", },
       { id: "map", name: "Map", },
     ];
 
@@ -97,6 +133,15 @@ var ProjectDataBox = React.createClass({
 
     return (
       <div className="selectedProjectBlockBox">
+
+        <ProjectFilterBox
+          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
+          selectBaselineEndDateRangeCallback={this.selectBaselineEndDateRangeCallback}
+          selectReportingStartDateRangeCallback={this.selectReportingStartDateRangeCallback}
+
+          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
+          {...this.props}
+        />
 
         <div className="row">
           <div className="col-md-9">
@@ -159,13 +204,6 @@ var ProjectDataBox = React.createClass({
           </div>
         </div>
 
-        <ProjectFilterBox
-          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
-
-          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
-          {...this.props}
-        />
-
         <ProjectTable
           projects={this.state.projects}
         />
@@ -173,3 +211,16 @@ var ProjectDataBox = React.createClass({
     )
   }
 });
+
+ReactDOM.render(
+  <DashboardBox
+    project_block_list_url="/datastore_proxy/project_blocks/"
+    project_list_url="/datastore_proxy/projects/"
+    meter_run_list_url="/datastore_proxy/meter_runs/"
+    project_attribute_key_list_url="/datastore_proxy/project_attribute_keys/"
+    project_attribute_list_url="/datastore_proxy/project_attributes/"
+    consumption_metadata_list_url="/datastore_proxy/consumption_metadatas/"
+  />,
+  document.getElementById('dashboard')
+);
+

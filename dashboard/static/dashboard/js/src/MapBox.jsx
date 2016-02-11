@@ -1,3 +1,4 @@
+var React = require('react');
 var Map = require("./Map.jsx");
 
 var MapBox = React.createClass({

@@ -1,3 +1,5 @@
+var React = require('react');
+var ReactDOM = require('react-dom');
 var scatterplot = require('./scatterplot');
 
 var Scatterplot = React.createClass({

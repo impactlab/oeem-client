@@ -1,3 +1,5 @@
+var React = require('react');
+var ReactDOM = require('react-dom');
 var timeseries = require('./timeseries');
 
 var Timeseries = React.createClass({

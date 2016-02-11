@@ -1,3 +1,4 @@
+var React = require('react');
 var _ = require('lodash');
 
 var DownloadButton = React.createClass({

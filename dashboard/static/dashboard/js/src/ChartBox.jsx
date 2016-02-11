@@ -1,3 +1,4 @@
+var React = require('react');
 var ScatterplotBox = require('./ScatterplotBox.jsx');
 var HistogramBox = require('./HistogramBox.jsx');
 var TimeseriesBox = require('./TimeseriesBox.jsx');

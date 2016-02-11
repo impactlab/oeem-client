@@ -1,3 +1,4 @@
+var React = require('react');
 var filter = require('lodash.filter');
 
 var ProjectSelectionSummaryBox = React.createClass({
@@ -39,11 +40,9 @@ var ProjectSelectionSummaryBox = React.createClass({
     }
     var consumptionMetadataListURL = props.consumption_metadata_list_url + "?summary=True";
 
-    if (props.projects.length > 0) {
-      consumptionMetadataListURL += "&projects=" + props.projects.map(function(d, i){
-        return d.id;
-      }).join("+");
-    }
+    consumptionMetadataListURL += "&projects=" + props.projects.map(function(d, i){
+      return d.id;
+    }).join("+");
 
     $.ajax({
       url: consumptionMetadataListURL,
@@ -65,11 +64,9 @@ var ProjectSelectionSummaryBox = React.createClass({
     }
     var meterRunListURL = props.meter_run_list_url + "?summary=True&most_recent=True";
 
-    if (props.projects.length > 0) {
-      meterRunListURL += "&projects=" + props.projects.map(function(d, i){
-        return d.id;
-      }).join("+");
-    }
+    meterRunListURL += "&projects=" + props.projects.map(function(d, i){
+      return d.id;
+    }).join("+");
 
     $.ajax({
       url: meterRunListURL,

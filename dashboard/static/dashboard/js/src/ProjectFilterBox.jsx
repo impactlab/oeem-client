@@ -1,27 +1,55 @@
+var React = require('react');
 var ProjectBlockFilter = require('./ProjectBlockFilter.jsx');
+var DateRangeFilter = require('./DateRangeFilter.jsx');
 
 var ProjectFilterBox = React.createClass({
+  toggleCollapsed: function() {
+    this.setState({collapsed: !this.state.collapsed});
+  },
+  getInitialState: function() {
+    return {
+      collapsed: true,
+    }
+  },
   render: function() {
-
-    var filters = [
-      (<li className="list-group-item" key={"projectBlockFilter"}>
-        <ProjectBlockFilter
-          {...this.props}
-        />
-      </li>),
-      // (<li className="list-group-item" key={"dateRangesFilter"}> <DateRangesFilter/> </li>),
-      // (<li className="list-group-item" key={"zipCodeFilter"}> <ZipCodeFilter/> </li>),
-      // (<li className="list-group-item" key={"projectCostFilter"}> <ProjectCostFilter/> </li>),
-      // (<li className="list-group-item" key={"climateZoneFilter"}> <ClimateZoneFilter/> </li>),
-      // (<li className="list-group-item" key={"ecmFilter"}> <EnergyConservationMeasureFilter/> </li>),
-    ];
-
+    var content;
+    if (this.state.collapsed) {
+      content = <div className="pull-right">
+        <a onClick={this.toggleCollapsed}>Show filters</a>
+      </div>
+    } else {
+      content = <div className="projectFilterBox row">
+        <div className="col-md-4">
+          <ProjectBlockFilter
+            {...this.props}
+          />
+        </div>
+        <div className="col-md-4">
+          <DateRangeFilter
+            title="Baseline Period End Date"
+            onSelect={this.props.selectBaselineEndDateRangeCallback}
+          />
+          <DateRangeFilter
+            title="Reporting Period Start Date"
+            onSelect={this.props.selectReportingStartDateRangeCallback}
+          />
+        </div>
+        <div className="col-md-4">
+          <div className="pull-right">
+            <a onClick={this.toggleCollapsed}>Hide filters</a>
+          </div>
+        </div>
+      </div>;
+    }
     return (
-      <div className="projectFilterBox">
-        <h5>Project Filters</h5>
-        <ul className="list-group">
-          {filters}
-        </ul>
+      <div className="projectFilterBox row">
+        <div className="col-md-12">
+          <div className="panel panel-default">
+            <div className="panel-body">
+              {content}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -32,17 +60,6 @@ var ClimateZoneFilter = React.createClass({
     return (
       <div className="climateZoneFilter">
         Filter by climate zone
-      </div>
-    )
-  }
-});
-
-
-var DateRangesFilter = React.createClass({
-  render: function() {
-    return (
-      <div className="dateRangesFilter">
-        Filter by date ranges
       </div>
     )
   }

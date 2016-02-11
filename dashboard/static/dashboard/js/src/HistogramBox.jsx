@@ -1,3 +1,4 @@
+var React = require('react');
 var Histogram = require('./Histogram.jsx');
 var ReactSpinner = require('./ReactSpinner.jsx');
 var _ = require('lodash');
@@ -8,11 +9,9 @@ var HistogramBox = React.createClass({
     meterRunListURL += "&fuel_type=E"
     meterRunListURL += "&fuel_type=NG"
 
-    if (nextProps.projects.length > 0) {
-      meterRunListURL += "&projects=" + nextProps.projects.map(function(d, i){
-        return d.id;
-      }).join("+");
-    }
+    meterRunListURL += "&projects=" + nextProps.projects.map(function(d, i){
+      return d.id;
+    }).join("+");
 
     $.ajax({
       url: meterRunListURL,

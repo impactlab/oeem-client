@@ -1,3 +1,5 @@
+var React = require('react');
+
 var ProjectTable = React.createClass({
   render: function() {
     var projects = this.props.projects.map(function(d,i) {
