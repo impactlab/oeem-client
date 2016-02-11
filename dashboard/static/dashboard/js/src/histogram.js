@@ -187,8 +187,11 @@ histogram._drawBars = function(el, scales, data) {
 
   g.call(tip);
 
+  g.selectAll(".bar").remove(); // Not sure why this is necessary, but bar.exit().remove() isn't doing its job
+
   var bar = g.selectAll(".bar")
       .data(data, function(d) { return d.x; });
+
 
   bar.enter().append("g")
       .attr("class", "bar");
