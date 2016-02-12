@@ -74,6 +74,8 @@ var Map = React.createClass({
     }, function () {
       map.addLayer(newLayer);
       map.addInteraction(newSelectInteraction);
+      var extent = newLayer.getSource().getExtent();
+      map.getView().fit(extent, map.getSize());
     });
   },
 

@@ -18,35 +18,37 @@ var ProjectFilterBox = React.createClass({
         <a onClick={this.toggleCollapsed}>Show filters</a>
       </div>
     } else {
-      content = <div className="projectFilterBox row">
-        <div className="col-md-4">
-          <ProjectBlockFilter
-            {...this.props}
-          />
-        </div>
-        <div className="col-md-4">
-          <DateRangeFilter
-            title="Baseline Period End Date"
-            onSelect={this.props.selectBaselineEndDateRangeCallback}
-          />
-          <DateRangeFilter
-            title="Reporting Period Start Date"
-            onSelect={this.props.selectReportingStartDateRangeCallback}
-          />
-        </div>
-        <div className="col-md-4">
-          <div className="pull-right">
-            <a onClick={this.toggleCollapsed}>Hide filters</a>
+      content = (
+        <div className="projectFilterBox row">
+          <div className="col-md-4">
+            <ProjectBlockFilter
+              {...this.props}
+            />
+          </div>
+          <div className="col-md-4">
+            <DateRangeFilter
+              title="Baseline Period End Date"
+              onSelect={this.props.selectBaselineEndDateRangeCallback}
+            />
+            <DateRangeFilter
+              title="Reporting Period Start Date"
+              onSelect={this.props.selectReportingStartDateRangeCallback}
+            />
+          </div>
+          <div className="col-md-4">
+            <div className="pull-right">
+              <a className="btn btn-primary" onClick={this.toggleCollapsed}>Hide filters</a>
+            </div>
           </div>
         </div>
-      </div>;
+      )
     }
     return (
       <div className="projectFilterBox row">
         <div className="col-md-12">
           <div className="panel panel-default">
             <div className="panel-body">
-              {content}
+            {content}
             </div>
           </div>
         </div>

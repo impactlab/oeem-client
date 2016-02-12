@@ -321,6 +321,52 @@
   opacity: 0.2;
 }
 
+/* Project Consumption Timeseries*/
+
+.projectConsumptionTimeseries .axis path, .projectConsumptionTimeseries .axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+}
+
+.projectConsumptionTimeseries .axis text {
+  fill: #bbb;
+  font-size: 0.72em;
+}
+
+.projectConsumptionTimeseries .axis.electricity text {
+  fill: #0073e6;
+  font-size: 0.72em;
+}
+
+.projectConsumptionTimeseries .axis.naturalGas text {
+  fill: #ff6c00;
+  font-size: 0.72em;
+}
+
+.projectConsumptionTimeseries text.axis.electricity {
+  fill: #0073e6;
+  font-size: 0.72em;
+}
+
+.projectConsumptionTimeseries text.axis.naturalGas {
+  fill: #ff6c00;
+  font-size: 0.72em;
+}
+
+
+.projectConsumptionTimeseries .line.electricity {
+  fill: none;
+  stroke: #0073e6;
+  stroke-width: 0.7px;
+}
+
+.projectConsumptionTimeseries .line.naturalGas {
+  fill: none;
+  stroke: #ff6c00;
+  stroke-width: 0.7px;
+}
+
 /* tooltip */
 .d3-tip {
   line-height: 1;
@@ -369,8 +415,15 @@ div.griddle {
 button.close {
   color: gray;
   margin-top: -6px;
+  padding-left: 20px;
 }
 
 button.close:hover {
   color: black;
+}
+
+/* inline headers */
+.inline-headers h2, .inline-headers h4 {
+  display: inline-block;
+  vertical-align: baseline;
 }

@@ -7,6 +7,7 @@ var ProjectFilterBox = require('./ProjectFilterBox.jsx');
 var ChartBox = require('./ChartBox.jsx');
 var DownloadButton = require('./DownloadButton.jsx');
 var ProjectDetailModal = require('./ProjectDetailModal.jsx');
+var _ = require('lodash');
 
 DashboardBox = React.createClass({
   render: function() {
@@ -94,17 +95,32 @@ var ProjectDataBox = React.createClass({
     }, this.loadProjects);
   },
   selectProjectDetailCallback: function(project_pk) {
+    var projectDetailURL = this.props.project_detail_url + project_pk
     $.ajax({
-      url: this.props.project_detail_url + project_pk,
+      url: projectDetailURL,
       dataType: 'json',
       cache: false,
       success: function(data) {
+
+        var projectIndex = _.findIndex(this.state.projects, function(o) { return o.id == project_pk});
+        var nextProject = null;
+        var prevProject = null;
+        if (projectIndex > 0) {
+          prevProject = this.state.projects[projectIndex - 1].id;
+        }
+
+        if (projectIndex < this.state.projects.length - 1) {
+          nextProject = this.state.projects[projectIndex + 1].id;
+        }
+
         this.setState({
           projectDetail: data,
+          projectDetailPrev: prevProject,
+          projectDetailNext: nextProject,
         }, this.openProjectDetailModal);
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(projectListURL, status, err.toString());
+        console.error(projectDetailURL, status, err.toString());
       }.bind(this)
     });
   },
@@ -129,6 +145,8 @@ var ProjectDataBox = React.createClass({
       selectedBaselineEndDateRange: null,
       selectedReportingStartDateRange: null,
       projectDetail: null,
+      projectDetailPrev: null,
+      projectDetailNext: null,
       projectDetailModalOpen: false,
     };
   },
@@ -238,10 +256,15 @@ var ProjectDataBox = React.createClass({
             />
           </div>
         </div>
+
         <ProjectDetailModal
           project={this.state.projectDetail}
+          nextProject={this.state.projectDetailNext}
+          prevProject={this.state.projectDetailPrev}
+          selectProjectCallback={this.selectProjectDetailCallback}
           modalIsOpen={this.state.projectDetailModalOpen}
           closeModalCallback={this.closeProjectDetailModalCallback}
+          consumption_metadata_list_url={this.props.consumption_metadata_list_url}
         />
       </div>
     )
