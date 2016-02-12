@@ -6,6 +6,7 @@ var ProjectSelectionSummaryBox = require('./ProjectSelectionSummaryBox.jsx');
 var ProjectFilterBox = require('./ProjectFilterBox.jsx');
 var ChartBox = require('./ChartBox.jsx');
 var DownloadButton = require('./DownloadButton.jsx');
+var ProjectDetailModal = require('./ProjectDetailModal.jsx');
 
 DashboardBox = React.createClass({
   render: function() {
@@ -83,18 +84,39 @@ var ProjectDataBox = React.createClass({
     this.setState({selectedEnergyUnitId: energyUnitId});
   },
   selectBaselineEndDateRangeCallback: function(dateRange) {
-    console.log("baseline");
-    console.log(dateRange);
     this.setState({
       selectedBaselineEndDateRange: dateRange,
     }, this.loadProjects);
   },
   selectReportingStartDateRangeCallback: function(dateRange) {
-    console.log("reporting");
-    console.log(dateRange);
     this.setState({
       selectedReportingStartDateRange: dateRange,
     }, this.loadProjects);
+  },
+  selectProjectDetailCallback: function(project_pk) {
+    $.ajax({
+      url: this.props.project_detail_url + project_pk,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({
+          projectDetail: data,
+        }, this.openProjectDetailModal);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(projectListURL, status, err.toString());
+      }.bind(this)
+    });
+  },
+  openProjectDetailModal: function() {
+    this.setState({
+      projectDetailModalOpen: true,
+    });
+  },
+  closeProjectDetailModalCallback: function() {
+    this.setState({
+      projectDetailModalOpen: false,
+    });
   },
   getInitialState: function() {
     return {
@@ -106,6 +128,8 @@ var ProjectDataBox = React.createClass({
       selectedEnergyUnitId: "KWH",
       selectedBaselineEndDateRange: null,
       selectedReportingStartDateRange: null,
+      projectDetail: null,
+      projectDetailModalOpen: false,
     };
   },
   componentDidMount: function() {
@@ -204,8 +228,20 @@ var ProjectDataBox = React.createClass({
           </div>
         </div>
 
-        <ProjectTable
-          projects={this.state.projects}
+        <div className="row">
+          <div className="col-md-12">
+            <ProjectTable
+              projects={this.state.projects}
+              consumption_metadata_list_url={this.props.consumption_metadata_list_url}
+              meter_run_list_url={this.props.meter_run_list_url}
+              selectProjectCallback={this.selectProjectDetailCallback}
+            />
+          </div>
+        </div>
+        <ProjectDetailModal
+          project={this.state.projectDetail}
+          modalIsOpen={this.state.projectDetailModalOpen}
+          closeModalCallback={this.closeProjectDetailModalCallback}
         />
       </div>
     )
@@ -216,6 +252,7 @@ ReactDOM.render(
   <DashboardBox
     project_block_list_url="/datastore_proxy/project_blocks/"
     project_list_url="/datastore_proxy/projects/"
+    project_detail_url="/datastore_proxy/projects/"
     meter_run_list_url="/datastore_proxy/meter_runs/"
     project_attribute_key_list_url="/datastore_proxy/project_attribute_keys/"
     project_attribute_list_url="/datastore_proxy/project_attributes/"

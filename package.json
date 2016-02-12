@@ -27,12 +27,16 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "fixed-data-table": "^0.6.0",
+    "griddle-react": "^0.3.1",
     "jquery": "^1.12.0",
     "lodash": "^4.2.0",
     "lodash.filter": "^4.0.1",
     "moment": "^2.11.2",
     "react": "^0.14.7",
     "react-bootstrap-daterangepicker": "^1.0.6",
-    "react-dom": "^0.14.7"
+    "react-dom": "^0.14.7",
+    "react-modal": "^0.6.1",
+    "underscore": "^1.8.3"
   }
 }

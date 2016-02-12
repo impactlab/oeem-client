@@ -344,6 +344,12 @@
   text-align: center;
 }
 
+/* griddle project table */
+
+div.griddle {
+  margin-top: 20px;
+}
+
 /* Style northward tooltips differently */
 .d3-tip.n:after {
   margin: -1px 0 0 0;
@@ -356,4 +362,15 @@
 .dateRangeFilter button.btn.btn-default {
   width: 100%;
   background-color: #FFF;
+}
+
+/* project data filter */
+
+button.close {
+  color: gray;
+  margin-top: -6px;
+}
+
+button.close:hover {
+  color: black;
 }
