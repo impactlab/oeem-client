@@ -118,7 +118,7 @@ var ProjectTable = React.createClass({
             columnName: "cvrmseBaselineElectricity",
           }, {
             displayName: "CVRMSE Reporting (E)",
-            columnName: "cvrmseReportingNaturalGas",
+            columnName: "cvrmseReportingElectricity",
           }, {
             displayName: "Annual Savings (NG)",
             columnName: "annualSavingsNaturalGas",
