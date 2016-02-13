@@ -5,7 +5,9 @@ celery
 kombu
 dj-database-url
 Django
+django-rest-framework-proxy
 django-sslserver
+djangorestframework
 numpy
 psycopg2
 python-dateutil

@@ -20,6 +20,8 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'sslserver',
     'dashboard',
+    'datastore_proxy',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (

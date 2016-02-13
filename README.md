@@ -52,3 +52,13 @@ You might consider adding these to your virtualenv activate script
 #### Start a server
 
     python manage.py runserver
+
+### JSX offline transform (for React)
+
+Install javascript deps (gulp):
+
+    npm install
+
+Run default gulp task, which watches the file dashboard/static/dashboard/js/src/main.jsx:
+
+    gulp
