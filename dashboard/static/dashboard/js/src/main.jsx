@@ -177,10 +177,10 @@ var ProjectDataBox = React.createClass({
       <div className="selectedProjectBlockBox">
 
         <ProjectFilterBox
+          projects={this.state.projects}
           selectProjectBlocksCallback={this.selectProjectBlocksCallback}
           selectBaselineEndDateRangeCallback={this.selectBaselineEndDateRangeCallback}
           selectReportingStartDateRangeCallback={this.selectReportingStartDateRangeCallback}
-
           projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
           {...this.props}
         />
@@ -196,10 +196,10 @@ var ProjectDataBox = React.createClass({
             <br/>
           </div>
           <div className="col-md-3">
-           <DownloadButton
+            <DownloadButton
               project_list_url={this.props.project_list_url}
               project_attribute_key_list_url={this.props.project_attribute_key_list_url}
-           />
+            />
           </div>
         </div>
 
@@ -274,12 +274,14 @@ var ProjectDataBox = React.createClass({
 ReactDOM.render(
   <DashboardBox
     project_block_list_url="/datastore_proxy/project_blocks/"
+    project_block_detail_url="/datastore_proxy/project_blocks/"
     project_list_url="/datastore_proxy/projects/"
     project_detail_url="/datastore_proxy/projects/"
     meter_run_list_url="/datastore_proxy/meter_runs/"
     project_attribute_key_list_url="/datastore_proxy/project_attribute_keys/"
     project_attribute_list_url="/datastore_proxy/project_attributes/"
     consumption_metadata_list_url="/datastore_proxy/consumption_metadatas/"
+    csrf_token={document.csrf_token}
   />,
   document.getElementById('dashboard')
 );

@@ -1,14 +1,23 @@
 var React = require('react');
 var ProjectBlockFilter = require('./ProjectBlockFilter.jsx');
 var DateRangeFilter = require('./DateRangeFilter.jsx');
+var SaveProjectBlockModal = require('./SaveProjectBlockModal.jsx');
 
 var ProjectFilterBox = React.createClass({
   toggleCollapsed: function() {
     this.setState({collapsed: !this.state.collapsed});
   },
+  openSaveProjectBlockModal: function() {
+    this.setState({saveProjectBlockModalIsOpen: true});
+  },
+  closeSaveProjectBlockModal: function() {
+    // after a save, sometimes there will be a new project block.
+    this.setState({saveProjectBlockModalIsOpen: false});
+  },
   getInitialState: function() {
     return {
       collapsed: true,
+      saveProjectBlockModalIsOpen: false,
     }
   },
   render: function() {
@@ -39,7 +48,19 @@ var ProjectFilterBox = React.createClass({
             <div className="pull-right">
               <a className="btn btn-primary" onClick={this.toggleCollapsed}>Hide filters</a>
             </div>
+            <div className="pull-right">
+              <a className="btn btn-primary" onClick={this.openSaveProjectBlockModal}>Save</a>
+            </div>
           </div>
+
+          <SaveProjectBlockModal
+            projects={this.props.projects}
+            modalIsOpen={this.state.saveProjectBlockModalIsOpen}
+            closeModalCallback={this.closeSaveProjectBlockModal}
+            project_block_list_url={this.props.project_block_list_url}
+            project_block_detail_url={this.props.project_block_detail_url}
+            csrf_token={this.props.csrf_token}
+          />
         </div>
       )
     }

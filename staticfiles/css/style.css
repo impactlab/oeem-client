@@ -236,3 +236,18 @@ button.close:hover {
   display: inline-block;
   vertical-align: baseline;
 }
+
+li.projectBlockListItem.list-group-item.active a {
+  color: white;
+}
+
+li.projectBlockListItem.list-group-item.active a {
+  color: white;
+}
+li.projectBlockListItem input, li.projectBlockListItem select, li.projectBlockListItem textarea{
+    color: #000;
+}
+
+li.projectBlockListItem textarea:focus, li.projectBlockListItem input:focus {
+    color: #000;
+}
