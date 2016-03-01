@@ -15,7 +15,7 @@ before_script:
 before_install:
   - docker build -t impactlab/oeem-client .
   - docker ps -a
-  - docker run impactlab/oeem-client -c "cd /code; python manage.py test"
+  - docker run -d impactlab/oeem-client
 
 script:
   - python manage.py test
