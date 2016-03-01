@@ -9,13 +9,13 @@ services:
 addons:
   postgresql: "9.3"
 
-before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
-
 before_install:
   - docker build -t impactlab/oeem-client .
   - docker ps -a
   - docker run -d impactlab/oeem-client
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
   - python manage.py test
