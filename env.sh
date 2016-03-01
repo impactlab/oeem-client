@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -e '/etc/secret-volume']; then
+if [ -e '/etc/secret-volume' ]; then
     echo 'In kubernetes environment; using secrets'
 
     export DATABASE_URL=postgres://$(cat /etc/secret-volume/pg-user):$(cat /etc/secret-volume/pg-password)@$(cat /etc/secret-volume/pg-service-name).default.svc.cluster.local:5432/$(cat /etc/secret-volume/pg-user)
