@@ -12,7 +12,7 @@ addons:
 before_install:
   - docker build -t impactlab/oeem-client .
   - docker ps -a
-  - docker run impactlab/oeem-client
+  - docker run impactlab/oeem-client -e DATABASE_URL=$DATABASE_URL -e DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE -e SECRET_KEY=$SECRET_KEY -e DJANGO_LOGFILE=$DJANGO_LOGFILE -e TEST=$TEST -e PROTOCOL=$PROTOCOL -e SERVER_NAME=$SERVER_NAME -e BROKER_HOST=$BROKER_HOST -e SETUP=$SETUP
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
