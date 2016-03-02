@@ -15,7 +15,7 @@ touch /srv/logs/access.log
 touch /srv/logs/django.log
 tail -n 0 -f /srv/logs/*.log &
 
-if [ ${TRAVIS} = true ]; then
+if [ $TEST = true ]; then
 
     python manage.py test
 
@@ -31,4 +31,3 @@ else
         "$@"
 
 fi
-
