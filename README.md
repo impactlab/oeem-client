@@ -1,7 +1,8 @@
 OEEM Client
 ===========
 
-[![Build Status](https://travis-ci.org/impactlab/oeem-client.svg?branch=master)](https://travis-ci.org/impactlab/oeem-client)
+[![Build Status](https://travis-ci.org/impactlab/oeem-client.svg?branch=develop)](https://travis-ci.org/impactlab/oeem-client)
+
 
 This client uses the Open EE Energy Datastore API to provide a front-end
 dashboard experience.
