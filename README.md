@@ -31,17 +31,18 @@ We recommend using virtualenv to manage python packages
 
 #### Define the following environment variables
 
-    export DJANGO_SETTINGS_MODULE=oeem_client.settings
-    export DATABASE_URL=postgres://:@localhost:5432/oeem_client
+    export DATABASE_URL=postgres://philngo:@0.0.0.0:5432/oeem_client
     export DEBUG=true
-    export SECRET_KEY=############################
-    export DATASTORE_ACCESS_TOKEN=#####################
-    export DATASTORE_URL=https://############
+    export DJANGO_SETTINGS_MODULE=oeem_client.settings
+    export SECRET_KEY=<django-secret-key>
+    export DATASTORE_ACCESS_TOKEN=<my-access-token>
+    export DATASTORE_URL=http://0.0.0.0:8000 #change to match URL of datastore
+    export DJANGO_LOGFILE=django.log
 
-You might consider adding these to your virtualenv activate script
+You might consider adding these to your virtualenv postctivate script
 
-    vim /path/to/virtualenvs/oeem-client/bin/activate
-    workon oeem-client
+    vim /path/to/virtualenvs/oeem-client/bin/postactivate
+    workon oeem-client # reactivate environment
 
 #### Run migrations
 
