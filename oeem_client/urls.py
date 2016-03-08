@@ -16,9 +16,18 @@ Including another URLconf
 from django.views.generic.base import RedirectView
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
 
 urlpatterns = [
+
+    url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
-    url(r'^$', RedirectView.as_view(url='dashboard/', permanent=False), name='index')
+    url(r'^datastore_proxy/', include('datastore_proxy.urls', namespace='datastore_proxy')),
+
+    url(r'^$', RedirectView.as_view(url='dashboard/', permanent=False), name='index'),
+
+    url(r'^accounts/login/$', login, {'template_name':'admin/login.html'}, name='login'),
+    url(r'^accounts/logout/$', logout, name='logout'),
 ]

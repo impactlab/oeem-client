@@ -9,3 +9,7 @@ local_settings.py
 # Client Specific Stuff
 client_logos/
 !client_logos/oee-logo.png
+
+node_modules/
+
+*.log

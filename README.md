@@ -1,6 +1,9 @@
 OEEM Client
 ===========
 
+[![Build Status](https://travis-ci.org/impactlab/oeem-client.svg?branch=develop)](https://travis-ci.org/impactlab/oeem-client)
+
+
 This client uses the Open EE Energy Datastore API to provide a front-end
 dashboard experience.
 
@@ -29,17 +32,20 @@ We recommend using virtualenv to manage python packages
 
 #### Define the following environment variables
 
-    export DJANGO_SETTINGS_MODULE=oeem_client.settings
-    export DATABASE_URL=postgres://:@localhost:5432/oeem_client
+    export DATABASE_URL=postgres://philngo:@0.0.0.0:5432/oeem_client
     export DEBUG=true
-    export SECRET_KEY=############################
-    export DATASTORE_ACCESS_TOKEN=#####################
-    export DATASTORE_URL=https://############
+    export DJANGO_SETTINGS_MODULE=oeem_client.settings
+    export SECRET_KEY=<django-secret-key>
+    export DJANGO_LOGFILE=django.log
 
-You might consider adding these to your virtualenv activate script
+    # For extra info on connecting the datastore, see below
+    export DATASTORE_ACCESS_TOKEN=<my-access-token>
+    export DATASTORE_URL=http://0.0.0.0:8000 #change to match URL of datastore
 
-    vim /path/to/virtualenvs/oeem-client/bin/activate
-    workon oeem-client
+You might consider adding these to your virtualenv postctivate script
+
+    vim /path/to/virtualenvs/oeem-client/bin/postactivate
+    workon oeem-client # reactivate environment
 
 #### Run migrations
 
@@ -52,3 +58,50 @@ You might consider adding these to your virtualenv activate script
 #### Start a server
 
     python manage.py runserver
+
+#### Connecting the datastore and the client.
+
+Once a superuser has been created for the client and the datastore, log in
+to the datastore and manually create the access token defined in the ini file.
+
+In the admin, create a Django OAuth Toolkit application with the following
+attributes:
+
+    Client id: Use default
+    User: <pick a user or create a new one>
+    Redirect URI: https://example-client.openeemeter.org (this can actually be any url - we don't use it when creating an application manually)
+    Client type: Confidential
+    Authorization grant type: Authorization code
+    Client secret: Use default
+    Name: OEEM Client (can be anything that helps you remember)
+
+
+Then go over and manually create a Django OAuth Toolkit access token with
+the following attributes.
+
+    User: <same user as for the application>
+    Token: <any string of characters - preferably at least 30 chars long and random>
+    Application: <the application you just created>
+    Expires: <some future date>
+    Scope: "read write" (no quotes)
+
+The environment variable `DATASTORE_ACCESS_TOKEN` should be set to the value
+of this access token in the _client_'s deployment environment. E.g.
+
+    export DATASTORE_ACCESS_TOKEN=YOUR_TOKEN_GOES_HERE
+
+#### Adding data
+
+You will upload data to the datastore and view it in the client.
+
+See the API at this datastore URL: [http://0.0.0.0:8000/docs/](http://0.0.0.0:8000/docs/)
+
+### JSX offline transform (for React)
+
+Install javascript deps (gulp):
+
+    npm install
+
+Run default gulp task, which watches the file dashboard/static/dashboard/js/src/main.jsx:
+
+    gulp
