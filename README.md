@@ -102,6 +102,8 @@ Install javascript deps (gulp):
 
     npm install
 
+Note: if this doesn't work, you may need to [install gulp globally](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) (`npm install --global gulp-cli`)
+
 Run default gulp task, which watches the file dashboard/static/dashboard/js/src/main.jsx:
 
     gulp
