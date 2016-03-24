@@ -7,29 +7,72 @@
 {% block content %}
 
 
-{% block navbar %}
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+
+  <!-- this is the horizontal bar at the top -->
+  <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+    <div class="mdl-layout__header-row">
+      <span class="mdl-layout-title">Home</span>
+      <div class="mdl-layout-spacer"></div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">Item</li>
+        <li class="mdl-menu__item">Item</li>
+        <li class="mdl-menu__item">Item</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- this is the vertical nav on the left -->
+  <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+    <header class="demo-drawer-header">
       <a class="navbar-brand logo" href="{% url 'dashboard:main' %}">
         <img alt="OEE" src="{% static logo %}">
       </a>
-    </div>
-    <div class="collapse navbar-collapse">
-      <ul class="nav navbar-nav navbar-right">
-        {% if user.is_staff %}
-        <li><a href="{% url 'admin:index' %}">Admin</a></li>
-        {% endif %}
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-{% endblock navbar %}
+    </header>
+    <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
 
-{% block container %}
-<div id="dashboard"></div>
-{% endblock container %}
+      {% if user.is_staff %}
+      <a class="mdl-navigation__link" href="{% url 'admin:index' %}">Admin</a>
+      {% endif %}
+      <a class="mdl-navigation__link" href="{% url 'logout' %}">Logout</a>
+
+    </nav>
+  </div>
+  <main class="mdl-layout__content mdl-color--grey-100">
+    <div class="mdl-grid demo-content">
+
+      <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+        {% block container %}
+          <div id="dashboard"></div>
+        {% endblock container %}
+      </div>
+      <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
+        [charts go here]
+      </div>
+      <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+        <div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+          <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">Summary</h2>
+          </div>
+          <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            [summary goes here]
+          </div>
+        </div>
+      </div>
+      <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+        [projects table goes here]
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+
 
 {% endblock content %}
 
