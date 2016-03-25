@@ -4,57 +4,64 @@ var HistogramBox = require('./HistogramBox.jsx');
 var TimeseriesBox = require('./TimeseriesBox.jsx');
 var MapBox = require('./MapBox.jsx');
 
+var Tabs = require('material-ui/lib/tabs/tabs')
+var Tab = require('material-ui/lib/tabs/tab')
+
+const styles = {
+  headline: {
+    fontSize: 24,
+    paddingTop: 16,
+    marginBottom: 12,
+    fontWeight: 400,
+  },
+};
+
+
 var ChartBox = React.createClass({
   render: function() {
-    var chartComponent;
-    if (this.props.chartType == "histogram") {
-
-      chartComponent = (
-        <HistogramBox
-          projects={this.props.projects}
-          fuelType={this.props.fuelType}
-          energyUnit={this.props.energyUnit}
-          meter_run_list_url={this.props.meter_run_list_url}
-          height={300}
-        />
-      )
-    } else if (this.props.chartType == "timeSeries") {
-      chartComponent = (
-        <TimeseriesBox
-          projects={this.props.projects}
-          fuelType={this.props.fuelType}
-          energyUnit={this.props.energyUnit}
-          project_list_url={this.props.project_list_url}
-          height={300}
-        />
-      )
-    } else if (this.props.chartType == "scatterPlot") {
-
-      chartComponent = (
-        <ScatterplotBox
-          projects={this.props.projects}
-          fuelType={this.props.fuelType}
-          energyUnit={this.props.energyUnit}
-          project_attribute_key_list_url={this.props.project_attribute_key_list_url}
-          project_list_url={this.props.project_list_url}
-          height={300}
-        />
-      )
-    } else if (this.props.chartType == "map") {
-      chartComponent = (
-        <MapBox
-          projects={this.props.projects}
-          project_list_url={this.props.project_list_url}
-          height={300}
-        />
-      )
-    } else {
-      chartComponent = <span>Please Select a Chart</span>
-    }
-
     return (
       <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
-        {chartComponent}
+        <Tabs>
+          <Tab label="Realization rate" >
+            <ScatterplotBox
+              projects={this.props.projects}
+              fuelType={this.props.fuelType}
+              energyUnit={this.props.energyUnit}
+              project_attribute_key_list_url={this.props.project_attribute_key_list_url}
+              project_list_url={this.props.project_list_url}
+              height={300}
+            />
+          </Tab>
+          <Tab label="Gross savings" >
+            <HistogramBox
+              projects={this.props.projects}
+              fuelType={this.props.fuelType}
+              energyUnit={this.props.energyUnit}
+              meter_run_list_url={this.props.meter_run_list_url}
+              height={300}
+            />
+          </Tab>
+          <Tab label="Annual savings" >
+            <TimeseriesBox
+              projects={this.props.projects}
+              fuelType={this.props.fuelType}
+              energyUnit={this.props.energyUnit}
+              project_list_url={this.props.project_list_url}
+              height={300}
+            />
+          </Tab>
+          <Tab label="Map" >
+            <MapBox
+              projects={this.props.projects}
+              project_list_url={this.props.project_list_url}
+              height={300}
+            />
+          </Tab>
+        </Tabs>
+
+
+
+
       </div>
     )
   }

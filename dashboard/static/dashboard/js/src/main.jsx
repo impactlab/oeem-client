@@ -9,6 +9,9 @@ var DownloadButton = require('./DownloadButton.jsx');
 var ProjectDetailModal = require('./ProjectDetailModal.jsx');
 var _ = require('lodash');
 
+var injectTapEventPlugin = require('react-tap-event-plugin');
+injectTapEventPlugin();
+
 DashboardBox = React.createClass({
   render: function() {
     return (
@@ -169,32 +172,21 @@ var ProjectDataBox = React.createClass({
 
     return (
       <div className="selectedProjectBlockBox mdl-grid">
+        <div className="mdl-cell mdl-cell--12-col">
+          <ProjectFilterBox
+            projects={this.state.projects}
+            selectProjectBlocksCallback={this.selectProjectBlocksCallback}
+            selectBaselineEndDateRangeCallback={this.selectBaselineEndDateRangeCallback}
+            selectReportingStartDateRangeCallback={this.selectReportingStartDateRangeCallback}
+            projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
+            {...this.props}
+          />
 
-        <ProjectFilterBox
-          projects={this.state.projects}
-          selectProjectBlocksCallback={this.selectProjectBlocksCallback}
-          selectBaselineEndDateRangeCallback={this.selectBaselineEndDateRangeCallback}
-          selectReportingStartDateRangeCallback={this.selectReportingStartDateRangeCallback}
-          projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
-          {...this.props}
-        />
 
-        <div className="row">
-          <div className="col-md-9">
-            <CategorySelector
-              title={null}
-              categories={chartTypes}
-              selectCategoryCallback={this.selectChartTypeCallback}
-              selectedCategoryId={this.state.selectedChartTypeId}
-            />
-            <br/>
-          </div>
-          <div className="col-md-3">
-            <DownloadButton
-              project_list_url={this.props.project_list_url}
-              project_attribute_key_list_url={this.props.project_attribute_key_list_url}
-            />
-          </div>
+          <DownloadButton
+            project_list_url={this.props.project_list_url}
+            project_attribute_key_list_url={this.props.project_attribute_key_list_url}
+          />
         </div>
 
 
