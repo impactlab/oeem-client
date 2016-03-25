@@ -172,7 +172,7 @@ var ProjectDataBox = React.createClass({
 
     return (
       <div className="selectedProjectBlockBox mdl-grid">
-        <div className="mdl-cell mdl-cell--12-col">
+        <div className="mdl-cell mdl-cell--8-col">
           <ProjectFilterBox
             projects={this.state.projects}
             selectProjectBlocksCallback={this.selectProjectBlocksCallback}
@@ -181,7 +181,8 @@ var ProjectDataBox = React.createClass({
             projectBlockIdFilterMode={this.state.projectBlockIdFilterMode}
             {...this.props}
           />
-
+        </div>
+        <div className="mdl-cell mdl-cell--4-col">
 
           <DownloadButton
             project_list_url={this.props.project_list_url}
@@ -208,25 +209,21 @@ var ProjectDataBox = React.createClass({
         />
 
 
-        <div className="row">
-          <div className="col-md-4">
-            <CategorySelector
-              title={null}
-              categories={fuelTypes}
-              selectCategoryCallback={this.selectFuelTypeCallback}
-              selectedCategoryId={this.state.selectedFuelTypeId}
-            />
-          </div>
 
-          <div className="col-md-4">
-            <CategorySelector
-              title={null}
-              categories={energyUnits}
-              selectCategoryCallback={this.selectEnergyUnitCallback}
-              selectedCategoryId={this.state.selectedEnergyUnitId}
-            />
-          </div>
-        </div>
+        <CategorySelector
+          title={null}
+          categories={fuelTypes}
+          selectCategoryCallback={this.selectFuelTypeCallback}
+          selectedCategoryId={this.state.selectedFuelTypeId}
+        />
+
+        <CategorySelector
+          title={null}
+          categories={energyUnits}
+          selectCategoryCallback={this.selectEnergyUnitCallback}
+          selectedCategoryId={this.state.selectedEnergyUnitId}
+        />
+
 
 
         <ProjectTable

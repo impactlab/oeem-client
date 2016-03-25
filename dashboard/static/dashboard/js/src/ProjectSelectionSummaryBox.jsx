@@ -115,7 +115,6 @@ var ProjectSelectionSummaryBox = React.createClass({
     return (
       <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--4-col">
         Summary statistics
-        <span className="badge pull-right">{this.props.projects.length} projects</span>
 
         <table className="table table-condensed">
           <thead>

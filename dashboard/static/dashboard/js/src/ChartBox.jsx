@@ -7,15 +7,6 @@ var MapBox = require('./MapBox.jsx');
 var Tabs = require('material-ui/lib/tabs/tabs')
 var Tab = require('material-ui/lib/tabs/tab')
 
-const styles = {
-  headline: {
-    fontSize: 24,
-    paddingTop: 16,
-    marginBottom: 12,
-    fontWeight: 400,
-  },
-};
-
 
 var ChartBox = React.createClass({
   render: function() {
