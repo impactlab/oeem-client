@@ -236,16 +236,14 @@ var ProjectDataBox = React.createClass({
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-md-12">
-            <ProjectTable
-              projects={this.state.projects}
-              consumption_metadata_list_url={this.props.consumption_metadata_list_url}
-              meter_run_list_url={this.props.meter_run_list_url}
-              selectProjectCallback={this.selectProjectDetailCallback}
-            />
-          </div>
-        </div>
+
+        <ProjectTable
+          projects={this.state.projects}
+          consumption_metadata_list_url={this.props.consumption_metadata_list_url}
+          meter_run_list_url={this.props.meter_run_list_url}
+          selectProjectCallback={this.selectProjectDetailCallback}
+        />
+
 
         <ProjectDetailModal
           project={this.state.projectDetail}

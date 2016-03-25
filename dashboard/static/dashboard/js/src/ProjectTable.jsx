@@ -82,72 +82,75 @@ var ProjectTable = React.createClass({
   render: function() {
     var selectProjectCallback = this.props.selectProjectCallback;
     return (
-      <Griddle
-        results={this.state.data}
-        resultsPerPage={10}
-        tableClassName="table"
-        showFilter={true}
-        showSettings={true}
-        columns={[
-          "projectID",
-          "annualSavingsElectricity",
-          "annualSavingsNaturalGas",
-        ]}
-        columnMetadata={[
-          {
-            displayName: "Project ID",
-            columnName: "projectID",
-            customComponent: LinkComponent,
-            selectProject: function(projectPK) {
-              selectProjectCallback(projectPK);
-            },
-          }, {
-            displayName: "Annual Savings (E)",
-            columnName: "annualSavingsElectricity",
-          }, {
-            displayName: "Gross Savings (E)",
-            columnName: "grossSavingsElectricity",
-          }, {
-            displayName: "Annual Usage Baseline (E)",
-            columnName: "annualUsageBaselineElectricity",
-          }, {
-            displayName: "Annual Usage Reporting (E)",
-            columnName: "annualUsageReportingElectricity",
-          }, {
-            displayName: "CVRMSE Baseline (E)",
-            columnName: "cvrmseBaselineElectricity",
-          }, {
-            displayName: "CVRMSE Reporting (E)",
-            columnName: "cvrmseReportingElectricity",
-          }, {
-            displayName: "Annual Savings (NG)",
-            columnName: "annualSavingsNaturalGas",
-          }, {
-            displayName: "Gross Savings (NG)",
-            columnName: "grossSavingsNaturalGas",
-          }, {
-            displayName: "Annual Usage Baseline (NG)",
-            columnName: "annualUsageBaselineNaturalGas",
-          }, {
-            displayName: "Annual Usage Reporting (NG)",
-            columnName: "annualUsageReportingNaturalGas",
-          }, {
-            displayName: "CVRMSE Baseline (NG)",
-            columnName: "cvrmseBaselineNaturalGas",
-          }, {
-            displayName: "CVRMSE Reporting (NG)",
-            columnName: "cvrmseReportingNaturalGas",
-          }, {
-            displayName: "ZIP code",
-            columnName: "zipcode",
-          }, {
-            displayName: "Weather Station",
-            columnName: "weatherStation",
-          }, {
-            columnName: "projectPK",
-            visible: false,
-          }]}
+      <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--12-col">
+        <Griddle
+          results={this.state.data}
+          resultsPerPage={10}
+          tableClassName="table"
+          showFilter={true}
+          showSettings={true}
+          columns={[
+            "projectID",
+            "annualSavingsElectricity",
+            "annualSavingsNaturalGas",
+          ]}
+          columnMetadata={[
+            {
+              displayName: "Project ID",
+              columnName: "projectID",
+              customComponent: LinkComponent,
+              selectProject: function(projectPK) {
+                selectProjectCallback(projectPK);
+              },
+            }, {
+              displayName: "Annual Savings (E)",
+              columnName: "annualSavingsElectricity",
+            }, {
+              displayName: "Gross Savings (E)",
+              columnName: "grossSavingsElectricity",
+            }, {
+              displayName: "Annual Usage Baseline (E)",
+              columnName: "annualUsageBaselineElectricity",
+            }, {
+              displayName: "Annual Usage Reporting (E)",
+              columnName: "annualUsageReportingElectricity",
+            }, {
+              displayName: "CVRMSE Baseline (E)",
+              columnName: "cvrmseBaselineElectricity",
+            }, {
+              displayName: "CVRMSE Reporting (E)",
+              columnName: "cvrmseReportingElectricity",
+            }, {
+              displayName: "Annual Savings (NG)",
+              columnName: "annualSavingsNaturalGas",
+            }, {
+              displayName: "Gross Savings (NG)",
+              columnName: "grossSavingsNaturalGas",
+            }, {
+              displayName: "Annual Usage Baseline (NG)",
+              columnName: "annualUsageBaselineNaturalGas",
+            }, {
+              displayName: "Annual Usage Reporting (NG)",
+              columnName: "annualUsageReportingNaturalGas",
+            }, {
+              displayName: "CVRMSE Baseline (NG)",
+              columnName: "cvrmseBaselineNaturalGas",
+            }, {
+              displayName: "CVRMSE Reporting (NG)",
+              columnName: "cvrmseReportingNaturalGas",
+            }, {
+              displayName: "ZIP code",
+              columnName: "zipcode",
+            }, {
+              displayName: "Weather Station",
+              columnName: "weatherStation",
+            }, {
+              columnName: "projectPK",
+              visible: false,
+            }
+          ]}
         />
+      </div>
     )
   }
 });
