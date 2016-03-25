@@ -1,5 +1,7 @@
 /* all styling related to the page layout & nav, using material design */
 
+
+
 .mdl-layout--fixed-drawer.is-upgraded:not(.is-small-screen)>.mdl-layout__content, .mdl-layout--fixed-drawer.is-upgraded:not(.is-small-screen)>.mdl-layout__header {
 	margin-left: 60px; /*this should be same width as sidebar*/
 	width: calc(100% - 60px);

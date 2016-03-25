@@ -113,50 +113,46 @@ var ProjectSelectionSummaryBox = React.createClass({
 
   render: function() {
     return (
-      <div className="projectSelectionSummaryBox">
-        <div className="panel panel-default">
-          <div className="panel-heading">
-            Summary statistics
-            <span className="badge pull-right">{this.props.projects.length} projects</span>
-          </div>
+      <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--4-col">
+        Summary statistics
+        <span className="badge pull-right">{this.props.projects.length} projects</span>
 
-          <table className="table table-condensed">
-            <thead>
-            <tr>
-              <th></th>
-              <th className="text-center">Electricity</th>
-              <th className="text-center">Natural Gas</th>
-              <th className="text-center">Total</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Number of projects</td>
-              <td className="text-center">{this.state.nProjectsElectricity}</td>
-              <td className="text-center">{this.state.nProjectsNaturalGas}</td>
-              <td className="text-center">{this.props.projects.length}</td>
-            </tr>
-            <tr>
-              <td>Number of meter runs</td>
-              <td className="text-center">{this.state.nMeterRunsElectricity}</td>
-              <td className="text-center">{this.state.nMeterRunsNaturalGas}</td>
-              <td className="text-center">{this.state.nMeterRuns}</td>
-            </tr>
-            <tr>
-              <td>Gross savings (kWh)</td>
-              <td className="text-center">{this.state.grossSavingsElectricity}</td>
-              <td className="text-center">{this.state.grossSavingsNaturalGas}</td>
-              <td className="text-center">{this.state.grossSavings}</td>
-            </tr>
-            <tr>
-              <td>Annual savings (kWh)</td>
-              <td className="text-center">{this.state.annualSavingsElectricity}</td>
-              <td className="text-center">{this.state.annualSavingsNaturalGas}</td>
-              <td className="text-center">{this.state.annualSavings}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+        <table className="table table-condensed">
+          <thead>
+          <tr>
+            <th></th>
+            <th className="text-center">Electricity</th>
+            <th className="text-center">Natural Gas</th>
+            <th className="text-center">Total</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Number of projects</td>
+            <td className="text-center">{this.state.nProjectsElectricity}</td>
+            <td className="text-center">{this.state.nProjectsNaturalGas}</td>
+            <td className="text-center">{this.props.projects.length}</td>
+          </tr>
+          <tr>
+            <td>Number of meter runs</td>
+            <td className="text-center">{this.state.nMeterRunsElectricity}</td>
+            <td className="text-center">{this.state.nMeterRunsNaturalGas}</td>
+            <td className="text-center">{this.state.nMeterRuns}</td>
+          </tr>
+          <tr>
+            <td>Gross savings (kWh)</td>
+            <td className="text-center">{this.state.grossSavingsElectricity}</td>
+            <td className="text-center">{this.state.grossSavingsNaturalGas}</td>
+            <td className="text-center">{this.state.grossSavings}</td>
+          </tr>
+          <tr>
+            <td>Annual savings (kWh)</td>
+            <td className="text-center">{this.state.annualSavingsElectricity}</td>
+            <td className="text-center">{this.state.annualSavingsNaturalGas}</td>
+            <td className="text-center">{this.state.annualSavings}</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     )
   }

@@ -53,12 +53,8 @@ var ChartBox = React.createClass({
     }
 
     return (
-      <div className="chartBox">
-        <div className="panel panel-default">
-          <div className="panel-body">
-            {chartComponent}
-          </div>
-        </div>
+      <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
+        {chartComponent}
       </div>
     )
   }

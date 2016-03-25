@@ -12,15 +12,9 @@ var _ = require('lodash');
 DashboardBox = React.createClass({
   render: function() {
     return (
-      <div className="dashboardBox container-fluid">
-        <div className="row">
-          <div className="col-xs-12">
-            <ProjectDataBox
-              {...this.props}
-            />
-          </div>
-        </div>
-      </div>
+      <ProjectDataBox
+        {...this.props}
+      />
     )
   }
 });
@@ -174,7 +168,7 @@ var ProjectDataBox = React.createClass({
     ];
 
     return (
-      <div className="selectedProjectBlockBox">
+      <div className="selectedProjectBlockBox mdl-grid">
 
         <ProjectFilterBox
           projects={this.state.projects}
@@ -204,27 +198,23 @@ var ProjectDataBox = React.createClass({
         </div>
 
 
-        <div className="row">
-          <div className="col-md-8">
-            <ChartBox
-              chartType={this.state.selectedChartTypeId}
-              fuelType={this.state.selectedFuelTypeId}
-              energyUnit={this.state.selectedEnergyUnitId}
-              projects={this.state.projects}
-              meter_run_list_url={this.props.meter_run_list_url}
-              project_attribute_key_list_url={this.props.project_attribute_key_list_url}
-              project_list_url={this.props.project_list_url}
-            />
-          </div>
 
-          <div className="col-md-4">
-            <ProjectSelectionSummaryBox
-              projects={this.state.projects}
-              consumption_metadata_list_url={this.props.consumption_metadata_list_url}
-              meter_run_list_url={this.props.meter_run_list_url}
-            />
-          </div>
-        </div>
+        <ChartBox
+          chartType={this.state.selectedChartTypeId}
+          fuelType={this.state.selectedFuelTypeId}
+          energyUnit={this.state.selectedEnergyUnitId}
+          projects={this.state.projects}
+          meter_run_list_url={this.props.meter_run_list_url}
+          project_attribute_key_list_url={this.props.project_attribute_key_list_url}
+          project_list_url={this.props.project_list_url}
+        />
+
+        <ProjectSelectionSummaryBox
+          projects={this.state.projects}
+          consumption_metadata_list_url={this.props.consumption_metadata_list_url}
+          meter_run_list_url={this.props.meter_run_list_url}
+        />
+
 
         <div className="row">
           <div className="col-md-4">
@@ -283,6 +273,6 @@ ReactDOM.render(
     consumption_metadata_list_url="/datastore_proxy/consumption_metadatas/"
     csrf_token={document.csrf_token}
   />,
-  document.getElementById('dashboard')
+  document.getElementById('oeem-content')
 );
 
