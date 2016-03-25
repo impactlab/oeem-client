@@ -210,22 +210,6 @@ var ProjectDataBox = React.createClass({
 
 
 
-        <CategorySelector
-          title={null}
-          categories={fuelTypes}
-          selectCategoryCallback={this.selectFuelTypeCallback}
-          selectedCategoryId={this.state.selectedFuelTypeId}
-        />
-
-        <CategorySelector
-          title={null}
-          categories={energyUnits}
-          selectCategoryCallback={this.selectEnergyUnitCallback}
-          selectedCategoryId={this.state.selectedEnergyUnitId}
-        />
-
-
-
         <ProjectTable
           projects={this.state.projects}
           consumption_metadata_list_url={this.props.consumption_metadata_list_url}
