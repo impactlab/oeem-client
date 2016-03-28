@@ -3,7 +3,7 @@ var ScatterplotBox = require('./ScatterplotBox.jsx');
 var HistogramBox = require('./HistogramBox.jsx');
 var TimeseriesBox = require('./TimeseriesBox.jsx');
 var MapBox = require('./MapBox.jsx');
-var CategorySelector = require('./CategorySelector.jsx');
+var ChartControl = require('./ChartControl.jsx')
 
 var Tabs = require('material-ui/lib/tabs/tabs')
 var Tab = require('material-ui/lib/tabs/tab')
@@ -48,20 +48,10 @@ var ChartBox = React.createClass({
               height={300}
             />
 
-            <CategorySelector
-              title={null}
-              categories={fuelTypes}
-              selectCategoryCallback={this.selectFuelTypeCallback}
-              selectedCategoryId={this.state.selectedFuelTypeId}
+            <ChartControl
+              selectedFuelTypeId={this.state.selectedFuelTypeId}
+              selectedEnergyUnitId={this.state.selectedEnergyUnitId}
             />
-
-            <CategorySelector
-              title={null}
-              categories={energyUnits}
-              selectCategoryCallback={this.selectEnergyUnitCallback}
-              selectedCategoryId={this.state.selectedEnergyUnitId}
-            />
-
 
           </Tab>
           <Tab label="Gross savings" >
@@ -73,19 +63,11 @@ var ChartBox = React.createClass({
               height={300}
             />
 
-            <CategorySelector
-              title={null}
-              categories={fuelTypes}
-              selectCategoryCallback={this.selectFuelTypeCallback}
-              selectedCategoryId={this.state.selectedFuelTypeId}
+            <ChartControl
+              selectedFuelTypeId={this.state.selectedFuelTypeId}
+              selectedEnergyUnitId={this.state.selectedEnergyUnitId}
             />
 
-            <CategorySelector
-              title={null}
-              categories={energyUnits}
-              selectCategoryCallback={this.selectEnergyUnitCallback}
-              selectedCategoryId={this.state.selectedEnergyUnitId}
-            />
           </Tab>
           <Tab label="Annual savings" >
             <TimeseriesBox
@@ -95,19 +77,12 @@ var ChartBox = React.createClass({
               project_list_url={this.props.project_list_url}
               height={300}
             />
-            <CategorySelector
-              title={null}
-              categories={fuelTypes}
-              selectCategoryCallback={this.selectFuelTypeCallback}
-              selectedCategoryId={this.state.selectedFuelTypeId}
+
+            <ChartControl
+              selectedFuelTypeId={this.state.selectedFuelTypeId}
+              selectedEnergyUnitId={this.state.selectedEnergyUnitId}
             />
 
-            <CategorySelector
-              title={null}
-              categories={energyUnits}
-              selectCategoryCallback={this.selectEnergyUnitCallback}
-              selectedCategoryId={this.state.selectedEnergyUnitId}
-            />
           </Tab>
           <Tab label="Map" >
             <MapBox

@@ -1,6 +1,5 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var CategorySelector = require('./CategorySelector.jsx');
 var ProjectTable = require('./ProjectTable.jsx');
 var ProjectSelectionSummaryBox = require('./ProjectSelectionSummaryBox.jsx');
 var ProjectFilterBox = require('./ProjectFilterBox.jsx');
