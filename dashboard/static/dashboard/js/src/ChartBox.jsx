@@ -16,6 +16,12 @@ var ChartBox = React.createClass({
       selectedEnergyUnitId: "KWH",
     };
   },
+  selectFuelTypeCallback: function(fuelTypeId) {
+    this.setState({selectedFuelTypeId: fuelTypeId});
+  },
+  selectEnergyUnitCallback: function(energyUnitId) {
+    this.setState({selectedEnergyUnitId: energyUnitId});
+  },
   render: function() {
 
     var fuelTypes = [
@@ -35,8 +41,8 @@ var ChartBox = React.createClass({
           <Tab label="Realization rate" >
             <ScatterplotBox
               projects={this.props.projects}
-              fuelType={this.props.fuelType}
-              energyUnit={this.props.energyUnit}
+              fuelType={this.state.selectedFuelTypeId}
+              energyUnit={this.state.selectedEnergyUnitId}
               project_attribute_key_list_url={this.props.project_attribute_key_list_url}
               project_list_url={this.props.project_list_url}
               height={300}
@@ -61,19 +67,46 @@ var ChartBox = React.createClass({
           <Tab label="Gross savings" >
             <HistogramBox
               projects={this.props.projects}
-              fuelType={this.props.fuelType}
-              energyUnit={this.props.energyUnit}
+              fuelType={this.state.selectedFuelTypeId}
+              energyUnit={this.state.selectedEnergyUnitId}
               meter_run_list_url={this.props.meter_run_list_url}
               height={300}
+            />
+
+            <CategorySelector
+              title={null}
+              categories={fuelTypes}
+              selectCategoryCallback={this.selectFuelTypeCallback}
+              selectedCategoryId={this.state.selectedFuelTypeId}
+            />
+
+            <CategorySelector
+              title={null}
+              categories={energyUnits}
+              selectCategoryCallback={this.selectEnergyUnitCallback}
+              selectedCategoryId={this.state.selectedEnergyUnitId}
             />
           </Tab>
           <Tab label="Annual savings" >
             <TimeseriesBox
               projects={this.props.projects}
-              fuelType={this.props.fuelType}
-              energyUnit={this.props.energyUnit}
+              fuelType={this.state.selectedFuelTypeId}
+              energyUnit={this.state.selectedEnergyUnitId}
               project_list_url={this.props.project_list_url}
               height={300}
+            />
+            <CategorySelector
+              title={null}
+              categories={fuelTypes}
+              selectCategoryCallback={this.selectFuelTypeCallback}
+              selectedCategoryId={this.state.selectedFuelTypeId}
+            />
+
+            <CategorySelector
+              title={null}
+              categories={energyUnits}
+              selectCategoryCallback={this.selectEnergyUnitCallback}
+              selectedCategoryId={this.state.selectedEnergyUnitId}
             />
           </Tab>
           <Tab label="Map" >

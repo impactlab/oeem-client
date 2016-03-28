@@ -72,15 +72,6 @@ var ProjectDataBox = React.createClass({
       projectBlockIdFilterMode: data.filterMode,
     }, this.loadProjects);
   },
-  selectChartTypeCallback: function(chartTypeId) {
-    this.setState({selectedChartTypeId: chartTypeId});
-  },
-  selectFuelTypeCallback: function(fuelTypeId) {
-    this.setState({selectedFuelTypeId: fuelTypeId});
-  },
-  selectEnergyUnitCallback: function(energyUnitId) {
-    this.setState({selectedEnergyUnitId: energyUnitId});
-  },
   selectBaselineEndDateRangeCallback: function(dateRange) {
     this.setState({
       selectedBaselineEndDateRange: dateRange,
@@ -152,13 +143,6 @@ var ProjectDataBox = React.createClass({
   },
   render: function() {
 
-    var chartTypes = [
-      { id: "timeSeries", name: "Gross Savings", },
-      { id: "histogram", name: "Annual Savings", },
-      { id: "scatterPlot", name: "Realization Rate", },
-      { id: "map", name: "Map", },
-    ];
-
     var fuelTypes = [
       { id: "E", name: "Electricity", },
       { id: "NG", name: "Natural Gas", },
@@ -194,8 +178,6 @@ var ProjectDataBox = React.createClass({
 
         <ChartBox
           chartType={this.state.selectedChartTypeId}
-          fuelType={this.state.selectedFuelTypeId}
-          energyUnit={this.state.selectedEnergyUnitId}
           projects={this.state.projects}
           meter_run_list_url={this.props.meter_run_list_url}
           project_attribute_key_list_url={this.props.project_attribute_key_list_url}
