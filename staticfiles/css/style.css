@@ -231,6 +231,34 @@ button.close:hover {
   color: black;
 }
 
+/* chart controls */
+.CategorySelector{
+  display: inline-block;
+  margin: 2px;
+}
+.ChartControl .btn-group>.btn{
+  font-size: .8em;
+  padding: 1px 4px;
+  border: 1px solid #37474f;
+  background-color: transparent;
+  color: #37474f;
+  box-shadow: none;
+}
+.ChartControl .btn-group>.btn.active{
+  background-color: #37474f;
+  color: #fff;
+  box-shadow: none;
+}
+.ChartControl .btn-group>.btn:first-child{
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.ChartControl .btn-group>.btn:last-child{
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+
 /* inline headers */
 .inline-headers h2, .inline-headers h4 {
   display: inline-block;

@@ -51,6 +51,8 @@ var ChartBox = React.createClass({
             <ChartControl
               selectedFuelTypeId={this.state.selectedFuelTypeId}
               selectedEnergyUnitId={this.state.selectedEnergyUnitId}
+              selectFuelTypeCallback={this.selectFuelTypeCallback}
+              selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
           </Tab>
@@ -66,6 +68,8 @@ var ChartBox = React.createClass({
             <ChartControl
               selectedFuelTypeId={this.state.selectedFuelTypeId}
               selectedEnergyUnitId={this.state.selectedEnergyUnitId}
+              selectFuelTypeCallback={this.selectFuelTypeCallback}
+              selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
           </Tab>
@@ -81,6 +85,8 @@ var ChartBox = React.createClass({
             <ChartControl
               selectedFuelTypeId={this.state.selectedFuelTypeId}
               selectedEnergyUnitId={this.state.selectedEnergyUnitId}
+              selectFuelTypeCallback={this.selectFuelTypeCallback}
+              selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
           </Tab>

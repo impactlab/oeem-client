@@ -19,20 +19,20 @@ var ChartControl = React.createClass({
         <CategorySelector
           title={null}
           categories={fuelTypes}
-          selectCategoryCallback={this.selectFuelTypeCallback}
+          selectCategoryCallback={this.props.selectFuelTypeCallback}
           selectedCategoryId={this.props.selectedFuelTypeId}
         />
 
         <CategorySelector
           title={null}
           categories={energyUnits}
-          selectCategoryCallback={this.selectEnergyUnitCallback}
+          selectCategoryCallback={this.props.selectEnergyUnitCallback}
           selectedCategoryId={this.props.selectedEnergyUnitId}
         />
       </div>
     );
 
-  };
+  }
 });
 
 module.exports = ChartControl;

@@ -22,7 +22,7 @@ var CategorySelector = React.createClass({
     }
 
     return (
-      <div className="categorySelector">
+      <div className="CategorySelector">
         {title}
         <div className="btn-group" data-toggle="buttons">
           {categoryListItems}
@@ -44,14 +44,14 @@ var CategoryListItem = React.createClass({
       bootstrap_class = "categoryListItem btn btn-primary";
     }
     return (
-      <label className={bootstrap_class} onClick={this.handleSelect}>
+      <button className={bootstrap_class} onClick={this.handleSelect}>
         <input
           type="radio"
           checked={this.props.selected}
           readOnly={true}
         />
         {this.props.category.name}
-      </label>
+      </button>
     )
   }
 });
