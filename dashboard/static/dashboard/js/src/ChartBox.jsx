@@ -39,6 +39,14 @@ var ChartBox = React.createClass({
       <div className="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
         <Tabs>
           <Tab label="Realization rate" >
+
+            <ChartControl
+              selectedFuelTypeId={this.state.selectedFuelTypeId}
+              selectedEnergyUnitId={this.state.selectedEnergyUnitId}
+              selectFuelTypeCallback={this.selectFuelTypeCallback}
+              selectEnergyUnitCallback={this.selectEnergyUnitCallback}
+            />
+
             <ScatterplotBox
               projects={this.props.projects}
               fuelType={this.state.selectedFuelTypeId}
@@ -48,6 +56,9 @@ var ChartBox = React.createClass({
               height={300}
             />
 
+          </Tab>
+          <Tab label="Gross savings" >
+
             <ChartControl
               selectedFuelTypeId={this.state.selectedFuelTypeId}
               selectedEnergyUnitId={this.state.selectedEnergyUnitId}
@@ -55,8 +66,6 @@ var ChartBox = React.createClass({
               selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
-          </Tab>
-          <Tab label="Gross savings" >
             <HistogramBox
               projects={this.props.projects}
               fuelType={this.state.selectedFuelTypeId}
@@ -65,6 +74,9 @@ var ChartBox = React.createClass({
               height={300}
             />
 
+          </Tab>
+          <Tab label="Annual savings" >
+
             <ChartControl
               selectedFuelTypeId={this.state.selectedFuelTypeId}
               selectedEnergyUnitId={this.state.selectedEnergyUnitId}
@@ -72,21 +84,12 @@ var ChartBox = React.createClass({
               selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
-          </Tab>
-          <Tab label="Annual savings" >
             <TimeseriesBox
               projects={this.props.projects}
               fuelType={this.state.selectedFuelTypeId}
               energyUnit={this.state.selectedEnergyUnitId}
               project_list_url={this.props.project_list_url}
               height={300}
-            />
-
-            <ChartControl
-              selectedFuelTypeId={this.state.selectedFuelTypeId}
-              selectedEnergyUnitId={this.state.selectedEnergyUnitId}
-              selectFuelTypeCallback={this.selectFuelTypeCallback}
-              selectEnergyUnitCallback={this.selectEnergyUnitCallback}
             />
 
           </Tab>

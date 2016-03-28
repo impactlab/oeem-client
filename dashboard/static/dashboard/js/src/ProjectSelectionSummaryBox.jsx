@@ -114,7 +114,7 @@ var ProjectSelectionSummaryBox = React.createClass({
   render: function() {
     return (
       <div className="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
-        <div className="mdl-card__title mdl-card--expand">
+        <div className="mdl-card__title">
           Summary statistics
         </div>
 

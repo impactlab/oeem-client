@@ -21,3 +21,8 @@
 	padding: 16px 0px;
 	text-align: center;
 }
+
+
+.mdl-card__supporting-text{
+	width: 100%;
+}
