@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var histogram = require('./histogram');
+var spinner = require('./spinner')
 
 var Histogram = React.createClass({
   propTypes: {
@@ -11,17 +12,41 @@ var Histogram = React.createClass({
     height: React.PropTypes.number,
   },
 
+  getInitialState: function() {
+    return {
+      chartCreated: false
+    };
+  },
+
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this);
 
-    histogram.create(el, {
-      height: this.props.height,
-    }, this.getChartState());
+    spinner.create(el, 'hist-spinner');
+
   },
 
   componentDidUpdate: function() {
     var el = ReactDOM.findDOMNode(this);
-    histogram.update(el, this.getChartState());
+
+    // if there is data
+    if(this.props.data.length){
+
+      // create chart if it hasn't been created
+      if(!this.state.chartCreated){
+
+        spinner.destroy('hist-spinner');
+
+        histogram.create(el, {
+          height: this.props.height,
+        }, this.getChartState());
+
+        this.setState({ chartCreated: true });
+      } else{
+        // otherwise update chart
+        histogram.update(el, this.getChartState());
+      }
+    }
+
   },
 
   getChartState: function() {

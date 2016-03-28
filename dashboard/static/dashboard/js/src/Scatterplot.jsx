@@ -20,7 +20,7 @@ var Scatterplot = React.createClass({
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this);
 
-    spinner.create(el);
+    spinner.create(el, 'scatter-spinner');
 
   },
 
@@ -33,7 +33,7 @@ var Scatterplot = React.createClass({
       // create chart if it hasn't been created
       if(!this.state.chartCreated){
 
-        spinner.destroy();
+        spinner.destroy('scatter-spinner');
 
         scatterplot.create(el, {
           height: this.props.height,

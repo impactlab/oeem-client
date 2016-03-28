@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var timeseries = require('./timeseries');
+var spinner = require('./spinner')
 
 var Timeseries = React.createClass({
   propTypes: {
@@ -11,17 +12,39 @@ var Timeseries = React.createClass({
     height: React.PropTypes.number,
   },
 
+  getInitialState: function() {
+    return {
+      chartCreated: false
+    };
+  },
+
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this);
 
-    timeseries.create(el, {
-      height: this.props.height,
-    }, this.getChartState());
+    spinner.create(el, 'ts-spinner');
   },
 
   componentDidUpdate: function() {
     var el = ReactDOM.findDOMNode(this);
-    timeseries.update(el, this.getChartState());
+
+    // if there is data
+    if(this.props.data.length){
+
+      // create chart if it hasn't been created
+      if(!this.state.chartCreated){
+
+        spinner.destroy('ts-spinner');
+
+        timeseries.create(el, {
+          height: this.props.height,
+        }, this.getChartState());
+
+        this.setState({ chartCreated: true });
+      } else{
+        // otherwise update chart
+        timeseries.update(el, this.getChartState());
+      }
+    }
   },
 
   getChartState: function() {
