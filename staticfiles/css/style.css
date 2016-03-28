@@ -262,6 +262,16 @@ button.close:hover {
   border-bottom-right-radius: 4px;
 }
 
+/* chart spinner */
+.spinner-box{
+  height: 300px;
+  text-align: center;
+}
+.spinner{
+  color: #cecece;
+  line-height: 300px;
+}
+
 
 /* inline headers */
 .inline-headers h2, .inline-headers h4 {
