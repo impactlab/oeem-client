@@ -1,6 +1,7 @@
 var React = require('react');
 var Scatterplot = require('./Scatterplot.jsx');
 var _ = require('lodash');
+var helpers = require("./helpers");
 
 var ScatterplotBox = React.createClass({
   getInitialState: function() {
@@ -153,9 +154,7 @@ var ScatterplotBox = React.createClass({
     var projectListURL = props.project_list_url +
       "?with_attributes=True&with_meter_runs=True";
 
-    projectListURL += "&projects=" + props.projects.map(function(d, i){
-      return d.id;
-    }).join("+");
+    projectListURL += "&" + helpers.getProjectParam(props.projects);
 
     $.ajax({
       url: projectListURL,

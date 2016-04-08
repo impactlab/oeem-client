@@ -2,6 +2,7 @@ var React = require('react');
 var Histogram = require('./Histogram.jsx');
 var ReactSpinner = require('./ReactSpinner.jsx');
 var _ = require('lodash');
+var helpers = require('./helpers');
 
 var HistogramBox = React.createClass({
   loadMeterRuns: function(nextProps) {
@@ -9,9 +10,7 @@ var HistogramBox = React.createClass({
     meterRunListURL += "&fuel_type=E"
     meterRunListURL += "&fuel_type=NG"
 
-    meterRunListURL += "&projects=" + nextProps.projects.map(function(d, i){
-      return d.id;
-    }).join("+");
+    meterRunListURL += "&" + helpers.getProjectParam(nextProps.projects);
 
     $.ajax({
       url: meterRunListURL,

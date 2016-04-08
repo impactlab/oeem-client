@@ -1,5 +1,6 @@
 var React = require('react');
 var Griddle = require('griddle-react');
+var helpers = require("./helpers");
 
 var ProjectTable = React.createClass({
   loadData: function(props) {
@@ -8,9 +9,7 @@ var ProjectTable = React.createClass({
     }
     var meterRunListURL = props.meter_run_list_url + "?summary=True&most_recent=True";
 
-    meterRunListURL += "&projects=" + props.projects.map(function(d, i){
-      return d.id;
-    }).join("+");
+    meterRunListURL += "&" + helpers.getProjectParam(props.projects);
 
     $.ajax({
       url: meterRunListURL,

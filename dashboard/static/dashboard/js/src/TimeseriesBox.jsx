@@ -2,6 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var Timeseries = require("./Timeseries.jsx");
 var _ = require("lodash");
+var helpers = require("./helpers");
 
 var TimeseriesBox = React.createClass({
   loadProjects: function(props) {
@@ -11,9 +12,7 @@ var TimeseriesBox = React.createClass({
 
     var projectListURL = props.project_list_url + "?with_monthly_summary=True";
 
-    projectListURL += "&projects=" + props.projects.map(function(d, i){
-      return d.id;
-    }).join("+");
+    projectListURL += "&" + helpers.getProjectParam(props.projects);
 
     $.ajax({
       url: projectListURL,
