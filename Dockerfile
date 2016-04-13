@@ -9,7 +9,7 @@ RUN apt-get update && \
 RUN sh -c 'echo "deb http://ftp.debian.org/debian wheezy-backports main" > \
     /etc/apt/sources.list.d/wheezy-backports.list'
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
-RUN apt-get install nodejs -y
+RUN apt-get update && apt-get install nodejs -y
 
 EXPOSE 8000
 
