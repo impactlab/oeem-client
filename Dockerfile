@@ -3,9 +3,13 @@ FROM continuumio/anaconda3
 # python
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y postgresql-client libpq-dev curl build-essential && \
-    curl -sL https://deb.nodesource.com/setup_5.x | bash - && \
-    apt-get install -y nodejs
+RUN apt-get update && \
+    apt-get install -y postgresql-client libpq-dev git-core curl \
+                       build-essential openssl libssl-dev &&
+    git clone https://github.com/joyent/node.git /tmp && \
+    cd /tmp/node && git checkout v5.9.1 && \
+    ./configure --openssl-libpath=/usr/lib/ssl && \
+    make && make test && sudo make install
 
 EXPOSE 8000
 
