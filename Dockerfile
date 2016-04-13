@@ -17,7 +17,7 @@ RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf install.sh \
     && npm install --global gulp-cli \
-    && cd /code && npm install
+    && npm install --prefix /code
 
 EXPOSE 8000
 
