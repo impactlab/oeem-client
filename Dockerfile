@@ -5,11 +5,15 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
     apt-get install -y postgresql-client libpq-dev git-core curl \
-                       build-essential openssl libssl-dev && \
-    git clone https://github.com/nodejs/node.git /tmp/node && \
-    cd /tmp/node && git checkout v5.10.1 && \
-    ./configure --openssl-libpath=/usr/lib/ssl && \
-    make && make test && sudo make install
+                       build-essential openssl libssl-dev
+
+RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+RUN apt-get install --yes nodejs
+
+    # git clone https://github.com/nodejs/node.git /tmp/node && \
+    # cd /tmp/node && git checkout v5.10.1 && \
+    # ./configure --openssl-libpath=/usr/lib/ssl && \
+    # make && make test && sudo make install
 
 EXPOSE 8000
 
