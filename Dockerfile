@@ -6,6 +6,7 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update && \
     apt-get install -y postgresql-client libpq-dev curl build-essential
 
+RUN sudo sh -c 'echo "deb http://ftp.debian.org/debian wheezy-backports main" > /etc/apt/sources.list.d/wheezy-backports.list'
 RUN curl -sL https://deb.nodesource.com/setup_5.x | bash -
 RUN apt-get update
 RUN apt-get install nodejs -y --force-yes
