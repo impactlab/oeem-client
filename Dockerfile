@@ -14,6 +14,8 @@ RUN apt-get update && \
 RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt/sources.list \
     && DEBIAN_FRONTEND=noninteractive apt-get -y update \
     && apt-get install -y nodejs-legacy \
+    && mkdir -p /etc/pki/tls/certs \
+    && cp /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt \
     && curl -L --insecure -O https://www.npmjs.org/install.sh \
     && /bin/bash install.sh \
     && rm -rf /var/lib/apt/lists/* \
