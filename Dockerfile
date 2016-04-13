@@ -4,17 +4,11 @@ FROM continuumio/anaconda3
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
-    apt-get install -y postgresql-client libpq-dev git-core curl \
-                       build-essential openssl libssl-dev
+    apt-get install -y postgresql-client libpq-dev curl build-essential
 
-RUN apt-get -t wheezy-backports install nodejs
-# RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
-# RUN apt-get install --yes nodejs
-
-    # git clone https://github.com/nodejs/node.git /tmp/node && \
-    # cd /tmp/node && git checkout v5.10.1 && \
-    # ./configure --openssl-libpath=/usr/lib/ssl && \
-    # make && make test && sudo make install
+RUN curl -sL https://deb.nodesource.com/setup_5.x | bash -
+RUN apt-get update
+RUN apt-get install nodejs -y --force-yes
 
 EXPOSE 8000
 
