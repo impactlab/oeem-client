@@ -4,7 +4,7 @@ FROM continuumio/anaconda3
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
-    apt-get install -y postgresql-client libpq-dev curl build-essential cacertificates
+    apt-get install -y postgresql-client libpq-dev curl build-essential ca-certificates
 
 # node and npm
 RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt/sources.list \
