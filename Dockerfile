@@ -4,7 +4,7 @@ FROM continuumio/anaconda3
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
-    apt-get install -y postgresql-client libpq-dev curl build-essential
+    apt-get install -y postgresql-client libpq-dev curl build-essential ca-certificates
 
 # RUN sh -c 'echo "deb http://ftp.debian.org/debian wheezy-backports main" > \
 #     /etc/apt/sources.list.d/wheezy-backports.list'
@@ -13,7 +13,7 @@ RUN apt-get update && \
 
 RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt/sources.list \
     && DEBIAN_FRONTEND=noninteractive apt-get -y update \
-    && apt-get install -y curl nodejs-legacy \
+    && apt-get install -y nodejs-legacy \
     && curl -L --insecure -O https://www.npmjs.org/install.sh \
     && /bin/bash install.sh \
     && rm -rf /var/lib/apt/lists/* \
