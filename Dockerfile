@@ -7,8 +7,9 @@ RUN apt-get update && \
     apt-get install -y postgresql-client libpq-dev git-core curl \
                        build-essential openssl libssl-dev
 
-RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
-RUN apt-get install --yes nodejs
+RUN aptitude -t wheezy-backports install nodejs
+# RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+# RUN apt-get install --yes nodejs
 
     # git clone https://github.com/nodejs/node.git /tmp/node && \
     # cd /tmp/node && git checkout v5.10.1 && \
