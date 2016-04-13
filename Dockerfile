@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get install -y postgresql-client libpq-dev git-core curl \
                        build-essential openssl libssl-dev
 
-RUN aptitude -t wheezy-backports install nodejs
+RUN apt-get -t wheezy-backports install nodejs
 # RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 # RUN apt-get install --yes nodejs
 
