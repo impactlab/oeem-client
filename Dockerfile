@@ -16,8 +16,7 @@ RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt
     && /bin/bash install.sh \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf install.sh \
-    && npm install --global gulp-cli \
-    && npm install --prefix /code
+    && npm install --global gulp-cli
 
 EXPOSE 8000
 
@@ -30,9 +29,11 @@ VOLUME /srv/static
 
 RUN mkdir /code
 WORKDIR /code
-ADD requirements.txt /code/
-RUN pip install -r requirements.txt
+COPY requirements.txt /code/
+COPY package.json /code/
+RUN pip install -r requirements.txt && npm install
 ADD . /code/
+
 
 COPY ./docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
