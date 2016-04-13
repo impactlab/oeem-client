@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
     apt-get install -y postgresql-client libpq-dev git-core curl \
-                       build-essential openssl libssl-dev &&
+                       build-essential openssl libssl-dev && \
     git clone https://github.com/joyent/node.git /tmp && \
     cd /tmp/node && git checkout v5.9.1 && \
     ./configure --openssl-libpath=/usr/lib/ssl && \
