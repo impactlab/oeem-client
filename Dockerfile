@@ -15,7 +15,9 @@ RUN echo "deb http://ftp.us.debian.org/debian wheezy-backports main" >> /etc/apt
     && curl -L --insecure -O https://www.npmjs.org/install.sh \
     && /bin/bash install.sh \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf install.sh
+    && rm -rf install.sh \
+    && npm install --global gulp-cli
+    && cd /code && npm install
 
 EXPOSE 8000
 
