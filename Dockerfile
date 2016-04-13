@@ -3,7 +3,7 @@ FROM continuumio/anaconda3
 # python
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y postgresql-client libpq-dev npm
+RUN apt-get update && apt-get install -y postgresql-client libpq-dev nodejs
 
 EXPOSE 8000
 
