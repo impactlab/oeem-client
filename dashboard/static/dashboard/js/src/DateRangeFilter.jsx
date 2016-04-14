@@ -2,6 +2,7 @@ var React = require('react');
 var moment = require('moment');
 var DateRangePicker = require('react-bootstrap-daterangepicker');
 
+
 var DateRangeFilter = React.createClass({
   handleEvent: function (event, picker) {
 		this.setState({

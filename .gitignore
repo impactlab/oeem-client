@@ -11,5 +11,6 @@ client_logos/
 !client_logos/oee-logo.png
 
 node_modules/
+build/
 
 *.log

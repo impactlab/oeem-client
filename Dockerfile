@@ -34,6 +34,8 @@ COPY package.json /code/
 RUN pip install -r requirements.txt && npm install
 ADD . /code/
 
+# build static assets
+RUN gulp build:production
 
 COPY ./docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

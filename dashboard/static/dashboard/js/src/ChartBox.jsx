@@ -3,10 +3,10 @@ var ScatterplotBox = require('./ScatterplotBox.jsx');
 var HistogramBox = require('./HistogramBox.jsx');
 var TimeseriesBox = require('./TimeseriesBox.jsx');
 var MapBox = require('./MapBox.jsx');
-var ChartControl = require('./ChartControl.jsx')
+var ChartControl = require('./ChartControl.jsx');
 
-var Tabs = require('material-ui/lib/tabs/tabs')
-var Tab = require('material-ui/lib/tabs/tab')
+var Tabs = require('material-ui/lib/tabs/tabs');
+var Tab = require('material-ui/lib/tabs/tab');
 
 
 var ChartBox = React.createClass({
